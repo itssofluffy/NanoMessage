@@ -22,8 +22,6 @@
 
 import C7
 import CNanoMessage
-//import CNanoMsgExtensions
-
 
 internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
     let bytesSent = nn_send(socketFd, payload.bytes, payload.count, blockingMode.rawValue)

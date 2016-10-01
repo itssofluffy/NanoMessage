@@ -39,7 +39,7 @@ do {
     let node0 = try PullSocket()
     try node0.bindToAddress(endPointAddress: "inproc:///tmp/pipeline.inproc")
 
-    let received: (bytes: Int, message: String) = try node0.receiveMessage() {
+    let received: (bytes: Int, message: String) = try node0.receiveMessage()
 
     print("bytes  : \(received.bytes)")     // 39
     print("message: \(received.message)")   // This is earth calling...earth calling...

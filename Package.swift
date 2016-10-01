@@ -34,7 +34,7 @@ let package = Package (
             majorVersion: 0
         ),
         .Package (
-            url:          "https://github.com/itssofluffy/CNanoMessage",
+            url:          "https://github.com/itssofluffy/CNanoMessage.git",
             majorVersion: 0
         )
     ]

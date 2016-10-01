@@ -36,7 +36,7 @@ public final class RequestSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
     }
 }
 
-public extension RequestSocket {
+extension RequestSocket {
     public func getResendInterval() throws -> Int {
         return try getSocketOption(self.socketFd, NN_REQ_RESEND_IVL, .RequestProtocol)
     }

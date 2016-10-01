@@ -30,7 +30,7 @@ public protocol ProtocolSocket {
     init() throws
 }
 
-public extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: Sender {
     @discardableResult
     public func sendMessage(message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         return try sendPayloadToSocket(self._nanoSocket.socketFd, message, blockingMode)
@@ -42,7 +42,7 @@ public extension ProtocolSocket where Self: Sender {
     }
 }
 
-public extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: Data) {
         return try receivePayloadFromSocket(self._nanoSocket.socketFd, blockingMode)
     }
@@ -54,7 +54,7 @@ public extension ProtocolSocket where Self: Receiver {
     }
 }
 
-public extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: Sender {
     public func getSendBufferSize() throws -> UInt {
         return try getSocketOption(self._nanoSocket.socketFd, NN_SNDBUF)
     }
@@ -84,7 +84,7 @@ public extension ProtocolSocket where Self: Sender {
     }
 }
 
-public extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: Receiver {
     public func getReceiverBufferSize() throws -> UInt {
         return try getSocketOption(self._nanoSocket.socketFd, NN_RCVBUF)
     }
@@ -122,7 +122,7 @@ public extension ProtocolSocket where Self: Receiver {
     }
 }
 
-public extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: Sender {
     public func getMessagesSent() throws -> UInt64 {
         return try getStatistic(self._nanoSocket.socketFd, NN_STAT_MESSAGES_SENT)
     }
@@ -136,7 +136,7 @@ public extension ProtocolSocket where Self: Sender {
     }
 }
 
-public extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: Receiver {
     public func getMessagesReceived() throws -> UInt64 {
         return try getStatistic(self._nanoSocket.socketFd, NN_STAT_MESSAGES_RECEIVED)
     }

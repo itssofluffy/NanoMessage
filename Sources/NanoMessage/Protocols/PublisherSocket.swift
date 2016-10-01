@@ -44,7 +44,7 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, Publishe
     }
 }
 
-public extension PublisherSocket {
+extension PublisherSocket {
     @discardableResult
     public func sendMessage(message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         var messagePayload: Data

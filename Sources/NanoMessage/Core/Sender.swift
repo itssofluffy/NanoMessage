@@ -29,7 +29,7 @@ public protocol Sender {
     var sendAllowed: Bool  { get }
 }
 
-public extension Sender {
+extension Sender {
     public var sendAllowed: Bool {
         return true
     }

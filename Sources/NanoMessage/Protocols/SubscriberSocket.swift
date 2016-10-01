@@ -47,7 +47,7 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Receiver, Publi
     }
 }
 
-public extension SubscriberSocket {
+extension SubscriberSocket {
     private func _messageHasTopic(_ topic: Data, _ message: Data) -> Bool {
         if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
             if (Data(message[0 ..< topic.count]) != topic) {
@@ -122,7 +122,7 @@ public extension SubscriberSocket {
     }
 }
 
-public extension SubscriberSocket {
+extension SubscriberSocket {
     public func isTopicSubscribed(_ topic: Data) -> Bool {
         return self.subscribedTopics.contains(topic)
     }
@@ -165,9 +165,9 @@ public extension SubscriberSocket {
     public func flipIgnoreTopicSeperator() throws -> Bool {
         if (!self.subscribedToAllTopics) {
             if (!self.ignoreTopicSeperator) {
-                let topic: (equalLengths: Bool, _: Int) = _validateTopicLengths()
+                let topics: (equalLengths: Bool, _: Int) = _validateTopicLengths()
 
-                if (!topic.equalLengths) {
+                if (!topics.equalLengths) {
                     throw NanoMessageError(errorNumber: 4, errorMessage: "topics of unequal length")
                 }
             }

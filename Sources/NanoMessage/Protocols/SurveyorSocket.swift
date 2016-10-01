@@ -36,7 +36,7 @@ public final class SurveyorSocket: NanoSocket, ProtocolSocket, Sender, Receiver 
     }
 }
 
-public extension SurveyorSocket {
+extension SurveyorSocket {
     public func getDeadline() throws -> Int {
         return try getSocketOption(self.socketFd, NN_SURVEYOR_DEADLINE, .SurveyorProtocol)
     }

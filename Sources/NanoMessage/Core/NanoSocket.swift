@@ -49,7 +49,7 @@ public class NanoSocket {
         func closeSocket() throws {
             if (self.socketFd >= 0) {
                 var loopCount: UInt = 0
-                let milliseconds: UInt32 = UInt32(try UInt(getClosureTimeout()) / self.closureAttempts)
+                let milliseconds: UInt32 = UInt32(UInt(try getClosureTimeout()) / self.closureAttempts)
 
                 while (true) {
                     let rc = nn_close(self.socketFd)
@@ -102,7 +102,7 @@ public class NanoSocket {
     }
 }
 
-public extension NanoSocket {
+extension NanoSocket {
     public func bindToAddress(endPointAddress: String, endPointName: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
@@ -154,7 +154,7 @@ public extension NanoSocket {
     @discardableResult
     public func removeEndPoint(endPoint: EndPoint) throws -> Bool {
         var loopCount: UInt = 0
-        let milliseconds: UInt32 = UInt32(try UInt(getClosureTimeout()) / self.closureAttempts)
+        let milliseconds: UInt32 = UInt32(UInt(try getClosureTimeout()) / self.closureAttempts)
 
         while (true) {
             let rc = nn_shutdown(self.socketFd, CInt(endPoint.id))
@@ -202,13 +202,13 @@ public extension NanoSocket {
     }
 }
 
-public extension NanoSocket {
+extension NanoSocket {
     public func getSocketDomain() throws -> SocketDomain {
-        return try SocketDomain(rawValue: getSocketOption(self.socketFd, NN_DOMAIN))!
+        return SocketDomain(rawValue: try getSocketOption(self.socketFd, NN_DOMAIN))!
     }
 
     public func getSocketProtocol() throws -> SocketProtocol {
-        return try SocketProtocol(rawValue: getSocketOption(self.socketFd, NN_PROTOCOL))!
+        return SocketProtocol(rawValue: try getSocketOption(self.socketFd, NN_PROTOCOL))!
     }
 
     public func getProtocolFamily() throws -> ProtocolFamily {
@@ -284,7 +284,7 @@ public extension NanoSocket {
     }
 }
 
-public extension NanoSocket {
+extension NanoSocket {
     public func getEstablishedConnections() throws -> UInt64 {
         return try getStatistic(self.socketFd, NN_STAT_ESTABLISHED_CONNECTIONS)
     }

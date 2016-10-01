@@ -1,13 +1,10 @@
 #NN_CONFIG_OPT = -Xlinker=-L/usr/local/lib/x86_64-linux-gnu
 all: build
 
-gyb:
-	gyb-source
-
-build: gyb
+build:
 	swift build $(NN_CONFIG_OPT)
 
-test: gyb
+test:
 	swift test $(NN_CONFIG_OPT)
 
 runtest:
@@ -19,4 +16,4 @@ docs:
 clean:
 	swift build --clean
 
-.PHONY: gyb build test runtest docs clean
+.PHONY: build test runtest docs clean
