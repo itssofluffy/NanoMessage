@@ -35,17 +35,17 @@ class SurveyProtocolFamilyTests: XCTestCase {
             let node0 = try SurveyorSocket()
             let node1 = try RespondentSocket()
 
-            let node0EndPointId: Int = try node0.connectToAddress(endPointAddress: connectAddress)
+            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
             try node0.setDeadline(milliseconds: 1000)
 
-            let node1EndPointId: Int = try node1.bindToAddress(endPointAddress: bAddress)
+            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
 
-            var bytesSent = try node0.sendMessage(message: payload)
+            var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
 
             sleep(2)    // sleep for 2 second, deadline is 1 second, will cause node0.receiveMessage() to timeout.
@@ -54,7 +54,7 @@ class SurveyProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
 
-            bytesSent = try node1.sendMessage(message: payload)
+            bytesSent = try node1.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
 
             do {

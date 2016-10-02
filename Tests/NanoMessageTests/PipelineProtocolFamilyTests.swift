@@ -31,17 +31,17 @@ class PipelineProtocolFamilyTests: XCTestCase {
         do {
             let node0 = try PushSocket()
 
-            let node0EndPointId: Int = try node0.connectToAddress(endPointAddress: connectAddress)
+            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
             let node1 = try PullSocket()
 
-            let node1EndPointId: Int = try node1.bindToAddress(endPointAddress: bAddress)
+            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
 
-            let bytesSent = try node0.sendMessage(message: payload)
+            let bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
 
             let node1Received: (bytes: Int, message: String) = try node1.receiveMessage()

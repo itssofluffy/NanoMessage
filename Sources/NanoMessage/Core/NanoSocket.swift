@@ -103,7 +103,7 @@ public class NanoSocket {
 }
 
 extension NanoSocket {
-    public func bindToAddress(endPointAddress: String, endPointName: String = "") throws -> EndPoint {
+    public func bindToAddress(_ endPointAddress: String, endPointName: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
         endPointAddress.withCString {
@@ -121,13 +121,13 @@ extension NanoSocket {
         return endPoint
     }
 
-    public func bindToAddress(endPointAddress: String, endPointName: String = "") throws -> Int {
-        let endPoint: EndPoint = try self.bindToAddress(endPointAddress: endPointAddress, endPointName: endPointName)
+    public func bindToAddress(_ endPointAddress: String, endPointName: String = "") throws -> Int {
+        let endPoint: EndPoint = try self.bindToAddress(endPointAddress, endPointName: endPointName)
 
         return endPoint.id
     }
 
-    public func connectToAddress(endPointAddress: String, endPointName: String = "") throws -> EndPoint {
+    public func connectToAddress(_ endPointAddress: String, endPointName: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
         endPointAddress.withCString {
@@ -145,14 +145,14 @@ extension NanoSocket {
         return endPoint
     }
 
-    public func connectToAddress(endPointAddress: String, endPointName: String = "") throws -> Int {
-        let endPoint: EndPoint = try self.connectToAddress(endPointAddress: endPointAddress, endPointName: endPointName)
+    public func connectToAddress(_ endPointAddress: String, endPointName: String = "") throws -> Int {
+        let endPoint: EndPoint = try self.connectToAddress(endPointAddress, endPointName: endPointName)
 
         return endPoint.id
     }
 
     @discardableResult
-    public func removeEndPoint(endPoint: EndPoint) throws -> Bool {
+    public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         var loopCount: UInt = 0
         let milliseconds: UInt32 = UInt32(UInt(try getClosureTimeout()) / self.closureAttempts)
 
@@ -183,17 +183,18 @@ extension NanoSocket {
     }
 
     @discardableResult
-    public func removeEndPointById(endPointId: Int) throws -> Bool {
-        for endPoint in self.endPoints {
-            if (endPointId == endPoint.id) {
-                return try self.removeEndPoint(endPoint: endPoint)
+    public func removeEndPoint(_ endPoint: Int) throws -> Bool {
+
+        for epoint in self.endPoints {
+            if (endPoint == epoint.id) {
+                return try self.removeEndPoint(epoint)
             }
         }
 
         return false
     }
 
-    public func bindToSocket(nanoSocket: NanoSocket) throws {
+    public func bindToSocket(_ nanoSocket: NanoSocket) throws {
         let rc = nn_device(self.socketFd, nanoSocket.socketFd)
 
         if (rc < 0) {

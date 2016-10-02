@@ -23,8 +23,8 @@
 import C7
 
 public protocol Sender {
-    func sendMessage(message: Data, blockingMode: BlockingMode) throws -> Int
-    func sendMessage(message: String, blockingMode: BlockingMode) throws -> Int
+    func sendMessage(_ message: Data, blockingMode: BlockingMode) throws -> Int
+    func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int
 
     var sendAllowed: Bool  { get }
 }

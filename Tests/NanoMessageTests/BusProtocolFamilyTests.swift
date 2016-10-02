@@ -32,19 +32,19 @@ class BusProtocolFamilyTests: XCTestCase {
             let node1 = try BusSocket()
             let node2 = try BusSocket()
 
-            let _: Int = try node0.bindToAddress(endPointAddress: address1)
+            let _: Int = try node0.bindToAddress(address1)
 
-            let _: Int = try node1.connectToAddress(endPointAddress: address1)
-            let _: Int = try node1.bindToAddress(endPointAddress: address2)
+            let _: Int = try node1.connectToAddress(address1)
+            let _: Int = try node1.bindToAddress(address2)
 
-            let _: Int = try node2.connectToAddress(endPointAddress: address1)
-            let _: Int = try node2.connectToAddress(endPointAddress: address2)
+            let _: Int = try node2.connectToAddress(address1)
+            let _: Int = try node2.connectToAddress(address2)
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
 
-            try node0.sendMessage(message: "A")
-            try node1.sendMessage(message: "AB")
-            try node2.sendMessage(message: "ABC")
+            try node0.sendMessage("A")
+            try node1.sendMessage("AB")
+            try node2.sendMessage("ABC")
 
             for _ in 0 ... 1 {
                 let received: (bytes: Int, message: String) = try node0.receiveMessage()

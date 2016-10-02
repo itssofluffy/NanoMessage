@@ -46,7 +46,7 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, Publishe
 
 extension PublisherSocket {
     @discardableResult
-    public func sendMessage(message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
+    public func sendMessage(_ message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         var messagePayload: Data
 
         if (self.prependTopic) {
@@ -76,7 +76,7 @@ extension PublisherSocket {
     }
 
     @discardableResult
-    public func sendMessage(message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        return try self.sendMessage(message: Data(message), blockingMode: blockingMode)
+    public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
+        return try self.sendMessage(Data(message), blockingMode: blockingMode)
     }
 }

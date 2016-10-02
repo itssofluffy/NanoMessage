@@ -17,9 +17,9 @@ import NanoMessage
 
 do {
     let node0 = try PushSocket()
-    try node0.connectToAddress(endPointAddress: "inproc:///tmp/pipeline.inproc")
+    let eid: Int = try node0.connectToAddress("inproc:///tmp/pipeline.inproc")
 
-    try node0.sendMessage(message: "This is earth calling...earth calling...")
+    try node0.sendMessage("This is earth calling...earth calling...")
 } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
     print("\(errorMessage) (#\(errorNumber))")
 } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
@@ -37,7 +37,7 @@ import NanoMessage
 
 do {
     let node0 = try PullSocket()
-    try node0.bindToAddress(endPointAddress: "inproc:///tmp/pipeline.inproc")
+    let eid: Int = try node0.bindToAddress("inproc:///tmp/pipeline.inproc")
 
     let received: (bytes: Int, message: String) = try node0.receiveMessage()
 

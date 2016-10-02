@@ -33,22 +33,22 @@ class PairProtocolFamilyTests: XCTestCase {
             let node0 = try PairSocket()
             let node1 = try PairSocket()
 
-            let node0EndPointId: Int = try node0.connectToAddress(endPointAddress: connectAddress)
+            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
-            let node1EndPointId: Int = try node1.bindToAddress(endPointAddress: bAddress)
+            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
 
-            var bytesSent = try node0.sendMessage(message: payload)
+            var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
 
             var node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
 
-            bytesSent = try node1.sendMessage(message: payload)
+            bytesSent = try node1.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
 
             var node0Received: (bytes: Int, message: String) = try node0.receiveMessage()

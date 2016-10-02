@@ -32,13 +32,13 @@ public protocol ProtocolSocket {
 
 extension ProtocolSocket where Self: Sender {
     @discardableResult
-    public func sendMessage(message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
+    public func sendMessage(_ message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         return try sendPayloadToSocket(self._nanoSocket.socketFd, message, blockingMode)
     }
 
     @discardableResult
-    public func sendMessage(message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        return try self.sendMessage(message: Data(message), blockingMode: blockingMode)
+    public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
+        return try self.sendMessage(Data(message), blockingMode: blockingMode)
     }
 }
 

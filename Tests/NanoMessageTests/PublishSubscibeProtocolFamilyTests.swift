@@ -33,13 +33,13 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0 = try PublisherSocket()
             let node1 = try SubscriberSocket()
 
-            let node0EndPointId: Int = try node0.connectToAddress(endPointAddress: connectAddress)
+            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
             node0.sendTopic = "shakespeare"
             XCTAssertEqual(node0.prependTopic, true, "node0.prependTopic")
 
-            let node1EndPointId: Int = try node1.bindToAddress(endPointAddress: bAddress)
+            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
@@ -51,7 +51,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1.isTopicSubscribed(node0.sendTopic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
 
-            var bytesSent = try node0.sendMessage(message: payload)
+            var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.utf8.count")
 
             var node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
@@ -67,7 +67,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1.subscribedTopics.count, 1, "node1.subscribedTopics.count != 0")
             try node1.setReceiverTimeout(milliseconds: 1000)   // set receiver timeout to 1 second
 
-            bytesSent = try node0.sendMessage(message: payload)
+            bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.utf8.count")
 
             do {
@@ -99,10 +99,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0 = try PublisherSocket()
             let node1 = try SubscriberSocket()
 
-            let node0EndPointId: Int = try node0.connectToAddress(endPointAddress: connectAddress)
+            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
-            let node1EndPointId: Int = try node1.bindToAddress(endPointAddress: bAddress)
+            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
@@ -117,7 +117,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             node0.sendTopic = "planet"
 
             for planet in planets {
-                let bytesSent = try node0.sendMessage(message: planet)
+                let bytesSent = try node0.sendMessage(planet)
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + planet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + planet.utf8.count")
 
                 let _: (bytes: Int, message: String) = try node1.receiveMessage()
@@ -128,7 +128,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             node0.sendTopic = "dwarfPlanet"
 
             for dwarfPlanet in dwarfPlanets {
-                let bytesSent = try node0.sendMessage(message: dwarfPlanet)
+                let bytesSent = try node0.sendMessage(dwarfPlanet)
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
 
                 let _: (bytes: Int, message: String) = try node1.receiveMessage()
@@ -150,7 +150,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             node0.sendTopic = "planet"
 
             for planet in planets {
-                let bytesSent = try node0.sendMessage(message: planet)
+                let bytesSent = try node0.sendMessage(planet)
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + planet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + planet.utf8.count")
             }
 
@@ -164,7 +164,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             node0.sendTopic = "dwarfPlanet"
 
             for dwarfPlanet in dwarfPlanets {
-                let bytesSent = try node0.sendMessage(message: dwarfPlanet)
+                let bytesSent = try node0.sendMessage(dwarfPlanet)
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
 
@@ -194,10 +194,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0 = try PublisherSocket()
             let node1 = try SubscriberSocket()
 
-            let node0EndPointId: Int = try node0.connectToAddress(endPointAddress: connectAddress)
+            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
-            let node1EndPointId: Int = try node1.bindToAddress(endPointAddress: bAddress)
+            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
@@ -225,7 +225,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             node0.sendTopic = "AAA"
 
-            let _ = try node0.sendMessage(message: payload)
+            let _ = try node0.sendMessage(payload)
 
             let received: (bytes: Int, message: String) = try node1.receiveMessage()
 
