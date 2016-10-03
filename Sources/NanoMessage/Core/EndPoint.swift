@@ -23,13 +23,13 @@
 import FNVHashValue
 
 public struct EndPoint {
-    let id: Int
-    let address: String
-    let connectionType: ConnectionType
-    var transportMechanism: TransportMechanism {
+    public let id: Int
+    public let address: String
+    public let connectionType: ConnectionType
+    public var transportMechanism: TransportMechanism {
         return TransportMechanism(rawValue: self.address)
     }
-    let name: String
+    public var name: String
 
     public init(endPointId: Int, endPointAddress: String, connectionType: ConnectionType, endPointName: String = "") {
         self.id = endPointId

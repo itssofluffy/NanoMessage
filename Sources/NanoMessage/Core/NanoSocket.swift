@@ -184,7 +184,6 @@ extension NanoSocket {
 
     @discardableResult
     public func removeEndPoint(_ endPoint: Int) throws -> Bool {
-
         for epoint in self.endPoints {
             if (endPoint == epoint.id) {
                 return try self.removeEndPoint(epoint)
