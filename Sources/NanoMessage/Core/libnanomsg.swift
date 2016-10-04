@@ -90,9 +90,9 @@ public var symbolProperty: Set<SymbolProperty> {
 private var _nanomsgError = Dictionary<Int, String>()
 public var nanomsgError: Dictionary<Int, String> {
     if (_nanomsgError.isEmpty) {
-        for symbolProperty in symbolProperty {
-            if (symbolProperty.namespace == NN_NS_ERROR) {
-                _nanomsgError[Int(symbolProperty.value)] = symbolProperty.name
+        for symbol in symbolProperty {
+            if (symbol.namespace == NN_NS_ERROR) {
+                _nanomsgError[Int(symbol.value)] = symbol.name
             }
         }
     }

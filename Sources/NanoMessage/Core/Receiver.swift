@@ -25,12 +25,4 @@ import C7
 public protocol Receiver {
     func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: Data)
     func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: String)
-
-    var receiveAllowed: Bool { get }
-}
-
-extension Receiver {
-    public var receiveAllowed: Bool {
-        return true
-    }
 }

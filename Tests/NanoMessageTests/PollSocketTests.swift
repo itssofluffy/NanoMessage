@@ -1,5 +1,5 @@
 /*
-    SurveyProtocolFamilyTests.swift
+    PollSocketTests.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -25,49 +25,41 @@ import Foundation
 
 @testable import NanoMessage
 
-class SurveyProtocolFamilyTests: XCTestCase {
-    private func testPair(connectAddress: String, bindAddress: String = "") {
+class PollSocketTests: XCTestCase {
+    private func testPollSocket(connectAddress: String, bindAddress: String = "") {
         let bAddress = (bindAddress == "") ? connectAddress : bindAddress
-
         var completed = false
 
         do {
-            print("survey with deadline reached...")
-
-            let node0 = try SurveyorSocket()
-            let node1 = try RespondentSocket()
+            let node0 = try PushSocket()
+            let node1 = try PullSocket()
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
-
-            try node0.setDeadline(milliseconds: 1000)
 
             let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
 
-            var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
+            var node1Poll: (messageIsWaiting: Bool, sendIsBlocked: Bool) = try node1.pollSocket(timeout: 1000)
+            XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
+            XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
-            sleep(2)    // sleep for 2 second, deadline is 1 second, will cause node0.receiveMessage() to timeout.
+            let bytesSent = try node0.sendMessage(payload)
+            XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
 
-            var node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
-            XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")
-            XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
+            node1Poll = try node1.pollSocket()
+            XCTAssertEqual(node1Poll.messageIsWaiting, true, "node1Poll.messageIsWaiting != true")
+            XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
-            bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
+            let node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
+            XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "bytes != message.utf8.count")
+            XCTAssertEqual(node1Received.message, payload, "message != payload")
 
-            do {
-                var _: (Int, String) = try node0.receiveMessage()
-                XCTAssert(false, "received a message on node0")
-            } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-                if (errorNumber != 3) {
-                    throw NanoMessageError(errorNumber: errorNumber, errorMessage: errorMessage)
-                }
-                XCTAssertEqual(errorNumber, 3, "\(errorMessage) (#\(errorNumber))")   // have we timedout
-            }
+            node1Poll = try node1.pollSocket()
+            XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
+            XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
             completed = true
         } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
@@ -81,32 +73,32 @@ class SurveyProtocolFamilyTests: XCTestCase {
         XCTAssert(completed, "test not completed")
     }
 
-    func testTCPSurvey() {
+    func testTCPPollSocket() {
         print("TCP tests...")
-        testPair(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testPollSocket(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
-    func testInProcessSurvey() {
+    func testInProcessPollSocket() {
         print("In-Process tests...")
-        testPair(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testPollSocket(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
-    func testInterProcessSurvey() {
+    func testInterProcessPollSocket() {
         print("Inter Process tests...")
-        testPair(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testPollSocket(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
-    func testWebSocketSurvey() {
+    func testWebSocketPollSocket() {
         print("Web Socket tests...")
-        testPair(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testPollSocket(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 
 #if !os(OSX)
     static let allTests = [
-        ("testTCPSurvey", testTCPSurvey),
-        ("testInProcessSurvey", testInProcessSurvey),
-        ("testInterProcessSurvey", testInterProcessSurvey),
-        ("testWebSocketSurvey", testWebSocketSurvey)
+        ("testTCPPollSocket", testTCPPollSocket),
+        ("testInProcessPollSocket", testInProcessPollSocket),
+        ("testInterProcessPollSocket", testInterProcessPollSocket),
+        ("testWebSocketPollSocket", testWebSocketPollSocket)
     ]
 #endif
 }

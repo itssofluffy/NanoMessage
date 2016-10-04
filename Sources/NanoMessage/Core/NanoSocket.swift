@@ -29,14 +29,6 @@ public class NanoSocket {
 
     public var closureAttempts: UInt = 10
 
-    public var sendAllowed: Bool {
-        return false
-    }
-
-    public var receiveAllowed: Bool {
-        return false
-    }
-
     public init(socketDomain: SocketDomain, socketProtocol: SocketProtocol) throws {
         self.socketFd = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
 

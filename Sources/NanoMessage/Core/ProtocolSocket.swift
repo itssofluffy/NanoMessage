@@ -30,6 +30,35 @@ public protocol ProtocolSocket {
     init() throws
 }
 
+extension ProtocolSocket {
+    public func pollSocket(timeout milliseconds: Int = 1000) throws -> (messageIsWaiting: Bool, sendIsBlocked: Bool) {
+        var eventMask = CShort.allZeros
+        // rely on the fact that getting the for example receive file descriptor for a socket type
+        // that does not support receiving will throw to determine what our polling event mask will be.
+        do {
+            let _: Int = try getSocketOption(self._nanoSocket.socketFd, NN_RCVFD)
+            eventMask = eventMask | CShort(NN_POLLIN)
+        } catch { }
+        do {
+            let _: Int = try getSocketOption(self._nanoSocket.socketFd, NN_SNDFD)
+            eventMask = eventMask | CShort(NN_POLLOUT)
+        } catch { }
+
+        var pfd = nn_pollfd(fd: self._nanoSocket.socketFd, events: eventMask, revents: 0)
+
+        let rc = nn_poll(&pfd, 1, CInt(milliseconds))
+
+        if (rc < 0) {
+            throw NanoMessageError()
+        }
+
+        let messageIsWaiting = ((pfd.revents & CShort(NN_POLLIN)) != 0) ? true : false
+        let sendIsBlocked = ((pfd.revents & CShort(NN_POLLOUT)) != 0) ? true : false
+
+        return (messageIsWaiting, sendIsBlocked)
+    }
+}
+
 extension ProtocolSocket where Self: Sender {
     @discardableResult
     public func sendMessage(_ message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
