@@ -41,7 +41,7 @@ public class NanoSocket {
         func closeSocket() throws {
             if (self.socketFd >= 0) {
                 var loopCount: UInt = 0
-                let milliseconds: UInt32 = UInt32(UInt(try getClosureTimeout()) / self.closureAttempts)
+                let milliseconds: UInt32 = UInt32(_getClosureTimeout() / self.closureAttempts)
 
                 while (true) {
                     let rc = nn_close(self.socketFd)
@@ -77,20 +77,16 @@ public class NanoSocket {
         }
     }
 
-    fileprivate func getClosureTimeout() throws -> Int {
-        var milliseconds: Int
-
-        do {
-            milliseconds = try self.getLinger()
-
+    fileprivate func _getClosureTimeout() -> UInt {
+        if var milliseconds = try? self.getLinger() {
             if (milliseconds <= 0) {
                 milliseconds = 1000
             }
-        } catch {
-            milliseconds = 1000
+
+            return UInt(milliseconds)
         }
 
-        return milliseconds
+        return 1000
     }
 }
 
@@ -146,7 +142,7 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         var loopCount: UInt = 0
-        let milliseconds: UInt32 = UInt32(UInt(try getClosureTimeout()) / self.closureAttempts)
+        let milliseconds: UInt32 = UInt32(_getClosureTimeout() / self.closureAttempts)
 
         while (true) {
             let rc = nn_shutdown(self.socketFd, CInt(endPoint.id))
@@ -211,6 +207,7 @@ extension NanoSocket {
         return try getSocketOption(self.socketFd, NN_LINGER)
     }
 
+    @available(*, unavailable, message: "nanomsg library no longer supports this feature")
     public func setLinger(milliseconds: Int) throws {
         try setSocketOption(self.socketFd, NN_LINGER, milliseconds)
     }

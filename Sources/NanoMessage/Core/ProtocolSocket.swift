@@ -44,7 +44,7 @@ extension ProtocolSocket {
         // that does not support receiving will throw a nil return value to determine what our
         // polling event mask will be
         if let _: Int = try? getSocketOption(socketFd, NN_RCVFD) {
-            eventMask = eventMask | pollinMask
+            eventMask = pollinMask
         }
         if let _: Int = try? getSocketOption(socketFd, NN_SNDFD) {
             eventMask = eventMask | polloutMask
