@@ -43,7 +43,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 
 // Zero copy message size. NN_MSG = ((size_t)-1) this cannot be reproduced using the clang compiler see:
 // https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
-private func _maxBufferSize(_ socketFd: CInt) throws -> CInt {
+private func _maxBufferSize(_ socketFd: CInt) -> Int {
     let defaultReceiveMaximumMessageSize: CInt = 1048576 // 1024 * 1024 bytes = 1 MiB
 
     if var bufferSize: CInt = try? getSocketOption(socketFd, NN_RCVMAXSIZE) {
@@ -51,17 +51,17 @@ private func _maxBufferSize(_ socketFd: CInt) throws -> CInt {
             bufferSize = defaultReceiveMaximumMessageSize
         }
 
-        return bufferSize
+        return Int(bufferSize)
     } else {
-        return defaultReceiveMaximumMessageSize
+        return Int(defaultReceiveMaximumMessageSize)
     }
 }
 
 internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> (Int, Data) {
-    let bufferSize = try _maxBufferSize(socketFd)
-    var buffer = Data.buffer(with: Int(bufferSize))
+    let bufferSize = _maxBufferSize(socketFd)
+    var buffer = Data.buffer(with: bufferSize)
 
-    let bytesReceived = nn_recv(socketFd, &buffer.bytes, Int(bufferSize), blockingMode.rawValue)
+    let bytesReceived = Int(nn_recv(socketFd, &buffer.bytes, bufferSize, blockingMode.rawValue))
 
     if (bytesReceived < 0) {
         let errno = nn_errno()
@@ -75,5 +75,5 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
         throw NanoMessageError()
     }
 
-    return (Int(bytesReceived), Data(buffer[0 ..< min(Int(bytesReceived), Int(bufferSize))]))
+    return (bytesReceived, Data(buffer[0 ..< min(bytesReceived, bufferSize)]))
 }

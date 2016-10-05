@@ -32,26 +32,37 @@ public protocol ProtocolSocket {
 
 extension ProtocolSocket {
     public func pollSocket(timeout milliseconds: Int = 1000) throws -> (messageIsWaiting: Bool, sendIsBlocked: Bool) {
+        // define our nano sockets file descriptor locally instead of calling the code chain multiple times
+        let socketFd = self._nanoSocket.socketFd
+
+        // define nn_poll event masks as short's so we only cast once in the function
+        let pollinMask = CShort(NN_POLLIN)
+        let polloutMask = CShort(NN_POLLOUT)
+
         var eventMask = CShort.allZeros
         // rely on the fact that getting the for example receive file descriptor for a socket type
-        // that does not support receiving will throw to determine what our polling event mask will be.
-        if let _: Int = try? getSocketOption(self._nanoSocket.socketFd, NN_RCVFD) {
-            eventMask = eventMask | CShort(NN_POLLIN)
+        // that does not support receiving will throw a nil return value to determine what our
+        // polling event mask will be
+        if let _: Int = try? getSocketOption(socketFd, NN_RCVFD) {
+            eventMask = eventMask | pollinMask
         }
-        if let _: Int = try? getSocketOption(self._nanoSocket.socketFd, NN_SNDFD) {
-            eventMask = eventMask | CShort(NN_POLLOUT)
+        if let _: Int = try? getSocketOption(socketFd, NN_SNDFD) {
+            eventMask = eventMask | polloutMask
         }
 
-        var pfd = nn_pollfd(fd: self._nanoSocket.socketFd, events: eventMask, revents: 0)
+        // define the pollfd struct for this socket
+        var pfd = nn_pollfd(fd: socketFd, events: eventMask, revents: 0)
 
+        // poll the nano socket
         let rc = nn_poll(&pfd, 1, CInt(milliseconds))
 
         if (rc < 0) {
             throw NanoMessageError()
         }
 
-        let messageIsWaiting = ((pfd.revents & CShort(NN_POLLIN)) != 0) ? true : false
-        let sendIsBlocked = ((pfd.revents & CShort(NN_POLLOUT)) != 0) ? true : false
+        // using the event masks determine our return values
+        let messageIsWaiting = ((pfd.revents & pollinMask) != 0) ? true : false
+        let sendIsBlocked = ((pfd.revents & polloutMask) != 0) ? true : false
 
         return (messageIsWaiting, sendIsBlocked)
     }
