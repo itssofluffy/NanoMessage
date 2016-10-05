@@ -44,17 +44,15 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 // Zero copy message size. NN_MSG = ((size_t)-1) this cannot be reproduced using the clang compiler see:
 // https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
 private func _maxBufferSize(_ socketFd: CInt) throws -> CInt {
-    let defaultReceiveMaximumMessageSize: CInt = 1024 * 1024
+    let defaultReceiveMaximumMessageSize: CInt = 1048576 // 1024 * 1024 bytes = 1 MiB
 
-    do {
-        var bufferSize: CInt = try getSocketOption(socketFd, NN_RCVMAXSIZE)
-
+    if var bufferSize: CInt = try? getSocketOption(socketFd, NN_RCVMAXSIZE) {
         if (bufferSize <= 0) {
             bufferSize = defaultReceiveMaximumMessageSize
         }
 
         return bufferSize
-    } catch {
+    } else {
         return defaultReceiveMaximumMessageSize
     }
 }

@@ -35,14 +35,12 @@ extension ProtocolSocket {
         var eventMask = CShort.allZeros
         // rely on the fact that getting the for example receive file descriptor for a socket type
         // that does not support receiving will throw to determine what our polling event mask will be.
-        do {
-            let _: Int = try getSocketOption(self._nanoSocket.socketFd, NN_RCVFD)
+        if let _: Int = try? getSocketOption(self._nanoSocket.socketFd, NN_RCVFD) {
             eventMask = eventMask | CShort(NN_POLLIN)
-        } catch { }
-        do {
-            let _: Int = try getSocketOption(self._nanoSocket.socketFd, NN_SNDFD)
+        }
+        if let _: Int = try? getSocketOption(self._nanoSocket.socketFd, NN_SNDFD) {
             eventMask = eventMask | CShort(NN_POLLOUT)
-        } catch { }
+        }
 
         var pfd = nn_pollfd(fd: self._nanoSocket.socketFd, events: eventMask, revents: 0)
 
