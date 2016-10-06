@@ -51,7 +51,7 @@ extension PublisherSocket {
 
         if (self.prependTopic) {
             if (self.sendTopic.isEmpty) {
-                throw NanoMessageError(errorNumber: 4, errorMessage: "topic not defined")
+                throw NanoMessageError.NoTopic
             }
 
             if (self.ignoreTopicSeperator) {

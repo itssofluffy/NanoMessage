@@ -56,8 +56,8 @@ extension ProtocolSocket {
         // poll the nano socket
         let rc = nn_poll(&pfd, 1, CInt(milliseconds))
 
-        if (rc < 0) {
-            throw NanoMessageError()
+        guard (rc >= 0) else {
+            throw NanoMessageError.PollSocket(code: nn_errno())
         }
 
         // using the event masks determine our return values

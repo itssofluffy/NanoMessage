@@ -24,3 +24,14 @@ public enum ConnectionType: UInt8 {
     case BindToAddress      // End-point is local to the socket
     case ConnectToAddress   // End-point is remote to the socket.
 }
+
+extension ConnectionType: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .BindToAddress:
+                return "bind"
+            case .ConnectToAddress:
+                return "connect"
+        }
+    }
+}

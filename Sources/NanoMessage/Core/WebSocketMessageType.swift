@@ -28,16 +28,32 @@ public enum WebSocketMessageType: CInt {
 
     public var rawValue: CInt {
         switch self {
-            case .TextFrames:   return NN_WS_MSG_TYPE_TEXT
-            case .BinaryFrames: return NN_WS_MSG_TYPE_BINARY
+            case .TextFrames:
+                return NN_WS_MSG_TYPE_TEXT
+            case .BinaryFrames:
+                return NN_WS_MSG_TYPE_BINARY
         }
     }
 
     public init?(rawValue: CInt) {
         switch rawValue {
-            case NN_WS_MSG_TYPE_TEXT:   self = .TextFrames
-            case NN_WS_MSG_TYPE_BINARY: self = .BinaryFrames
-            default:                    return nil
+            case NN_WS_MSG_TYPE_TEXT:
+                self = .TextFrames
+            case NN_WS_MSG_TYPE_BINARY:
+                self = .BinaryFrames
+            default:
+                return nil
+        }
+    }
+}
+
+extension WebSocketMessageType: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .TextFrames:
+                return "text"
+            case .BinaryFrames:
+                return "binary"
         }
     }
 }

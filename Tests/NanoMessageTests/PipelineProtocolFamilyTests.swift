@@ -32,11 +32,10 @@ class PipelineProtocolFamilyTests: XCTestCase {
 
         do {
             let node0 = try PushSocket()
+            let node1 = try PullSocket()
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
-
-            let node1 = try PullSocket()
 
             let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
@@ -51,12 +50,10 @@ class PipelineProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1Received.message, payload, "message != payload")
 
             completed = true
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            XCTAssert(false, "An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
+        } catch let error as NanoMessageError {
+            XCTAssert(false, "\(error)")
+        } catch {
+            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")

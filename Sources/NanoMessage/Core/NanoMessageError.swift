@@ -20,43 +20,72 @@
     IN THE SOFTWARE.
 */
 
-#if os(Linux)
-import Glibc
-#else
-import Darwin
-#endif
 import CNanoMessage
 
 public enum NanoMessageError: Error {
-    case nanomsgError(errorNumber: Int, errorMessage: String)
-    case Error(errorNumber: Int, errorMessage: String)
+    case Socket(code: CInt)
+    case Close(code: CInt)
+    case Interrupted
+    case BindToAddress(code: CInt)
+    case ConnectToAddress(code: CInt)
+    case RemoveEndPoint(code: CInt)
+    case BindToSocket(code: CInt)
+    case GetSocketOption(code: CInt)
+    case SetSocketOption(code: CInt)
+    case GetStatistic(code: CInt)
+    case PollSocket(code: CInt)
+    case SendMessage(code: CInt)
+    case MessageNotSent
+    case ReceiveMessage(code: CInt)
+    case MessageNotAvailable
+    case TimedOut
+    case NoTopic
+    case InvalidTopic
+}
 
-    init() {
-        var nanoError: (Int, String) {
-            let errorNumber = nn_errno()
-            let errorMessage = String(cString: nn_strerror(errorNumber))
-
-            return (Int(errorNumber), errorMessage)
+extension NanoMessageError: CustomStringConvertible {
+    public var description: String {
+        func errorString(_ code: CInt) -> String {
+            return String(cString: nn_strerror(code)) + " (#\(code) '\(nanomsgError[Int(code)]!)')"
         }
-        let (errorNumber, errorMessage) = nanoError
 
-        self = .nanomsgError(errorNumber: errorNumber, errorMessage: errorMessage)
+        switch self {
+            case .Socket(let code):
+                return "nn_socket() failed: " + errorString(code)
+            case .Close(let code):
+                return "nn_close() failed: " + errorString(code)
+            case .Interrupted:
+                return "operation was interrupted"
+            case .BindToAddress(let code):
+                return "bindToAddress() failed: " + errorString(code)
+            case .ConnectToAddress(let code):
+                return "connectToAddress() failed: " + errorString(code)
+            case .RemoveEndPoint(let code):
+                return "removeEndPoint() failed: " + errorString(code)
+            case .BindToSocket(let code):
+                return "bindToSocket() failed: " + errorString(code)
+            case .GetSocketOption(let code):
+                return "getSocketOption() failed: " + errorString(code)
+            case .SetSocketOption(let code):
+                return "setSocketOption() failed: " + errorString(code)
+            case .GetStatistic(let code):
+                return "getStatistic() failed: " + errorString(code)
+            case .PollSocket(let code):
+                return "pollSocket() failed: " + errorString(code)
+            case .SendMessage(let code):
+                return "sendMessage() failed: " + errorString(code)
+            case .MessageNotSent:
+                return "message not sent"
+            case .ReceiveMessage(let code):
+                return "receiveMessage() failed: " + errorString(code)
+            case .MessageNotAvailable:
+                return "no message received"
+            case .TimedOut:
+                return "operation has timed out"
+            case .NoTopic:
+                return "topic undefined"
+            case .InvalidTopic:
+                return "topics of unequal length"
+        }
     }
-
-    init(errorNumber: Int, errorMessage: String) {
-        self = .Error(errorNumber: errorNumber, errorMessage: errorMessage)
-    }
-}
-
-
-public struct StderrOutputStream: TextOutputStream {
-    public mutating func write(_ string: String) {
-        fputs(string, stderr)
-    }
-}
-
-public var stdErrorStream = StderrOutputStream()
-
-public func errorPrint(_ message: String) {
-    debugPrint(message, to: &stdErrorStream)
 }

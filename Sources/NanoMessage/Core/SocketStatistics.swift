@@ -25,8 +25,8 @@ import CNanoMessage
 internal func getStatistic(_ socketFd: CInt, _ statistic: CInt) throws -> UInt64 {
     let rc = nn_get_statistic(socketFd, statistic)
 
-    if (rc < 0) {
-        throw NanoMessageError()
+    guard (rc >= 0) else {
+        throw NanoMessageError.GetStatistic(code: nn_errno())
     }
 
     return rc

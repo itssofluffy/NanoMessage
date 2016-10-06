@@ -58,12 +58,10 @@ class RequestReplyProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node0Received.message, payload, "node0.message != payload")
 
             completed = true
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            XCTAssert(false, "An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
+        } catch let error as NanoMessageError {
+            XCTAssert(false, "\(error)")
+        } catch {
+            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")

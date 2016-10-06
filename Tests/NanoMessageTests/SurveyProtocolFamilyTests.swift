@@ -62,20 +62,15 @@ class SurveyProtocolFamilyTests: XCTestCase {
             do {
                 var _: (Int, String) = try node0.receiveMessage()
                 XCTAssert(false, "received a message on node0")
-            } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-                if (errorNumber != 3) {
-                    throw NanoMessageError(errorNumber: errorNumber, errorMessage: errorMessage)
-                }
-                XCTAssertEqual(errorNumber, 3, "\(errorMessage) (#\(errorNumber))")   // have we timedout
+            } catch NanoMessageError.TimedOut {
+                XCTAssert(true, "\(NanoMessageError.TimedOut)")   // we have timedout...yah!!!
             }
 
             completed = true
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            XCTAssert(false, "An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
+        } catch let error as NanoMessageError {
+            XCTAssert(false, "\(error)")
+        } catch {
+            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")

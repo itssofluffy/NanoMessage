@@ -91,7 +91,7 @@ extension SubscriberSocket {
             }
 
             if (self.receivedTopic.isEmpty) {
-                throw NanoMessageError(errorNumber: 4, errorMessage: "unknown topic received")
+                throw NanoMessageError.NoTopic
             }
 
             if (self.removeTopicFromMessage) {
@@ -168,7 +168,7 @@ extension SubscriberSocket {
                 let topics: (equalLengths: Bool, _: Int) = _validateTopicLengths()
 
                 if (!topics.equalLengths) {
-                    throw NanoMessageError(errorNumber: 4, errorMessage: "topics of unequal length")
+                    throw NanoMessageError.InvalidTopic
                 }
             }
 
@@ -188,7 +188,7 @@ extension SubscriberSocket {
             if (self.subscribedToAllTopics) {
                 try self.unsubscribeFromAllTopics()
             } else if (self.ignoreTopicSeperator && !_validTopicLengths(topic)) {
-                throw NanoMessageError(errorNumber: 4, errorMessage: "topics of unequal length")
+                throw NanoMessageError.InvalidTopic
             }
 
             try setSocketOption(self.socketFd, NN_SUB_SUBSCRIBE, topic, .SubscriberProtocol)

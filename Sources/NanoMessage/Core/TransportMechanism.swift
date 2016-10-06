@@ -32,21 +32,31 @@ public enum TransportMechanism: CInt {
 
     public var rawValue: CInt {
         switch self {
-            case .TCP:          return NN_TCP
-            case .InProcess:    return NN_INPROC
-            case .InterProcess: return NN_IPC
-            case .WebSocket:    return NN_WS
-            case .Unsupported:  return 0
+            case .TCP:
+                return NN_TCP
+            case .InProcess:
+                return NN_INPROC
+            case .InterProcess:
+                return NN_IPC
+            case .WebSocket:
+                return NN_WS
+            case .Unsupported:
+                return 0
         }
     }
 
     public init(rawValue: CInt) {
         switch rawValue {
-            case NN_TCP:    self = .TCP
-            case NN_INPROC: self = .InProcess
-            case NN_IPC:    self = .InterProcess
-            case NN_WS:     self = .WebSocket
-            default:        self = .Unsupported
+            case NN_TCP:
+                self = .TCP
+            case NN_INPROC:
+                self = .InProcess
+            case NN_IPC:
+                self = .InterProcess
+            case NN_WS:
+                self = .WebSocket
+            default:
+                self = .Unsupported
         }
     }
 
@@ -61,6 +71,23 @@ public enum TransportMechanism: CInt {
             self = .WebSocket
         } else {
             self = .Unsupported
+        }
+    }
+}
+
+extension TransportMechanism: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .TCP:
+                return "tcp"
+            case .InProcess:
+                return "inter-process"
+            case .InterProcess:
+                return "ipc"
+            case .WebSocket:
+                return "web socket"
+            case .Unsupported:
+                return "unsupported"
         }
     }
 }

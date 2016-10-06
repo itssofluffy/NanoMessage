@@ -28,37 +28,38 @@ public class NanoSocket {
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
     public var closureAttempts: UInt = 10
+    public var blockTillCloseSuccess = false
 
     public init(socketDomain: SocketDomain, socketProtocol: SocketProtocol) throws {
         self.socketFd = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
 
-        if (self.socketFd < 0) {
-            throw NanoMessageError()
+        guard (self.socketFd >= 0) else {
+            throw NanoMessageError.Socket(code: nn_errno())
         }
     }
 
     deinit {
-        func closeSocket() throws {
+        func closeSocket(_ millisecondsDelay: UInt32) throws {
             if (self.socketFd >= 0) {
                 var loopCount: UInt = 0
-                let milliseconds: UInt32 = UInt32(_getClosureTimeout() / self.closureAttempts)
 
                 while (true) {
                     let rc = nn_close(self.socketFd)
 
                     if (rc < 0) {
+                        let errno = nn_errno()
                         // if we were interrupted by a signal, reattempt is allowed by the native library
-                        if (nn_errno() == EINTR) {
+                        if (errno == EINTR) {
                             if (loopCount >= self.closureAttempts) {
-                                throw NanoMessageError(errorNumber: 1, errorMessage: "socket closure repeatedly interrupted")
-                            } else {
-                                usleep(milliseconds)
+                                throw NanoMessageError.Interrupted
                             }
-
-                            loopCount += 1
                         } else {
-                            throw NanoMessageError()
+                            throw NanoMessageError.Close(code: errno)
                         }
+
+                        usleep(millisecondsDelay)
+
+                        loopCount += 1
                     } else {
                         break
                     }
@@ -66,15 +67,25 @@ public class NanoSocket {
             }
         }
 
-        do {
-            try closeSocket()
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            errorPrint("Error : \(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            errorPrint("Error : \(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            errorPrint("Error : An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
-        }
+        let millisecondsDelay = UInt32(_getClosureTimeout() / self.closureAttempts)
+        var terminateLoop = true
+
+        repeat {
+            do {
+                try closeSocket(millisecondsDelay)
+            } catch NanoMessageError.Interrupted {
+                print("NanoSocket.deinit(): \(NanoMessageError.Interrupted))")
+                if (self.blockTillCloseSuccess) {
+                    terminateLoop = false
+                }
+            } catch let error as NanoMessageError {
+                print(error)
+                terminateLoop = true
+            } catch {
+                print("an unknown error '\(error)' has occured in the library NanoMessage.")
+                terminateLoop = true
+            }
+        } while (!terminateLoop)
     }
 
     fileprivate func _getClosureTimeout() -> UInt {
@@ -98,8 +109,8 @@ extension NanoSocket {
             endPointId = nn_bind(self.socketFd, $0)
         }
 
-        if (endPointId < 0) {
-            throw NanoMessageError()
+        guard (endPointId >= 0) else {
+            throw NanoMessageError.BindToAddress(code: nn_errno())
         }
 
         let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .BindToAddress, endPointName: endPointName)
@@ -122,8 +133,8 @@ extension NanoSocket {
             endPointId = nn_connect(self.socketFd, $0)
         }
 
-        if (endPointId < 0) {
-            throw NanoMessageError()
+        guard (endPointId >= 0) else {
+            throw NanoMessageError.ConnectToAddress(code: nn_errno())
         }
 
         let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .ConnectToAddress, endPointName: endPointName)
@@ -142,23 +153,26 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         var loopCount: UInt = 0
-        let milliseconds: UInt32 = UInt32(_getClosureTimeout() / self.closureAttempts)
+        let millisecondsDelay = UInt32(_getClosureTimeout() / self.closureAttempts)
 
         while (true) {
             let rc = nn_shutdown(self.socketFd, CInt(endPoint.id))
 
             if (rc < 0) {
+                let errno = nn_errno()
                 // if we were interrupted by a signal, reattempt is allowed by the native library
-                if (nn_errno() == EINTR) {
+                if (errno == EINTR) {
                     if (loopCount >= self.closureAttempts) {
-                        throw NanoMessageError(errorNumber: 1, errorMessage: "endpoint closure interrupted")
-                    } else {
-                        usleep(milliseconds)
+                        throw NanoMessageError.Interrupted
                     }
 
+                    usleep(millisecondsDelay)
+
                     loopCount += 1
+
+                    break
                 } else {
-                    throw NanoMessageError()
+                    throw NanoMessageError.RemoveEndPoint(code: errno)
                 }
             } else {
                 break
@@ -172,9 +186,9 @@ extension NanoSocket {
 
     @discardableResult
     public func removeEndPoint(_ endPoint: Int) throws -> Bool {
-        for epoint in self.endPoints {
-            if (endPoint == epoint.id) {
-                return try self.removeEndPoint(epoint)
+        for ePoint in self.endPoints {
+            if (endPoint == ePoint.id) {
+                return try self.removeEndPoint(ePoint)
             }
         }
 
@@ -184,8 +198,8 @@ extension NanoSocket {
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
         let rc = nn_device(self.socketFd, nanoSocket.socketFd)
 
-        if (rc < 0) {
-            throw NanoMessageError()
+        guard (rc >= 0) else {
+            throw NanoMessageError.BindToSocket(code: nn_errno())
         }
     }
 }

@@ -48,3 +48,14 @@ extension EndPoint: Hashable {
         return (lhs.id == rhs.id)
     }
 }
+
+extension EndPoint: CustomStringConvertible {
+    public var description: String {
+        var epDescription = "id: \(self.id), address: \(self.address)"
+        if (self.name != "") {
+            epDescription += ", name: \(self.name)"
+        }
+
+        return epDescription
+    }
+}

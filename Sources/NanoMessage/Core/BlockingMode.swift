@@ -28,8 +28,21 @@ public enum BlockingMode: CInt {
 
     public var rawValue: CInt {
         switch self {
-            case .Blocking:    return 0
-            case .NonBlocking: return NN_DONTWAIT
+            case .Blocking:
+                return 0
+            case .NonBlocking:
+                return NN_DONTWAIT
+        }
+    }
+}
+
+extension BlockingMode: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .Blocking:
+                return "blocking"
+            case .NonBlocking:
+                return "non-blocking"
         }
     }
 }

@@ -36,32 +36,80 @@ public enum SocketProtocol {
 
     public var rawValue: CInt {
         switch self {
-            case .PairProtocol:       return NN_PAIR
-            case .PublisherProtocol:  return NN_PUB
-            case .SubscriberProtocol: return NN_SUB
-            case .RequestProtocol:    return NN_REQ
-            case .ReplyProtocol:      return NN_REP
-            case .PushProtocol:       return NN_PUSH
-            case .PullProtocol:       return NN_PULL
-            case .SurveyorProtocol:   return NN_SURVEYOR
-            case .RespondentProtocol: return NN_RESPONDENT
-            case .BusProtocol:        return NN_BUS
+            case .PairProtocol:
+                return NN_PAIR
+            case .PublisherProtocol:
+                return NN_PUB
+            case .SubscriberProtocol:
+                return NN_SUB
+            case .RequestProtocol:
+                return NN_REQ
+            case .ReplyProtocol:
+                return NN_REP
+            case .PushProtocol:
+                return NN_PUSH
+            case .PullProtocol:
+                return NN_PULL
+            case .SurveyorProtocol:
+                return NN_SURVEYOR
+            case .RespondentProtocol:
+                return NN_RESPONDENT
+            case .BusProtocol:
+                return NN_BUS
         }
     }
 
     public init?(rawValue: CInt) {
         switch rawValue {
-            case NN_PAIR:       self = .PairProtocol
-            case NN_PUB:        self = .PublisherProtocol
-            case NN_SUB:        self = .SubscriberProtocol
-            case NN_REQ:        self = .RequestProtocol
-            case NN_REP:        self = .ReplyProtocol
-            case NN_PUSH:       self = .PushProtocol
-            case NN_PULL:       self = .PullProtocol
-            case NN_SURVEYOR:   self = .SurveyorProtocol
-            case NN_RESPONDENT: self = .RespondentProtocol
-            case NN_BUS:        self = .BusProtocol
-            default:            return nil
+            case NN_PAIR:
+                self = .PairProtocol
+            case NN_PUB:
+                self = .PublisherProtocol
+            case NN_SUB:
+                self = .SubscriberProtocol
+            case NN_REQ:
+                self = .RequestProtocol
+            case NN_REP:
+                self = .ReplyProtocol
+            case NN_PUSH:
+                self = .PushProtocol
+            case NN_PULL:
+                self = .PullProtocol
+            case NN_SURVEYOR:
+                self = .SurveyorProtocol
+            case NN_RESPONDENT:
+                self = .RespondentProtocol
+            case NN_BUS:
+                self = .BusProtocol
+            default:
+                return nil
+        }
+    }
+}
+
+extension SocketProtocol: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .PairProtocol:
+                return "pair"
+            case .PublisherProtocol:
+                return "publisher"
+            case .SubscriberProtocol:
+                return "subscriber"
+            case .RequestProtocol:
+                return "request"
+            case .ReplyProtocol:
+                return "reply"
+            case .PushProtocol:
+                return "push"
+            case .PullProtocol:
+                return "pull"
+            case .SurveyorProtocol:
+                return "surveyor"
+            case .RespondentProtocol:
+                return "respondent"
+            case .BusProtocol:
+                return "bus"
         }
     }
 }

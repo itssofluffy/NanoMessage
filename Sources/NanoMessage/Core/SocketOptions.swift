@@ -28,8 +28,10 @@ internal func getSocketOption(_ socketFd: CInt, _ option: CInt, _ level: CInt = 
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 
-    if (nn_getsockopt(socketFd, level, option, &optval, &optvallen) < 0) {
-        throw NanoMessageError()
+    let rc = nn_getsockopt(socketFd, level, option, &optval, &optvallen)
+
+    guard (rc >= 0) else {
+        throw NanoMessageError.GetSocketOption(code: nn_errno())
     }
 
     return optval
@@ -40,8 +42,10 @@ internal func getSocketOption(_ socketFd: CInt, _ option: CInt, _ level: CInt = 
     var optvallen = 256
     let optval = UnsafeMutablePointer<CChar>.allocate(capacity: optvallen)
 
-    if (nn_getsockopt(socketFd, level, option, optval, &optvallen) < 0) {
-        throw NanoMessageError()
+    let rc = nn_getsockopt(socketFd, level, option, optval, &optvallen)
+
+    guard (rc >= 0) else {
+        throw NanoMessageError.GetSocketOption(code: nn_errno())
     }
 
     return String(cString: optval)
@@ -101,16 +105,20 @@ internal func getSocketOption(_ socketFd: CInt, _ option: CInt, _ level: SocketP
 internal func setSocketOption(_ socketFd: CInt, _ option: CInt, _ optval: CInt, _ level: CInt = NN_SOL_SOCKET) throws {
     var value = optval
 
-    if (nn_setsockopt(socketFd, level, option, &value, MemoryLayout<CInt>.size) < 0) {
-        throw NanoMessageError()
+    let rc = nn_setsockopt(socketFd, level, option, &value, MemoryLayout<CInt>.size)
+
+    guard (rc >= 0) else {
+        throw NanoMessageError.SetSocketOption(code: nn_errno())
     }
 }
 
 /** Set socket option of type String. */
 internal func setSocketOption(_ socketFd: CInt, _ option: CInt, _ optval: String, _ level: CInt = NN_SOL_SOCKET) throws {
     try optval.withCString {
-        if (nn_setsockopt(socketFd, level, option, $0, optval.utf8.count) < 0) {
-            throw NanoMessageError()
+        let rc = nn_setsockopt(socketFd, level, option, $0, optval.utf8.count)
+
+        guard (rc >= 0) else {
+            throw NanoMessageError.SetSocketOption(code: nn_errno())
         }
     }
 }
@@ -127,16 +135,20 @@ internal func setSocketOption(_ socketFd: CInt, _ option: CInt, _ optval: Int, _
 
 /** Set socket option of type Data. */
 internal func setSocketOption(_ socketFd: CInt, _ option: CInt, _ optval: Data, _ level: SocketProtocol) throws {
-    if (nn_setsockopt(socketFd, level.rawValue, option, optval.bytes, optval.count) < 0) {
-        throw NanoMessageError()
+    let rc = nn_setsockopt(socketFd, level.rawValue, option, optval.bytes, optval.count)
+
+    guard (rc >= 0) else {
+        throw NanoMessageError.SetSocketOption(code: nn_errno())
     }
 }
 
 /** Set socket option of type String. */
 internal func setSocketOption(_ socketFd: CInt, _ option: CInt, _ optval: String, _ level: SocketProtocol) throws {
     try optval.withCString {
-        if (nn_setsockopt(socketFd, level.rawValue, option, $0, optval.utf8.count) < 0) {
-            throw NanoMessageError()
+        let rc =  nn_setsockopt(socketFd, level.rawValue, option, $0, optval.utf8.count)
+
+        guard (rc >= 0) else {
+            throw NanoMessageError.SetSocketOption(code: nn_errno())
         }
     }
 }

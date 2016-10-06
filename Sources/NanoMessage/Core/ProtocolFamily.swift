@@ -30,12 +30,37 @@ public enum ProtocolFamily {
 
     public init(rawValue: SocketProtocol) {
         switch rawValue {
-            case .PairProtocol:                           self = .Pair
-            case .PublisherProtocol, .SubscriberProtocol: self = .PublishSubscribe
-            case .RequestProtocol, .ReplyProtocol:        self = .RequestReply
-            case .PushProtocol, .PullProtocol:            self = .Pipeline
-            case .SurveyorProtocol, .RespondentProtocol:  self = .Survey
-            case .BusProtocol:                            self = .Bus
+            case .PairProtocol:
+                self = .Pair
+            case .PublisherProtocol, .SubscriberProtocol:
+                self = .PublishSubscribe
+            case .RequestProtocol, .ReplyProtocol:
+                self = .RequestReply
+            case .PushProtocol, .PullProtocol:
+                self = .Pipeline
+            case .SurveyorProtocol, .RespondentProtocol:
+                self = .Survey
+            case .BusProtocol:
+                self = .Bus
+        }
+    }
+}
+
+extension ProtocolFamily: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .Pair:
+                return "pair"
+            case .PublishSubscribe:
+                return "publish/subscribe"
+            case .RequestReply:
+                return "request/reply"
+            case .Pipeline:
+                return "pipeline"
+            case .Survey:
+                return "survey"
+            case .Bus:
+                return "bus"
         }
     }
 }

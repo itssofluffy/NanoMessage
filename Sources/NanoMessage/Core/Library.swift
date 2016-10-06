@@ -26,16 +26,16 @@ import CNanoMessage
 internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
     let bytesSent = nn_send(socketFd, payload.bytes, payload.count, blockingMode.rawValue)
 
-    if (bytesSent < 0) {
+    guard (bytesSent >= 0) else {
         let errno = nn_errno()
 
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
-            throw NanoMessageError(errorNumber: 2, errorMessage: "unable to send")
+            throw NanoMessageError.MessageNotSent
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError(errorNumber: 3, errorMessage: "send timed out")
+            throw NanoMessageError.TimedOut
         }
 
-        throw NanoMessageError()
+        throw NanoMessageError.SendMessage(code: errno)
     }
 
     return Int(bytesSent)
@@ -63,16 +63,16 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
 
     let bytesReceived = Int(nn_recv(socketFd, &buffer.bytes, bufferSize, blockingMode.rawValue))
 
-    if (bytesReceived < 0) {
+    guard (bytesReceived >= 0) else {
         let errno = nn_errno()
 
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
-            throw NanoMessageError(errorNumber: 2, errorMessage: "unable to receive")
+            throw NanoMessageError.MessageNotAvailable
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError(errorNumber: 3, errorMessage: "receive timed out")
+            throw NanoMessageError.TimedOut
         }
 
-        throw NanoMessageError()
+        throw NanoMessageError.ReceiveMessage(code: errno)
     }
 
     return (bytesReceived, Data(buffer[0 ..< min(bytesReceived, bufferSize)]))

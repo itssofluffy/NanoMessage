@@ -28,16 +28,32 @@ public enum SocketDomain: CInt {
 
     public var rawValue: CInt {
         switch self {
-            case .StandardSocket: return AF_SP
-            case .RawSocket:      return AF_SP_RAW
+            case .StandardSocket:
+                return AF_SP
+            case .RawSocket:
+                return AF_SP_RAW
         }
     }
 
     public init?(rawValue: CInt) {
         switch rawValue {
-            case AF_SP:     self = .StandardSocket
-            case AF_SP_RAW: self = .RawSocket
-            default:        return nil
+            case AF_SP:
+                self = .StandardSocket
+            case AF_SP_RAW:
+                self = .RawSocket
+            default:
+                return nil
+        }
+    }
+}
+
+extension SocketDomain: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .StandardSocket:
+                return "standard"
+            case .RawSocket:
+                return "raw"
         }
     }
 }

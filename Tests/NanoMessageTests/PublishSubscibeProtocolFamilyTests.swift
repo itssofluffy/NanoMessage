@@ -75,17 +75,15 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             do {
                 node1Received = try node1.receiveMessage()
                 XCTAssert(false, "received a message on node1")
-            } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-                XCTAssertEqual(errorNumber, 3, "\(errorMessage) (#\(errorNumber))")   // have we timedout
+            } catch NanoMessageError.TimedOut {
+                XCTAssert(true, "\(NanoMessageError.TimedOut))")   // we have timedout
             }
 
             completed = true
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            XCTAssert(false, "An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
+        } catch let error as NanoMessageError {
+            XCTAssert(false, "\(error)")
+        } catch {
+            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")
@@ -159,8 +157,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             do {
                 let _: (bytes: Int, message: String) = try node1.receiveMessage()
                 XCTAssert(false, "received a message on node1")
-            } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-                XCTAssertEqual(errorNumber, 3, "\(errorMessage) (#\(errorNumber))")   // have we timedout
+            } catch NanoMessageError.TimedOut {
+                XCTAssert(true, "\(NanoMessageError.TimedOut)")
             }
 
             node0.sendTopic = "dwarfPlanet"
@@ -175,12 +173,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(received.message, dwarfPlanets[0], "received.message != \"\(dwarfPlanets[0])\"")
 
             completed = true
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            XCTAssert(false, "An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
+        } catch let error as NanoMessageError {
+            XCTAssert(false, "\(error)")
+        } catch {
+            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")
@@ -213,8 +209,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             do {
                 let _ = try node1.flipIgnoreTopicSeperator()
-            } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-                XCTAssertEqual(errorNumber, 4, "\(errorMessage) (#\(errorNumber))")   // have we timedout
+            } catch NanoMessageError.InvalidTopic {
+                XCTAssert(true, "\(NanoMessageError.InvalidTopic))")   // have we unequal length topics
             }
 
             try node1.unsubscribeFrom(topic: "CCCC")
@@ -236,12 +232,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(received.message, payload, "node1.receivedTopic != payload")
 
             completed = true
-        } catch NanoMessageError.nanomsgError(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch NanoMessageError.Error(let errorNumber, let errorMessage) {
-            XCTAssert(false, "\(errorMessage) (#\(errorNumber))")
-        } catch (let errorMessage) {
-            XCTAssert(false, "An Unknown error '\(errorMessage)' has occured in the library NanoMessage.")
+        } catch let error as NanoMessageError {
+            XCTAssert(false, "\(error)")
+        } catch {
+            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")
