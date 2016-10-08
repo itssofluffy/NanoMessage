@@ -57,7 +57,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: CInt, _ level: CInt = 
 ///
 /// - Returns: The result as a `Data` type.
 internal func getSocketOption(_ socketFd: CInt, _ option: CInt, _ level: CInt = NN_SOL_SOCKET) throws -> Data {
-    var optvallen: Int = Int.max
+    var optvallen = Int.max
     var optval = Data.buffer(with: optvallen)
 
     let rc = nn_getsockopt(socketFd, level, option, &optval.bytes, &optvallen)

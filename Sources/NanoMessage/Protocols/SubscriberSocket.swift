@@ -240,24 +240,29 @@ extension SubscriberSocket {
 ///   - topic: The topic to subscribe to.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
+///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
 ///
 /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: Data) throws -> Bool {
-        let topicSubscribed = self.isTopicSubscribed(topic)
+        if (!topic.isEmpty) {
+            let topicSubscribed = self.isTopicSubscribed(topic)
 
-        if (!topicSubscribed) {
-            if (self.subscribedToAllTopics) {
-                try self.unsubscribeFromAllTopics()
-            } else if (self.ignoreTopicSeperator && !_validTopicLengths(topic)) {
-                throw NanoMessageError.InvalidTopic
+            if (!topicSubscribed) {
+                if (self.subscribedToAllTopics) {
+                    try self.unsubscribeFromAllTopics()
+                } else if (self.ignoreTopicSeperator && !_validTopicLengths(topic)) {
+                    throw NanoMessageError.InvalidTopic
+                }
+
+                try setSocketOption(self.socketFd, NN_SUB_SUBSCRIBE, topic, .SubscriberProtocol)
+                self.subscribedTopics.insert(topic)
             }
 
-            try setSocketOption(self.socketFd, NN_SUB_SUBSCRIBE, topic, .SubscriberProtocol)
-            self.subscribedTopics.insert(topic)
+            return !topicSubscribed
         }
 
-        return !topicSubscribed
+        return false
     }
 
 /// Subscibe to a topic.
@@ -266,6 +271,7 @@ extension SubscriberSocket {
 ///   - topic: The topic to subscribe to.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
+///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
 ///
 /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
@@ -283,18 +289,22 @@ extension SubscriberSocket {
 /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
     public func unsubscribeFrom(topic: Data) throws -> Bool {
-        let topicSubscribed = self.isTopicSubscribed(topic)
+        if (!topic.isEmpty) {
+            let topicSubscribed = self.isTopicSubscribed(topic)
 
-        if (topicSubscribed) {
-            try setSocketOption(self.socketFd, NN_SUB_UNSUBSCRIBE, topic, .SubscriberProtocol)
-            self.subscribedTopics.remove(topic)
+            if (topicSubscribed) {
+                try setSocketOption(self.socketFd, NN_SUB_UNSUBSCRIBE, topic, .SubscriberProtocol)
+                self.subscribedTopics.remove(topic)
 
-            if (self.subscribedTopics.isEmpty) {
-                try self.unsubscribeFromAllTopics()
+                if (self.subscribedTopics.isEmpty) {
+                    try self.unsubscribeFromAllTopics()
+                }
             }
+
+            return topicSubscribed
         }
 
-        return topicSubscribed
+        return false
     }
 
 /// Unsubscibe from a topic.
@@ -314,7 +324,9 @@ extension SubscriberSocket {
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue has been encountered.
 ///
-/// - Returns: if we have managed to subscribe to all topics.
+/// - Returns: If we have managed to subscribe to all topics.
+///
+/// - Note:    You cannot subscribe to all topics if `ignoreTopicSeperator` is true.
     public func subscribeToAllTopics() throws -> Bool {
         if (!self.ignoreTopicSeperator) {
             if (!self.subscribedToAllTopics) {
