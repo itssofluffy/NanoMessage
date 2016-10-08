@@ -22,6 +22,7 @@
 
 import C7
 
+/// PublisherSocket/SubscriberSocket protocol.
 public protocol PublisherSubscriber {
     var topicSeperator: Byte { get set }
 }

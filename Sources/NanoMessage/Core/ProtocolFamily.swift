@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+/// Socket protocol family.
 public enum ProtocolFamily {
     case Pair              // One-to-one protocol family.
     case PublishSubscribe  // Publish/Subscribe protocol family. These socket types are used to distribute messages to multiple destinations.

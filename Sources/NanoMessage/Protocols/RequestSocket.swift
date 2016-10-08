@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Request socket.
 public final class RequestSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
     public var _nanoSocket: NanoSocket {
         return self
@@ -37,10 +38,23 @@ public final class RequestSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
 }
 
 extension RequestSocket {
+/// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
+///
+/// Default value is 60000 milliseconds (1 minute).
+///
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///
+/// - Returns: The sockets resend interval.
     public func getResendInterval() throws -> Int {
         return try getSocketOption(self.socketFd, NN_REQ_RESEND_IVL, .RequestProtocol)
     }
 
+/// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
+///
+/// - Parameters:
+///   - milliseconds: The sockets resend interval.
+///
+/// - Throws:  `NanoMessageError.SetSocketOption`
     public func setResendInterval(milliseconds: Int) throws {
         try setSocketOption(self.socketFd, NN_REQ_RESEND_IVL, milliseconds, .RequestProtocol)
     }

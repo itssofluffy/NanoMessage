@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Socket domain.
 public enum SocketDomain: CInt {
     case StandardSocket // Standard full-blown SP socket.
     case RawSocket      // Raw SP socket.

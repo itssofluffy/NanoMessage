@@ -22,6 +22,7 @@
 
 import FNVHashValue
 
+/// Nanomsg symbol.
 public struct SymbolProperty {
     public let value: CInt
     public let name: String

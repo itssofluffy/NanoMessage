@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Surveyor socket.
 public final class SurveyorSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
     public var _nanoSocket: NanoSocket {
         return self
@@ -37,10 +38,27 @@ public final class SurveyorSocket: NanoSocket, ProtocolSocket, Sender, Receiver 
 }
 
 extension SurveyorSocket {
+/// Specifies how long to wait for responses to the survey. Once the deadline expires,
+/// receive function will throw `NanoMessageError.TimedOut` and all subsequent responses
+/// to the survey will be silently dropped. The deadline is measured in milliseconds.
+///
+/// Default value is 1000 milliseconds (1 second).
+///
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///
+/// - Returns: The sockets deadline timeout.
     public func getDeadline() throws -> Int {
         return try getSocketOption(self.socketFd, NN_SURVEYOR_DEADLINE, .SurveyorProtocol)
     }
 
+/// Specifies how long to wait for responses to the survey. Once the deadline expires,
+/// receive function will throw `NanoMessageError.TimedOut` and all subsequent responses
+/// to the survey will be silently dropped. The deadline is measured in milliseconds.
+///
+/// - Parameters:
+///   - milliseconds: The deadline timeout in milliseconds.
+///
+/// - Throws:  `NanoMessageError.SetSocketOption`
     public func setDeadline(milliseconds: Int) throws {
         try setSocketOption(self.socketFd, NN_SURVEYOR_DEADLINE, milliseconds, .SurveyorProtocol)
     }

@@ -1,11 +1,14 @@
-#NN_CONFIG_OPT = -Xlinker=-L/usr/local/lib/x86_64-linux-gnu
+#NN_CONFIG_OPTS = -Xlinker=-L/usr/local/lib/x86_64-linux-gnu
 all: build
 
 build:
-	swift build $(NN_CONFIG_OPT)
+	swift build $(NN_CONFIG_OPTS)
+
+buildrelease:
+	swift build --configuration release $(NN_CONFIG_OPTS)
 
 test:
-	swift test $(NN_CONFIG_OPT)
+	swift test $(NN_CONFIG_OPTS)
 
 runtest:
 	swift test --skip-build

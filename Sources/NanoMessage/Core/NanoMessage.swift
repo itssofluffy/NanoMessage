@@ -1,5 +1,5 @@
 /*
-    libnanomsg.swift
+    NanoMessage.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -23,18 +23,27 @@
 import Foundation
 import CNanoMessage
 
+/// The underlying nanomsg libraries ABI version.
 public func getNanoMsgABIVersion() -> (current: Int, revision: Int, age: Int) {
     return (Int(NN_VERSION_CURRENT), Int(NN_VERSION_REVISION), Int(NN_VERSION_AGE))
 }
 
+/// NanoMessage library ABI version.
 public func getABIVersion() -> (current: Int, revision: Int, age: Int) {
-    return (current: 0, revision: 1, age: 0)
+    return (current: 0, revision: 0, age: 5)
 }
 
+/// Notify all sockets about process termination.
 public func Terminate() {
     nn_term()
 }
 
+/// Get a nanomsg symbol.
+///
+/// - Parameters:
+///   - index: The index of the nanomsg symbol we require.
+///
+/// - Returns: The nanomsg libraries symbol name and value as a tuple.
 private func _getSymbol(_ index: CInt) -> (name: String, value: CInt)? {
     var value: CInt = 0
 
@@ -46,6 +55,7 @@ private func _getSymbol(_ index: CInt) -> (name: String, value: CInt)? {
 }
 
 private var _nanomsgSymbol = Dictionary<String, CInt>()
+/// A dictionary of nanomsg symbol names and values.
 public var nanomsgSymbol: Dictionary<String, CInt> {
     if (_nanomsgSymbol.isEmpty) {
         var index: CInt = 0
@@ -54,7 +64,7 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
             if let symbol: (name: String, value: CInt) = _getSymbol(index) {
                 _nanomsgSymbol[symbol.name] = symbol.value
             } else {
-                break
+                break     // no more symbols
             }
 
             index += 1
@@ -65,6 +75,7 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
 }
 
 private var _symbolProperty = Set<SymbolProperty>()
+/// A set of nanomsg symbol properties.
 public var symbolProperty: Set<SymbolProperty> {
     if (_symbolProperty.isEmpty) {
         var buffer = nn_symbol_properties()
@@ -74,7 +85,7 @@ public var symbolProperty: Set<SymbolProperty> {
         while (true) {
             let rc = nn_symbol_info(index, &buffer, bufferLength)
 
-            if (rc == 0) {
+            if (rc == 0) {    // no more symbol properties
                 break
             }
 
@@ -88,10 +99,11 @@ public var symbolProperty: Set<SymbolProperty> {
 }
 
 private var _nanomsgError = Dictionary<Int, String>()
+/// A dictionary of Posix nanomsg error codes and strings.
 public var nanomsgError: Dictionary<Int, String> {
     if (_nanomsgError.isEmpty) {
         for symbol in symbolProperty {
-            if (symbol.namespace == NN_NS_ERROR) {
+            if (symbol.namespace == NN_NS_ERROR) {              // we have a symbol property of the error namespace
                 _nanomsgError[Int(symbol.value)] = symbol.name
             }
         }

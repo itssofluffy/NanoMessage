@@ -20,9 +20,10 @@
     IN THE SOFTWARE.
 */
 
+/// Socket endpoint connection type
 public enum ConnectionType: UInt8 {
-    case BindToAddress      // End-point is local to the socket
-    case ConnectToAddress   // End-point is remote to the socket.
+    case BindToAddress      // endpoint is local to the socket
+    case ConnectToAddress   // endpoint is remote to the socket
 }
 
 extension ConnectionType: CustomStringConvertible {

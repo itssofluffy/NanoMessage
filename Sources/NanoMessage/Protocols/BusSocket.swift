@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Bus socket.
 public final class BusSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
     public var _nanoSocket: NanoSocket {
         return self

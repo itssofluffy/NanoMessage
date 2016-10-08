@@ -22,14 +22,15 @@
 
 import FNVHashValue
 
+/// Endpoint.
 public struct EndPoint {
-    public let id: Int
-    public let address: String
-    public let connectionType: ConnectionType
-    public var transportMechanism: TransportMechanism {
+    public let id: Int                                      // end-point id
+    public let address: String                              // end-point address
+    public let connectionType: ConnectionType               // end-point connection type (connect/bind)
+    public var transportMechanism: TransportMechanism {     // end-points transport mechanism
         return TransportMechanism(rawValue: self.address)
     }
-    public var name: String
+    public var name: String                                 // user defined name of the end-point
 
     public init(endPointId: Int, endPointAddress: String, connectionType: ConnectionType, endPointName: String = "") {
         self.id = endPointId
@@ -51,11 +52,11 @@ extension EndPoint: Hashable {
 
 extension EndPoint: CustomStringConvertible {
     public var description: String {
-        var epDescription = "id: \(self.id), address: \(self.address)"
+        var description = "id: \(self.id), address: \(self.address), connection type: \(self.connectionType), transport: \(self.transportMechanism)"
         if (self.name != "") {
-            epDescription += ", name: \(self.name)"
+            description += ", name: \(self.name)"
         }
 
-        return epDescription
+        return description
     }
 }

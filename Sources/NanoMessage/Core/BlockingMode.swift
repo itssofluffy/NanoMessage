@@ -22,9 +22,10 @@
 
 import CNanoMessage
 
+/// Socket send/receive blocking mode.
 public enum BlockingMode: CInt {
-    case Blocking
-    case NonBlocking
+    case Blocking         // send/receive are blocking
+    case NonBlocking      // send/receive are non-blocking
 
     public var rawValue: CInt {
         switch self {

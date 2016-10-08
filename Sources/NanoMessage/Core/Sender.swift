@@ -22,6 +22,7 @@
 
 import C7
 
+/// Sender socket protocol.
 public protocol Sender {
     func sendMessage(_ message: Data, blockingMode: BlockingMode) throws -> Int
     func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int

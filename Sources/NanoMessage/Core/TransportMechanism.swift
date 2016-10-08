@@ -23,6 +23,7 @@
 import Foundation
 import CNanoMessage
 
+/// Transport mechanism.
 public enum TransportMechanism: CInt {
     case TCP            // Transmission Control Protocol transport.
     case InProcess      // In-process transport.
@@ -81,11 +82,11 @@ extension TransportMechanism: CustomStringConvertible {
             case .TCP:
                 return "tcp"
             case .InProcess:
-                return "inter-process"
+                return "in-process"
             case .InterProcess:
                 return "ipc"
             case .WebSocket:
-                return "web socket"
+                return "web-socket"
             case .Unsupported:
                 return "unsupported"
         }

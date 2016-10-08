@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Sockets protocol.
 public enum SocketProtocol {
     case PairProtocol       // One-to-one protocol.
     case PublisherProtocol  // Publish/Subscribe protocol. This socket type is used to distribute messages to multiple destinations.

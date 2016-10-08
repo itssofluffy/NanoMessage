@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Pair (one-to-one) socket
 public final class PairSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
     public var _nanoSocket: NanoSocket {
         return self

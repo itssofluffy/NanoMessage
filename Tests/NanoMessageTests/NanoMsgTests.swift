@@ -41,7 +41,7 @@ class NanoMsgTests: XCTestCase {
         // test error values that we use explicitly in NanoMessage
         XCTAssertEqual(nanomsgSymbol["EINTR"], EINTR, "nanomsg symbol value for EINTR is different than expected.")
         XCTAssertEqual(nanomsgSymbol["EAGAIN"], EAGAIN, "nanomsg symbol value for EAGAIN is different than expected.")
-        XCTAssertEqual(nanomsgSymbol["ETIMEDOUT"], ETIMEDOUT, "nanomsg symbol value for TIMEDOUT is different than expected.")
+        XCTAssertEqual(nanomsgSymbol["ETIMEDOUT"], ETIMEDOUT, "nanomsg symbol value for ETIMEDOUT is different than expected.")
 
         XCTAssertEqual(nanomsgError[Int(EINTR)], "EINTR", "nanomsgError[EINTR] != \"EINTR\"")
         XCTAssertEqual(nanomsgError[Int(EAGAIN)], "EAGAIN", "nanomsgError[EAGAIN] != \"EAGAIN\"")

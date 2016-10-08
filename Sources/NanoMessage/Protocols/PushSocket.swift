@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Push socket.
 public final class PushSocket: NanoSocket, ProtocolSocket, Sender {
     public var _nanoSocket: NanoSocket {
         return self

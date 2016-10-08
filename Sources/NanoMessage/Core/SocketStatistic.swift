@@ -1,5 +1,5 @@
 /*
-    SocketStatistics.swift
+    SocketStatistic.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -22,11 +22,26 @@
 
 import CNanoMessage
 
-internal func getStatistic(_ socketFd: CInt, _ statistic: CInt) throws -> UInt64 {
+/// Retrieves the value of a statistic from the socket. Not all statistics are relevant to all transports.
+/// For example, the nn_inproc(7) transport does not maintain any of the connection related statistics.
+///
+/// - Parameters:
+///   - socketFd:  The NanoSocket file descriptor
+///   - statistic: The nanomsg statistic option.
+///
+/// - Throws: `NanoMessageError.GetSocketStatistic` if an issue was encountered.
+///
+/// - Returns: the resulting statistic.
+///
+/// - Note:    While this extension API is stable, these statistics are intended for human consumption,
+///            to facilitate observability and debugging. The actual statistics themselves as well as
+///            their meanings are unstable, and subject to change without notice. Programs should not
+///            depend on the presence or values of any particular statistic. 
+internal func getSocketStatistic(_ socketFd: CInt, _ statistic: CInt) throws -> UInt64 {
     let rc = nn_get_statistic(socketFd, statistic)
 
     guard (rc >= 0) else {
-        throw NanoMessageError.GetStatistic(code: nn_errno())
+        throw NanoMessageError.GetSocketStatistic(code: nn_errno())
     }
 
     return rc

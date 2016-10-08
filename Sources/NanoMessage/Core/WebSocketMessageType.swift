@@ -22,6 +22,7 @@
 
 import CNanoMessage
 
+/// Web socket message type.
 public enum WebSocketMessageType: CInt {
     case TextFrames
     case BinaryFrames

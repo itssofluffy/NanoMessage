@@ -23,16 +23,24 @@
 import C7
 import CNanoMessage
 
+/// Publisher socket.
 public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, PublisherSubscriber {
     public var _nanoSocket: NanoSocket {
         return self
     }
 
+/// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
+
+/// The topic to send.
     public var sendTopic = Data()
+/// A Dictionary of the topics sent with a count of the times sent.
     public fileprivate(set) var sentTopics = Dictionary<Data, UInt>()
 
+/// Prepend the topic to the start of the message when sending.
     public var prependTopic = true
+/// When prepending the topic to the message do we ignore the topic seperator,
+/// if true then the Subscriber socket should do the same and have subscribed to topics of equal length.
     public var ignoreTopicSeperator = false
 
     public init(socketDomain: SocketDomain) throws {
@@ -45,16 +53,29 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, Publishe
 }
 
 extension PublisherSocket {
+/// Send a message.
+///
+/// - Parameters:
+///   - message:      The message to send.
+///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+///                   If the message cannot be sent straight away, the function will throw
+///                   `NanoMessageError.MessageNotSent`
+///
+/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+///            `NanoMessageError.TimedOut` the send timedout.
+///
+/// - Returns: The number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         var messagePayload: Data
 
-        if (self.prependTopic) {
-            if (self.sendTopic.isEmpty) {
+        if (self.prependTopic) {                                  // we are prepending the topic to the start of the message.
+            if (self.sendTopic.isEmpty) {                         // check that we have a topic to send.
                 throw NanoMessageError.NoTopic
             }
 
-            if (self.ignoreTopicSeperator) {
+            if (self.ignoreTopicSeperator) {                      // check if we are ignoring the topic seperator.
                 messagePayload = self.sendTopic + message
             } else {
                 messagePayload = self.sendTopic + [self.topicSeperator] + message
@@ -65,6 +86,7 @@ extension PublisherSocket {
 
         let bytesSent = try sendPayloadToSocket(self.socketFd, messagePayload, blockingMode)
 
+        // remember which topics we've sent and how many.
         if var topicCount = sentTopics[self.sendTopic] {
             topicCount += 1
             sentTopics[self.sendTopic] = topicCount
@@ -73,10 +95,5 @@ extension PublisherSocket {
         }
 
         return bytesSent
-    }
-
-    @discardableResult
-    public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        return try self.sendMessage(Data(message), blockingMode: blockingMode)
     }
 }

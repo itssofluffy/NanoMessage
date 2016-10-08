@@ -23,16 +23,17 @@
 import CNanoMessage
 
 public enum NanoMessageError: Error {
-    case Socket(code: CInt)
+    case NanoSocket(code: CInt)
     case Close(code: CInt)
     case Interrupted
     case BindToAddress(code: CInt)
     case ConnectToAddress(code: CInt)
     case RemoveEndPoint(code: CInt)
     case BindToSocket(code: CInt)
+    case LoopBack(code: CInt)
     case GetSocketOption(code: CInt)
     case SetSocketOption(code: CInt)
-    case GetStatistic(code: CInt)
+    case GetSocketStatistic(code: CInt)
     case PollSocket(code: CInt)
     case SendMessage(code: CInt)
     case MessageNotSent
@@ -41,16 +42,25 @@ public enum NanoMessageError: Error {
     case TimedOut
     case NoTopic
     case InvalidTopic
+    case FeatureNotSupported(str: String)
 }
 
 extension NanoMessageError: CustomStringConvertible {
     public var description: String {
         func errorString(_ code: CInt) -> String {
-            return String(cString: nn_strerror(code)) + " (#\(code) '\(nanomsgError[Int(code)]!)')"
+            var errorMessage = String(cString: nn_strerror(code))
+
+            if let posixError = nanomsgError[Int(code)] {
+                errorMessage += " (#\(code) '\(posixError)')"
+            } else {
+                errorMessage += " (#\(code))"
+            }
+
+            return errorMessage
         }
 
         switch self {
-            case .Socket(let code):
+            case .NanoSocket(let code):
                 return "nn_socket() failed: " + errorString(code)
             case .Close(let code):
                 return "nn_close() failed: " + errorString(code)
@@ -64,12 +74,14 @@ extension NanoMessageError: CustomStringConvertible {
                 return "removeEndPoint() failed: " + errorString(code)
             case .BindToSocket(let code):
                 return "bindToSocket() failed: " + errorString(code)
+            case .LoopBack(let code):
+                return "loopBack() failed: " + errorString(code)
             case .GetSocketOption(let code):
                 return "getSocketOption() failed: " + errorString(code)
             case .SetSocketOption(let code):
                 return "setSocketOption() failed: " + errorString(code)
-            case .GetStatistic(let code):
-                return "getStatistic() failed: " + errorString(code)
+            case .GetSocketStatistic(let code):
+                return "getSocketStatistic() failed: " + errorString(code)
             case .PollSocket(let code):
                 return "pollSocket() failed: " + errorString(code)
             case .SendMessage(let code):
@@ -86,6 +98,8 @@ extension NanoMessageError: CustomStringConvertible {
                 return "topic undefined"
             case .InvalidTopic:
                 return "topics of unequal length"
+            case .FeatureNotSupported(let str):
+                return "unsupported feature: " + str
         }
     }
 }
