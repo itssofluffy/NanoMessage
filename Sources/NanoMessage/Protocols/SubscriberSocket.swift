@@ -255,7 +255,7 @@ extension SubscriberSocket {
                     throw NanoMessageError.InvalidTopic
                 }
 
-                try setSocketOption(self.socketFd, NN_SUB_SUBSCRIBE, topic, .SubscriberProtocol)
+                try setSocketOption(self.socketFd, .Subscribe, topic, .SubscriberProtocol)
                 self.subscribedTopics.insert(topic)
             }
 
@@ -293,7 +293,7 @@ extension SubscriberSocket {
             let topicSubscribed = self.isTopicSubscribed(topic)
 
             if (topicSubscribed) {
-                try setSocketOption(self.socketFd, NN_SUB_UNSUBSCRIBE, topic, .SubscriberProtocol)
+                try setSocketOption(self.socketFd, .UnSubscribe, topic, .SubscriberProtocol)
                 self.subscribedTopics.remove(topic)
 
                 if (self.subscribedTopics.isEmpty) {
@@ -334,7 +334,7 @@ extension SubscriberSocket {
                     try self.unsubscribeFrom(topic: topic)
                 }
 
-                try setSocketOption(self.socketFd, NN_SUB_SUBSCRIBE, "", .SubscriberProtocol)
+                try setSocketOption(self.socketFd, .Subscribe, "", .SubscriberProtocol)
 
                 self.subscribedToAllTopics = true
             }
@@ -354,7 +354,7 @@ extension SubscriberSocket {
         }
 
         if (self.subscribedToAllTopics) {
-            try setSocketOption(self.socketFd, NN_SUB_UNSUBSCRIBE, "", .SubscriberProtocol)
+            try setSocketOption(self.socketFd, .UnSubscribe, "", .SubscriberProtocol)
         }
 
         self.subscribedToAllTopics = false

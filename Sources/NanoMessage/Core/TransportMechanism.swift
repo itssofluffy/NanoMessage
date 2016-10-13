@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
 import CNanoMessage
 
 /// Transport mechanism.

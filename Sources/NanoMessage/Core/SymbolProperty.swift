@@ -1,5 +1,5 @@
 /*
-    SymbolProperties.swift
+    SymbolProperty.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 

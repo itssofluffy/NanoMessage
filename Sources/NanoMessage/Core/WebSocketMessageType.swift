@@ -35,17 +35,6 @@ public enum WebSocketMessageType: CInt {
                 return NN_WS_MSG_TYPE_BINARY
         }
     }
-
-    public init?(rawValue: CInt) {
-        switch rawValue {
-            case NN_WS_MSG_TYPE_TEXT:
-                self = .TextFrames
-            case NN_WS_MSG_TYPE_BINARY:
-                self = .BinaryFrames
-            default:
-                return nil
-        }
-    }
 }
 
 extension WebSocketMessageType: CustomStringConvertible {

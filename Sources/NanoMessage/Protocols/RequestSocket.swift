@@ -46,7 +46,7 @@ extension RequestSocket {
 ///
 /// - Returns: The sockets resend interval.
     public func getResendInterval() throws -> Int {
-        return try getSocketOption(self.socketFd, NN_REQ_RESEND_IVL, .RequestProtocol)
+        return try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol)
     }
 
 /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
@@ -56,6 +56,6 @@ extension RequestSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setResendInterval(milliseconds: Int) throws {
-        try setSocketOption(self.socketFd, NN_REQ_RESEND_IVL, milliseconds, .RequestProtocol)
+        try setSocketOption(self.socketFd, .ResendInterval, milliseconds, .RequestProtocol)
     }
 }

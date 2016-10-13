@@ -31,9 +31,9 @@ public enum NanoMessageError: Error {
     case RemoveEndPoint(code: CInt)
     case BindToSocket(code: CInt)
     case LoopBack(code: CInt)
-    case GetSocketOption(code: CInt)
-    case SetSocketOption(code: CInt)
-    case GetSocketStatistic(code: CInt)
+    case GetSocketOption(code: CInt, option: SocketOption)
+    case SetSocketOption(code: CInt, option: SocketOption)
+    case GetSocketStatistic(code: CInt, option: SocketStatistic)
     case PollSocket(code: CInt)
     case SendMessage(code: CInt)
     case MessageNotSent
@@ -76,12 +76,12 @@ extension NanoMessageError: CustomStringConvertible {
                 return "bindToSocket() failed: " + errorString(code)
             case .LoopBack(let code):
                 return "loopBack() failed: " + errorString(code)
-            case .GetSocketOption(let code):
-                return "getSocketOption() failed: " + errorString(code)
-            case .SetSocketOption(let code):
-                return "setSocketOption() failed: " + errorString(code)
-            case .GetSocketStatistic(let code):
-                return "getSocketStatistic() failed: " + errorString(code)
+            case .GetSocketOption(let code, let option):
+                return "getSocketOption('\(option)') failed: " + errorString(code)
+            case .SetSocketOption(let code, let option):
+                return "setSocketOption('\(option)') failed: " + errorString(code)
+            case .GetSocketStatistic(let code, let option):
+                return "getSocketStatistic('\(option)') failed: " + errorString(code)
             case .PollSocket(let code):
                 return "pollSocket() failed: " + errorString(code)
             case .SendMessage(let code):

@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
 import CNanoMessage
 
 /// The underlying nanomsg libraries ABI version.
@@ -83,9 +82,9 @@ public var symbolProperty: Set<SymbolProperty> {
         var index: CInt = 0
 
         while (true) {
-            let rc = nn_symbol_info(index, &buffer, bufferLength)
+            let returnCode = nn_symbol_info(index, &buffer, bufferLength)
 
-            if (rc == 0) {    // no more symbol properties
+            if (returnCode == 0) {    // no more symbol properties
                 break
             }
 

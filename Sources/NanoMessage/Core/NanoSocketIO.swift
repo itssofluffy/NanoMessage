@@ -65,7 +65,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 private func _maxBufferSize(_ socketFd: CInt) -> Int {
     let defaultReceiveMaximumMessageSize: CInt = 1048576 // 1024 * 1024 bytes = 1 MiB
 
-    if var bufferSize: CInt = try? getSocketOption(socketFd, NN_RCVMAXSIZE) {
+    if var bufferSize: CInt = try? getSocketOption(socketFd, .ReceiveMaximumSize) {
         if (bufferSize <= 0) {
             bufferSize = defaultReceiveMaximumMessageSize
         }

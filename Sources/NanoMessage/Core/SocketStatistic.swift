@@ -22,12 +22,92 @@
 
 import CNanoMessage
 
+public enum SocketStatistic: CInt {
+    case EstablishedConnections     // The number of connections successfully established that were initiated from this socket.
+    case AcceptedConnections        // The number of connections successfully established that were accepted by this socket.
+    case DroppedConnections         // The number of established connections that were dropped by this socket.
+    case BrokenConnections          // The number of established connections that were closed by this socket, typically due to protocol errors.
+    case ConnectErrors              // The number of errors encountered by this socket trying to connect to a remote peer.
+    case BindErrors                 // The number of errors encountered by this socket trying to bind to a local address.
+    case AcceptErrors               // The number of errors encountered by this socket trying to accept a a connection from a remote peer.
+    case CurrentConnections         // The number of connections currently estabalished to this socket.
+    case MessagesSent               // The number messages sent by this socket.
+    case MessagesReceived           // The number messages received by this socket.
+    case BytesSent                  // The number of bytes sent by this socket.
+    case BytesReceived              // The number of bytes received by this socket.
+    case CurrentSendPriority        // The current send priority of the socket.
+
+    public var rawValue: CInt {
+        switch self {
+            case .EstablishedConnections:
+                return NN_STAT_ESTABLISHED_CONNECTIONS
+            case .AcceptedConnections:
+                return NN_STAT_ACCEPTED_CONNECTIONS
+            case .DroppedConnections:
+                return NN_STAT_DROPPED_CONNECTIONS
+            case .BrokenConnections:
+                return NN_STAT_BROKEN_CONNECTIONS
+            case .ConnectErrors:
+                return NN_STAT_CONNECT_ERRORS
+            case .BindErrors:
+                return NN_STAT_BIND_ERRORS
+            case .AcceptErrors:
+                return NN_STAT_ACCEPT_ERRORS
+            case .CurrentConnections:
+                return NN_STAT_CURRENT_CONNECTIONS
+            case .MessagesSent:
+                return NN_STAT_MESSAGES_SENT
+            case .MessagesReceived:
+                return NN_STAT_MESSAGES_RECEIVED
+            case .BytesSent:
+                return NN_STAT_BYTES_SENT
+            case .BytesReceived:
+                return NN_STAT_BYTES_RECEIVED
+            case .CurrentSendPriority:
+                return NN_STAT_CURRENT_SND_PRIORITY
+        }
+    }
+}
+
+extension SocketStatistic: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .EstablishedConnections:
+                return "established-connections"
+            case .AcceptedConnections:
+                return "accepted-connections"
+            case .DroppedConnections:
+                return "dropped-connections"
+            case .BrokenConnections:
+                return "broken-connections"
+            case .ConnectErrors:
+                return "connect-errors"
+            case .BindErrors:
+                return "bind-errors"
+            case .AcceptErrors:
+                return "accept-errors"
+            case .CurrentConnections:
+                return "current-connections"
+            case .MessagesSent:
+                return "messages-sent"
+            case .MessagesReceived:
+                return "messages-received"
+            case .BytesSent:
+                return "bytes-sent"
+            case .BytesReceived:
+                return "bytes-received"
+            case .CurrentSendPriority:
+                return "current send priority"
+        }
+    }
+}
+
 /// Retrieves the value of a statistic from the socket. Not all statistics are relevant to all transports.
 /// For example, the nn_inproc(7) transport does not maintain any of the connection related statistics.
 ///
 /// - Parameters:
-///   - socketFd:  The NanoSocket file descriptor
-///   - statistic: The nanomsg statistic option.
+///   - socketFd: The NanoSocket file descriptor
+///   - option:   The nanomsg statistic option.
 ///
 /// - Throws: `NanoMessageError.GetSocketStatistic` if an issue was encountered.
 ///
@@ -37,12 +117,12 @@ import CNanoMessage
 ///            to facilitate observability and debugging. The actual statistics themselves as well as
 ///            their meanings are unstable, and subject to change without notice. Programs should not
 ///            depend on the presence or values of any particular statistic. 
-internal func getSocketStatistic(_ socketFd: CInt, _ statistic: CInt) throws -> UInt64 {
-    let rc = nn_get_statistic(socketFd, statistic)
+internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) throws -> UInt64 {
+    let statistic = nn_get_statistic(socketFd, option.rawValue)
 
-    guard (rc >= 0) else {
-        throw NanoMessageError.GetSocketStatistic(code: nn_errno())
+    guard (statistic >= 0) else {
+        throw NanoMessageError.GetSocketStatistic(code: nn_errno(), option: option)
     }
 
-    return rc
+    return statistic
 }
