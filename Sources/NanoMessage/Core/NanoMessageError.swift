@@ -22,13 +22,14 @@
 
 import CNanoMessage
 
+/// NanoMessage Error Domain.
 public enum NanoMessageError: Error {
     case NanoSocket(code: CInt)
     case Close(code: CInt)
     case Interrupted
-    case BindToAddress(code: CInt)
-    case ConnectToAddress(code: CInt)
-    case RemoveEndPoint(code: CInt)
+    case BindToAddress(code: CInt, address: String)
+    case ConnectToAddress(code: CInt, address: String)
+    case RemoveEndPoint(code: CInt, address: String)
     case BindToSocket(code: CInt)
     case LoopBack(code: CInt)
     case GetSocketOption(code: CInt, option: SocketOption)
@@ -37,12 +38,13 @@ public enum NanoMessageError: Error {
     case PollSocket(code: CInt)
     case SendMessage(code: CInt)
     case MessageNotSent
+    case SendTimedOut
     case ReceiveMessage(code: CInt)
     case MessageNotAvailable
-    case TimedOut
+    case ReceiveTimedOut
     case NoTopic
     case InvalidTopic
-    case FeatureNotSupported(str: String)
+    case FeatureNotSupported(function: String, description: String)
 }
 
 extension NanoMessageError: CustomStringConvertible {
@@ -66,12 +68,12 @@ extension NanoMessageError: CustomStringConvertible {
                 return "nn_close() failed: " + errorString(code)
             case .Interrupted:
                 return "operation was interrupted"
-            case .BindToAddress(let code):
-                return "bindToAddress() failed: " + errorString(code)
-            case .ConnectToAddress(let code):
-                return "connectToAddress() failed: " + errorString(code)
-            case .RemoveEndPoint(let code):
-                return "removeEndPoint() failed: " + errorString(code)
+            case .BindToAddress(let code, let address):
+                return "bindToAddress('\(address)') failed: " + errorString(code)
+            case .ConnectToAddress(let code, let address):
+                return "connectToAddress('\(address)') failed: " + errorString(code)
+            case .RemoveEndPoint(let code, let address):
+                return "removeEndPoint('\(address)') failed: " + errorString(code)
             case .BindToSocket(let code):
                 return "bindToSocket() failed: " + errorString(code)
             case .LoopBack(let code):
@@ -92,14 +94,14 @@ extension NanoMessageError: CustomStringConvertible {
                 return "receiveMessage() failed: " + errorString(code)
             case .MessageNotAvailable:
                 return "no message received"
-            case .TimedOut:
+            case .SendTimedOut, .ReceiveTimedOut:
                 return "operation has timed out"
             case .NoTopic:
                 return "topic undefined"
             case .InvalidTopic:
                 return "topics of unequal length"
-            case .FeatureNotSupported(let str):
-                return "unsupported feature: " + str
+            case .FeatureNotSupported(let function, let description):
+                return "\(function)() unsupported feature: " + description
         }
     }
 }

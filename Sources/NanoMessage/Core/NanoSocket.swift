@@ -110,7 +110,7 @@ private var _closureAttempts: UInt = 10
                 print(error)
                 terminateLoop = true
             } catch {
-                print("an unexpected error '\(error)' has occured in the library NanoMessage.")
+                print("an unexpected error '\(error)' has occured in the library libNanoMessage.")
                 terminateLoop = true
             }
         } while (!terminateLoop)
@@ -156,7 +156,7 @@ extension NanoSocket {
         }
 
         guard (endPointId >= 0) else {
-            throw NanoMessageError.BindToAddress(code: nn_errno())
+            throw NanoMessageError.BindToAddress(code: nn_errno(), address: endPointAddress)
         }
 
         let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .BindToAddress, endPointName: endPointName)
@@ -210,7 +210,7 @@ extension NanoSocket {
         }
 
         guard (endPointId >= 0) else {
-            throw NanoMessageError.ConnectToAddress(code: nn_errno())
+            throw NanoMessageError.ConnectToAddress(code: nn_errno(), address: endPointAddress)
         }
 
         let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .ConnectToAddress, endPointName: endPointName)
@@ -272,7 +272,7 @@ extension NanoSocket {
 
                         loopCount += 1
                     } else {
-                        throw NanoMessageError.RemoveEndPoint(code: errno)
+                        throw NanoMessageError.RemoveEndPoint(code: errno, address: endPoint.address)
                     }
                 } else {
                     break                                                       // we've closed the endpoint succesfully
@@ -358,7 +358,7 @@ extension NanoSocket {
 ///
 /// - Returns: The sockets protocol family.
     public func getProtocolFamily() throws -> ProtocolFamily {
-        return try ProtocolFamily(rawValue: self.getSocketProtocol())
+        return ProtocolFamily(rawValue: try self.getSocketProtocol())
     }
 
 /// Specifies how long the socket should try to send pending outbound messages after the socket
@@ -426,7 +426,7 @@ extension NanoSocket {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets reconnect maximum interval.
-    public func getReconnectIntervalMax() throws -> UInt {
+    public func getReconnectIntervalMaximum() throws -> UInt {
         return try getSocketOption(self.socketFd, .ReconnectIntervalMaximum)
     }
 
@@ -440,7 +440,7 @@ extension NanoSocket {
 ///   - milliseconds: The reconnection maximum interval in milliseconds.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReconnectIntervalMax(milliseconds: UInt) throws {
+    public func setReconnectIntervalMaximum(milliseconds: UInt) throws {
         try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, milliseconds)
     }
 
@@ -477,7 +477,7 @@ extension NanoSocket {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
     public func getIPv4Only() throws -> Bool {
-        return try getSocketOption(self.socketFd, .IPV4Only)
+        return try getSocketOption(self.socketFd, .IPv4Only)
     }
 
 /// If true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
@@ -487,7 +487,7 @@ extension NanoSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setIPv4Only(_ ip4Only: Bool) throws {
-        try setSocketOption(self.socketFd, .IPV4Only, ip4Only)
+        try setSocketOption(self.socketFd, .IPv4Only, ip4Only)
     }
 
 /// The maximum number of "hops" a message can go through before it is dropped. Each time the

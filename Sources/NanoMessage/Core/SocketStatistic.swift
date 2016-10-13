@@ -73,29 +73,29 @@ extension SocketStatistic: CustomStringConvertible {
     public var description: String {
         switch self {
             case .EstablishedConnections:
-                return "established-connections"
+                return "established connections"
             case .AcceptedConnections:
-                return "accepted-connections"
+                return "accepted connections"
             case .DroppedConnections:
-                return "dropped-connections"
+                return "dropped connections"
             case .BrokenConnections:
-                return "broken-connections"
+                return "broken connections"
             case .ConnectErrors:
-                return "connect-errors"
+                return "connect errors"
             case .BindErrors:
-                return "bind-errors"
+                return "bind errors"
             case .AcceptErrors:
-                return "accept-errors"
+                return "accept errors"
             case .CurrentConnections:
-                return "current-connections"
+                return "current connections"
             case .MessagesSent:
-                return "messages-sent"
+                return "messages sent"
             case .MessagesReceived:
-                return "messages-received"
+                return "messages received"
             case .BytesSent:
-                return "bytes-sent"
+                return "bytes sent"
             case .BytesReceived:
-                return "bytes-received"
+                return "bytes received"
             case .CurrentSendPriority:
                 return "current send priority"
         }

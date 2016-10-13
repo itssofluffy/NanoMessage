@@ -75,8 +75,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             do {
                 node1Received = try node1.receiveMessage()
                 XCTAssert(false, "received a message on node1")
-            } catch NanoMessageError.TimedOut {
-                XCTAssert(true, "\(NanoMessageError.TimedOut))")   // we have timedout
+            } catch NanoMessageError.ReceiveTimedOut {
+                XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut))")   // we have timedout
             }
 
             completed = true
@@ -157,8 +157,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             do {
                 let _: (bytes: Int, message: String) = try node1.receiveMessage()
                 XCTAssert(false, "received a message on node1")
-            } catch NanoMessageError.TimedOut {
-                XCTAssert(true, "\(NanoMessageError.TimedOut)")
+            } catch NanoMessageError.ReceiveTimedOut {
+                XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")
             }
 
             node0.sendTopic = "dwarfPlanet"

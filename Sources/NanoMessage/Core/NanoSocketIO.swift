@@ -46,7 +46,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotSent
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.TimedOut
+            throw NanoMessageError.SendTimedOut
         }
 
         throw NanoMessageError.SendMessage(code: errno)
@@ -65,7 +65,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 private func _maxBufferSize(_ socketFd: CInt) -> Int {
     let defaultReceiveMaximumMessageSize: CInt = 1048576 // 1024 * 1024 bytes = 1 MiB
 
-    if var bufferSize: CInt = try? getSocketOption(socketFd, .ReceiveMaximumSize) {
+    if var bufferSize: CInt = try? getSocketOption(socketFd, .ReceiveMaximumMessageSize) {
         if (bufferSize <= 0) {
             bufferSize = defaultReceiveMaximumMessageSize
         }
@@ -101,7 +101,7 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotAvailable
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.TimedOut
+            throw NanoMessageError.ReceiveTimedOut
         }
 
         throw NanoMessageError.ReceiveMessage(code: errno)

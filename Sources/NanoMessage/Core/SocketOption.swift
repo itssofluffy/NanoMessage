@@ -29,14 +29,14 @@ public enum SocketOption: CInt {
     case Linger
     case SendBuffer
     case ReceiveBuffer
-    case ReceiveMaximumSize
+    case ReceiveMaximumMessageSize
     case SendTimeOut
     case ReceiveTimeOut
     case ReconnectInterval
     case ReconnectIntervalMaximum
     case SendPriority
     case ReceivePriority
-    case IPV4Only
+    case IPv4Only
     case SendFd
     case ReceiveFd
     case SocketName
@@ -60,7 +60,7 @@ public enum SocketOption: CInt {
                 return NN_SNDBUF
             case .ReceiveBuffer:
                 return NN_RCVBUF
-            case .ReceiveMaximumSize:
+            case .ReceiveMaximumMessageSize:
                 return NN_RCVMAXSIZE
             case .SendTimeOut:
                 return NN_SNDTIMEO
@@ -74,7 +74,7 @@ public enum SocketOption: CInt {
                 return NN_SNDPRIO
             case .ReceivePriority:
                 return NN_RCVPRIO
-            case .IPV4Only:
+            case .IPv4Only:
                 return NN_IPV4ONLY
             case .SendFd:
                 return NN_SNDFD
@@ -113,12 +113,12 @@ extension SocketOption: CustomStringConvertible {
                 return "send buffer"
             case .ReceiveBuffer:
                 return "receive buffer"
-            case .ReceiveMaximumSize:
+            case .ReceiveMaximumMessageSize:
                 return "receive maximum size"
             case .SendTimeOut:
-                return "send time out"
+                return "send timeout"
             case .ReceiveTimeOut:
-                return "receive time out"
+                return "receive timeout"
             case .ReconnectInterval:
                 return "reconnect interval"
             case .ReconnectIntervalMaximum:
@@ -127,7 +127,7 @@ extension SocketOption: CustomStringConvertible {
                 return "send priority"
             case .ReceivePriority:
                 return "receive priority"
-            case .IPV4Only:
+            case .IPv4Only:
                 return "ipv4 only"
             case .SendFd:
                 return "send fd"
@@ -146,7 +146,7 @@ extension SocketOption: CustomStringConvertible {
             case .SurveyDeadline:
                 return "survey deadline"
             case .TCPNoDelay:
-                return "tcp no delay"
+                return "tcp nodelay"
             case .WebSocketMessageType:
                 return "web-socket message type"
         }

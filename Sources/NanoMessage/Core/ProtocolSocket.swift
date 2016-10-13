@@ -265,7 +265,7 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Note:    The receive size is unlimited is not currently supported
     public func getMaximumMessageSize() throws -> Int {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumSize)
+        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumMessageSize)
     }
 
 /// Maximum message size that can be received, in bytes. Negative value means that the received size
@@ -280,10 +280,10 @@ extension ProtocolSocket where Self: Receiver {
 /// - Note:    The receive size is unlimited is not currently supported
     public func setMaximumMessageSize(bytes: Int) throws {
         if (bytes < 0) {
-            throw NanoMessageError.FeatureNotSupported(str: "unlimited buffersize is not currently supported")
+            throw NanoMessageError.FeatureNotSupported(function: "setMaximumMessageSize", description: "unlimited buffersize is not currently supported")
         }
 
-        try setSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumSize, bytes)
+        try setSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumMessageSize, bytes)
     }
 
 /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
