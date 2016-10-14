@@ -42,6 +42,8 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, Publishe
 /// When prepending the topic to the message do we ignore the topic seperator,
 /// if true then the Subscriber socket should do the same and have subscribed to topics of equal length.
     public var ignoreTopicSeperator = false
+/// Reset the send topic to empty after a sendMessage() has been performed.
+    public var resetTopicAfterSend = false
 
     public init(socketDomain: SocketDomain) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .PublisherProtocol)
@@ -86,12 +88,18 @@ extension PublisherSocket {
 
         let bytesSent = try sendPayloadToSocket(self.socketFd, messagePayload, blockingMode)
 
-        // remember which topics we've sent and how many.
-        if var topicCount = sentTopics[self.sendTopic] {
-            topicCount += 1
-            sentTopics[self.sendTopic] = topicCount
-        } else {
-            sentTopics[self.sendTopic] = 1
+        if (!self.sendTopic.isEmpty) {                            // check that we have a send topic.
+            // remember which topics we've sent and how many.
+            if var topicCount = sentTopics[self.sendTopic] {
+                topicCount += 1
+                sentTopics[self.sendTopic] = topicCount
+            } else {
+                sentTopics[self.sendTopic] = 1
+            }
+
+            if (self.resetTopicAfterSend) {                       // are we resetting the topic?
+                self.sendTopic = Data()
+            }
         }
 
         return bytesSent
