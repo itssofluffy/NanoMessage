@@ -280,7 +280,7 @@ extension ProtocolSocket where Self: Receiver {
 /// - Note:    The receive size is unlimited is not currently supported
     public func setMaximumMessageSize(bytes: Int) throws {
         if (bytes < 0) {
-            throw NanoMessageError.FeatureNotSupported(function: "setMaximumMessageSize", description: "unlimited buffersize is not currently supported")
+            throw NanoMessageError.FeatureNotSupported(function: #function, description: "unlimited buffersize is not currently supported")
         }
 
         try setSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumMessageSize, bytes)
