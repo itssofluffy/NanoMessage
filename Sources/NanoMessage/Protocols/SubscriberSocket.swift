@@ -101,11 +101,11 @@ extension SubscriberSocket {
 ///
 /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: Data) {
+        self.receivedTopic = Data()
+
         var received: (bytes: Int, message: Data) = try receivePayloadFromSocket(self.socketFd, blockingMode)
 
         if (received.bytes > 0) {                                               // we have a message to process...
-            self.receivedTopic = Data()
-
             if (!self.subscribedToAllTopics || self.ignoreTopicSeperator) {     // determine how to extract the topic.
                 for topic in self.subscribedTopics {
                     if (_messageHasTopic(topic, received.message)) {
