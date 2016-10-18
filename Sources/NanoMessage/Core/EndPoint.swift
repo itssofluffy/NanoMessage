@@ -30,12 +30,16 @@ public struct EndPoint {
     public var transportMechanism: TransportMechanism {     // end-points transport mechanism
         return TransportMechanism(rawValue: self.address)
     }
+    public let receivePriority: Int?                        // receive priority of the end-point.
+    public let sendPriority: Int?                           // send priority to the end-point.
     public var name: String                                 // user defined name of the end-point
 
-    public init(endPointId: Int, endPointAddress: String, connectionType: ConnectionType, endPointName: String = "") {
+    public init(endPointId: Int, endPointAddress: String, connectionType: ConnectionType, receivePriority: Int?, sendPriority: Int?, endPointName: String = "") {
         self.id = endPointId
         self.address = endPointAddress
         self.connectionType = connectionType
+        self.receivePriority = receivePriority
+        self.sendPriority = sendPriority
         self.name = endPointName
     }
 }

@@ -159,7 +159,18 @@ extension NanoSocket {
             throw NanoMessageError.BindToAddress(code: nn_errno(), address: endPointAddress)
         }
 
-        let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .BindToAddress, endPointName: endPointName)
+        var receivePriority: Int?
+        var sendPriority: Int?
+
+        if let _: Int = try? getSocketOption(socketFd, .ReceiveFd) {                  // if this is a receiver socket then...
+            receivePriority = try getSocketOption(self.socketFd, .ReceivePriority)    // obtain the receive priority for the end-point.
+        }
+        if let _: Int = try? getSocketOption(socketFd, .SendFd) {                     // if this is a sender socket then...
+            sendPriority = try getSocketOption(self.socketFd, .SendPriority)          // obtain the send priority for the end-point.
+        }
+
+        let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .BindToAddress,
+                                receivePriority: receivePriority, sendPriority: sendPriority, endPointName: endPointName)
 
         self.endPoints.insert(endPoint)
 
@@ -213,7 +224,18 @@ extension NanoSocket {
             throw NanoMessageError.ConnectToAddress(code: nn_errno(), address: endPointAddress)
         }
 
-        let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .ConnectToAddress, endPointName: endPointName)
+        var receivePriority: Int?
+        var sendPriority: Int?
+
+        if let _: Int = try? getSocketOption(socketFd, .ReceiveFd) {                  // if this is a receiver socket then...
+            receivePriority = try getSocketOption(self.socketFd, .ReceivePriority)    // obtain the receive priority for the end-point.
+        }
+        if let _: Int = try? getSocketOption(socketFd, .SendFd) {                     // if this is a sender socket then...
+            sendPriority = try getSocketOption(self.socketFd, .SendPriority)          // obtain the send priority for the end-point.
+        }
+
+        let endPoint = EndPoint(endPointId: Int(endPointId), endPointAddress: endPointAddress, connectionType: .ConnectToAddress,
+                                receivePriority: receivePriority, sendPriority: sendPriority, endPointName: endPointName)
 
         self.endPoints.insert(endPoint)
 
