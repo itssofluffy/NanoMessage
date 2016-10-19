@@ -172,6 +172,8 @@ extension NanoSocket {
     public func bindToAddress(_ endPointAddress: String, endPointName: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
+        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
+
         endPointAddress.withCString {
             endPointId = nn_bind(self.socketFd, $0)
         }
@@ -179,8 +181,6 @@ extension NanoSocket {
         guard (endPointId >= 0) else {
             throw NanoMessageError.BindToAddress(code: nn_errno(), address: endPointAddress)
         }
-
-        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
 
         let endPoint = EndPoint(endPointId: Int(endPointId),
                                 endPointAddress: endPointAddress,
@@ -235,6 +235,8 @@ extension NanoSocket {
     public func connectToAddress(_ endPointAddress: String, endPointName: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
+        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
+
         endPointAddress.withCString {
             endPointId = nn_connect(self.socketFd, $0)
         }
@@ -242,8 +244,6 @@ extension NanoSocket {
         guard (endPointId >= 0) else {
             throw NanoMessageError.ConnectToAddress(code: nn_errno(), address: endPointAddress)
         }
-
-        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
 
         let endPoint = EndPoint(endPointId: Int(endPointId),
                                 endPointAddress: endPointAddress,
@@ -335,10 +335,10 @@ extension NanoSocket {
 ///
 /// - Returns: If the endpoint was removed, false indicates that the endpoint was not attached to the socket.
     @discardableResult
-    public func removeEndPoint(_ endPoint: Int) throws -> Bool {
-        for ePoint in self.endPoints {
-            if (endPoint == ePoint.id) {
-                return try self.removeEndPoint(ePoint)
+    public func removeEndPoint(_ endPointId: Int) throws -> Bool {
+        for endPoint in self.endPoints {
+            if (endPointId == endPoint.id) {
+                return try self.removeEndPoint(endPoint)
             }
         }
 
