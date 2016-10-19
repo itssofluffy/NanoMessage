@@ -28,6 +28,8 @@ public let payload = "This above all...to thine own self be true."
 public let allTests = [
     testCase(NanoMsgTests.allTests),
     testCase(VersionTests.allTests),
+    testCase(SocketOptionTests.allTests),
+    testCase(EndPointTests.allTests),
     testCase(PipelineProtocolFamilyTests.allTests),
     testCase(PairProtocolFamilyTests.allTests),
     testCase(RequestReplyProtocolFamilyTests.allTests),

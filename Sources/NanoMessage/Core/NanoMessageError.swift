@@ -43,6 +43,7 @@ public enum NanoMessageError: Error {
     case MessageNotAvailable
     case ReceiveTimedOut
     case NoTopic
+    case TopicLength
     case InvalidTopic
     case FeatureNotSupported(function: String, description: String)
 }
@@ -98,10 +99,12 @@ extension NanoMessageError: CustomStringConvertible {
                 return "operation has timed out"
             case .NoTopic:
                 return "topic undefined"
+            case .TopicLength:
+                return "topic size > \(maximumTopicLength) bytes"
             case .InvalidTopic:
                 return "topics of unequal length"
             case .FeatureNotSupported(let function, let description):
-                return "\(function)() unsupported feature: " + description
+                return "\(function) unsupported feature: " + description
         }
     }
 }

@@ -22,6 +22,9 @@
 
 import CNanoMessage
 
+/// On publish/subscribe sockets the maximum size of a topic
+public let maximumTopicLength = 128
+
 /// The underlying nanomsg libraries ABI version.
 public func getNanoMsgABIVersion() -> (current: Int, revision: Int, age: Int) {
     return (Int(NN_VERSION_CURRENT), Int(NN_VERSION_REVISION), Int(NN_VERSION_AGE))
@@ -29,11 +32,11 @@ public func getNanoMsgABIVersion() -> (current: Int, revision: Int, age: Int) {
 
 /// NanoMessage library ABI version.
 public func getABIVersion() -> (current: Int, revision: Int, age: Int) {
-    return (current: 0, revision: 0, age: 5)
+    return (current: 0, revision: 0, age: 6)
 }
 
 /// Notify all sockets about process termination.
-public func Terminate() {
+public func terminate() {
     nn_term()
 }
 

@@ -26,6 +26,7 @@ import CNanoMessage
 public enum WebSocketMessageType: CInt {
     case TextFrames
     case BinaryFrames
+    case Unknown
 
     public var rawValue: CInt {
         switch self {
@@ -33,6 +34,19 @@ public enum WebSocketMessageType: CInt {
                 return NN_WS_MSG_TYPE_TEXT
             case .BinaryFrames:
                 return NN_WS_MSG_TYPE_BINARY
+            case .Unknown:
+                return -1
+        }
+    }
+
+    public init(rawValue: CInt) {
+        switch rawValue {
+            case NN_WS_MSG_TYPE_TEXT:
+                self = .TextFrames
+            case NN_WS_MSG_TYPE_BINARY:
+                self = .BinaryFrames
+            default:
+                self = .Unknown
         }
     }
 }
@@ -44,6 +58,8 @@ extension WebSocketMessageType: CustomStringConvertible {
                 return "text"
             case .BinaryFrames:
                 return "binary"
+            case .Unknown:
+                return "unknown"
         }
     }
 }

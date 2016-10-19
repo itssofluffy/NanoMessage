@@ -23,7 +23,7 @@
 import CNanoMessage
 
 /// Reply socket.
-public final class ReplySocket: NanoSocket, ProtocolSocket, Sender, Receiver {
+public final class ReplySocket: NanoSocket, ProtocolSocket, Receiver, Sender {
     public var _nanoSocket: NanoSocket {
         return self
     }

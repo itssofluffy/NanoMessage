@@ -30,8 +30,8 @@ public enum SocketOption: CInt {
     case SendBuffer
     case ReceiveBuffer
     case ReceiveMaximumMessageSize
-    case SendTimeOut
-    case ReceiveTimeOut
+    case SendTimeout
+    case ReceiveTimeout
     case ReconnectInterval
     case ReconnectIntervalMaximum
     case SendPriority
@@ -62,9 +62,9 @@ public enum SocketOption: CInt {
                 return NN_RCVBUF
             case .ReceiveMaximumMessageSize:
                 return NN_RCVMAXSIZE
-            case .SendTimeOut:
+            case .SendTimeout:
                 return NN_SNDTIMEO
-            case .ReceiveTimeOut:
+            case .ReceiveTimeout:
                 return NN_RCVTIMEO
             case .ReconnectInterval:
                 return NN_RECONNECT_IVL
@@ -115,9 +115,9 @@ extension SocketOption: CustomStringConvertible {
                 return "receive buffer"
             case .ReceiveMaximumMessageSize:
                 return "receive maximum size"
-            case .SendTimeOut:
+            case .SendTimeout:
                 return "send timeout"
-            case .ReceiveTimeOut:
+            case .ReceiveTimeout:
                 return "receive timeout"
             case .ReconnectInterval:
                 return "reconnect interval"
@@ -187,7 +187,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
 ///
 /// - Returns: The result as a `Data` type.
 internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> Data {
-    var optvallen = Int.max
+    var optvallen = maximumTopicLength
     var optval = Data.buffer(with: optvallen)
 
     let returnCode = nn_getsockopt(socketFd, level, option.rawValue, &optval.bytes, &optvallen)

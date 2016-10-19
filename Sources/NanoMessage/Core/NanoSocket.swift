@@ -395,7 +395,7 @@ extension NanoSocket {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets protocol family.
-    public func getProtocolFamily() throws -> ProtocolFamily {
+    public func getSocketProtocolFamily() throws -> ProtocolFamily {
         return ProtocolFamily(rawValue: try self.getSocketProtocol())
     }
 
@@ -556,7 +556,7 @@ extension NanoSocket {
 ///
 /// Default value is false.
 ///
-/// - Returns: Is Nage=le's algorithm enabled.
+/// - Returns: Is Nagele's algorithm enabled.
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
     public func getTCPNoDelay(transportMechanism: TransportMechanism = .TCP) throws -> Bool {
@@ -588,7 +588,7 @@ extension NanoSocket {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
     public func getWebSocketMessageType() throws -> WebSocketMessageType {
-        return WebSocketMessageType(rawValue: try getSocketOption(self.socketFd, .WebSocketMessageType, .WebSocket))!
+        return WebSocketMessageType(rawValue: try getSocketOption(self.socketFd, .WebSocketMessageType, .WebSocket))
     }
 
 /// This value determines whether data messages are sent as WebSocket text frames, or binary frames,

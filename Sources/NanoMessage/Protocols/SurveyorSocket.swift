@@ -23,7 +23,7 @@
 import CNanoMessage
 
 /// Surveyor socket.
-public final class SurveyorSocket: NanoSocket, ProtocolSocket, Sender, Receiver {
+public final class SurveyorSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
     public var _nanoSocket: NanoSocket {
         return self
     }

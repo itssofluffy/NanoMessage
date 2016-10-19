@@ -22,7 +22,7 @@
 
 /// Socket protocol family.
 public enum ProtocolFamily {
-    case Pair              // One-to-one protocol family.
+    case OneToOne          // One-to-one protocol family.
     case PublishSubscribe  // Publish/Subscribe protocol family. These socket types are used to distribute messages to multiple destinations.
     case RequestReply      // Request/reply protocol family. These socket types are used to send requests and receive replies.
     case Pipeline          // Pipeline protocol family. These socket types are used to send message to a cluster of load-balanced nodes.
@@ -32,7 +32,7 @@ public enum ProtocolFamily {
     public init(rawValue: SocketProtocol) {
         switch rawValue {
             case .PairProtocol:
-                self = .Pair
+                self = .OneToOne
             case .PublisherProtocol, .SubscriberProtocol:
                 self = .PublishSubscribe
             case .RequestProtocol, .ReplyProtocol:
@@ -50,8 +50,8 @@ public enum ProtocolFamily {
 extension ProtocolFamily: CustomStringConvertible {
     public var description: String {
         switch self {
-            case .Pair:
-                return "pair"
+            case .OneToOne:
+                return "one-to-one"
             case .PublishSubscribe:
                 return "publish/subscribe"
             case .RequestReply:

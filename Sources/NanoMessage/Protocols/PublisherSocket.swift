@@ -64,6 +64,7 @@ extension PublisherSocket {
 ///                   `NanoMessageError.MessageNotSent`
 ///
 /// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.TopicLength` if the topic length too large.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.TimedOut` the send timedout.
 ///
@@ -75,6 +76,8 @@ extension PublisherSocket {
         if (self.prependTopic) {                                  // we are prepending the topic to the start of the message.
             if (self.sendTopic.isEmpty) {                         // check that we have a topic to send.
                 throw NanoMessageError.NoTopic
+            } else if (self.sendTopic.count > maximumTopicLength) {
+                throw NanoMessageError.TopicLength
             }
 
             if (self.ignoreTopicSeperator) {                      // check if we are ignoring the topic seperator.

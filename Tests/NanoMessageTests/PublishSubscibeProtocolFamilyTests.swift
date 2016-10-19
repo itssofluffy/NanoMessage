@@ -67,7 +67,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.unsubscribeFrom(topic: node0.sendTopic)
             try node1.subscribeTo(topic: "xxxx")
             XCTAssertEqual(node1.subscribedTopics.count, 1, "node1.subscribedTopics.count != 0")
-            try node1.setReceiverTimeout(milliseconds: 1000)   // set receiver timeout to 1 second
+            try node1.setReceiveTimeout(milliseconds: 1000)   // set receive timeout to 1 second
 
             bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.utf8.count")
@@ -107,7 +107,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             sleep(1)    // give nn_bind a chance to asynchronously bind to the port
 
-            try node1.setReceiverTimeout(milliseconds: 1000)
+            try node1.setReceiveTimeout(milliseconds: 1000)
 
             let done = try node1.subscribeToAllTopics()
             XCTAssertEqual(done, true, "node1.subscribeToAllTopics()")
@@ -145,7 +145,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             print("unsubscribe from all topics and subscribe to only one topic...")
             try node1.unsubscribeFromAllTopics()
             try node1.subscribeTo(topic: "dwarfPlanet")
-            try node1.setReceiverTimeout(milliseconds: 1000)   // set receiver timeout to 1 second
+            try node1.setReceiveTimeout(milliseconds: 1000)   // set receive timeout to 1 second
 
             node0.sendTopic = "planet"
 
@@ -219,7 +219,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let _ = try node1.flipIgnoreTopicSeperator()
             XCTAssertEqual(node1.ignoreTopicSeperator, true, "node1.ignoreTopicSeperator")
 
-            try node1.setReceiverTimeout(milliseconds: 1000)
+            try node1.setReceiveTimeout(milliseconds: 1000)
 
             node0.sendTopic = "AAA"
 

@@ -241,6 +241,7 @@ extension SubscriberSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
 ///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
+///            `NanoMessageError.TopicLength` if the topic size is too large.
 ///
 /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
@@ -253,6 +254,10 @@ extension SubscriberSocket {
                     try self.unsubscribeFromAllTopics()
                 } else if (self.ignoreTopicSeperator && !_validTopicLengths(topic)) {
                     throw NanoMessageError.InvalidTopic
+                }
+
+                if (topic.count > maximumTopicLength) {
+                    throw NanoMessageError.TopicLength
                 }
 
                 try setSocketOption(self.socketFd, .Subscribe, topic, .SubscriberProtocol)
@@ -272,6 +277,7 @@ extension SubscriberSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
 ///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
+///            `NanoMessageError.TopicLength` if the topic size is too large.
 ///
 /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
