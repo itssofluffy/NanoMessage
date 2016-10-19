@@ -30,7 +30,7 @@ public class NanoSocket {
 /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
-private var _closureAttempts: UInt = 10
+    private var _closureAttempts: UInt = 10
 /// The number of attempts to close down a socket or endpoint.
 ///
 /// - Note:  The `getLinger()` function is called to determine the number of milliseconds to
@@ -65,7 +65,7 @@ private var _closureAttempts: UInt = 10
     }
 
     deinit {
-        func closeSocket(_ millisecondsDelay: UInt32) throws {
+        func closeSocket(_ microSecondsDelay: UInt32) throws {
             if (self.socketFd >= 0) {                                   // if we have a valid nanomsg socket file descriptor then...
                 var loopCount: UInt = 0
 
@@ -83,7 +83,7 @@ private var _closureAttempts: UInt = 10
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(millisecondsDelay)                       // zzzz...
+                        usleep(microSecondsDelay)                       // zzzz...
 
                         loopCount += 1
                     } else {
@@ -94,13 +94,13 @@ private var _closureAttempts: UInt = 10
         }
 
         // calculate the delay between re-attempts of closing the socket.
-        let millisecondsDelay = UInt32(_getClosureTimeout() / self.closureAttempts)
+        let microSecondsDelay = UInt32(_getClosureTimeout() * 1000 / self.closureAttempts)
         // are we going to terminate the `repeat` loop below.
         var terminateLoop = true
 
         repeat {
             do {
-                try closeSocket(millisecondsDelay)
+                try closeSocket(microSecondsDelay)
             } catch NanoMessageError.Interrupted {
                 print("NanoSocket.deinit(): \(NanoMessageError.Interrupted))")
                 if (self.blockTillCloseSuccess) {
@@ -133,13 +133,13 @@ private var _closureAttempts: UInt = 10
 }
 
 extension NanoSocket {
-/// Get socket priorites (send/receive)
+/// Get socket priorites (receive/send)
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: Tuple of receive and send send priorities, if either is nil then
 ///            socket is either not a receiver or sender.
-    private func _endPointPriorities() throws -> (receive: Int?, send: Int?) {
+    private func _socketPriorities() throws -> (receivePriority: Int?, sendPriority: Int?) {
         var receivePriority: Int?
         var sendPriority: Int?
 
@@ -162,6 +162,7 @@ extension NanoSocket {
 ///   - endPointName:    An optional endpoint name.
 ///
 /// - Throws:  `NanoMessageError.BindToAddress` if there was a problem binding the socket to the address.
+///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: An endpoint that has just been binded too. The endpoint can be later used to remove the
 ///            endpoint from the socket via `removeEndPoint()` function.
@@ -179,13 +180,13 @@ extension NanoSocket {
             throw NanoMessageError.BindToAddress(code: nn_errno(), address: endPointAddress)
         }
 
-        let priority: (receive: Int?, send: Int?) = try _endPointPriorities()
+        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
 
         let endPoint = EndPoint(endPointId: Int(endPointId),
                                 endPointAddress: endPointAddress,
                                 connectionType: .BindToAddress,
-                                receivePriority: priority.receive,
-                                sendPriority: priority.send,
+                                receivePriority: socket.receivePriority,
+                                sendPriority: socket.sendPriority,
                                 endPointName: endPointName)
 
         self.endPoints.insert(endPoint)
@@ -202,6 +203,7 @@ extension NanoSocket {
 ///   - endPointName:    An optional endpoint name.
 ///
 /// - Throws:  `NanoMessageError.BindToAddress` if there was a problem binding the socket to the address.
+///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from
 ///            the socket via `removeEndPoint()` function.
@@ -223,6 +225,7 @@ extension NanoSocket {
 ///   - endPointName:    An optional endpoint name.
 ///
 /// - Throws:  `NanoMessageError.ConnectToAddress` if there was a problem binding the socket to the address.
+///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The endpoint that has just been connected too. The endpoint can be later used to remove the
 ///            endpoint from the socket via `removeEndPoint()` function.
@@ -240,13 +243,13 @@ extension NanoSocket {
             throw NanoMessageError.ConnectToAddress(code: nn_errno(), address: endPointAddress)
         }
 
-        let priority: (receive: Int?, send: Int?) = try _endPointPriorities()
+        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
 
         let endPoint = EndPoint(endPointId: Int(endPointId),
                                 endPointAddress: endPointAddress,
                                 connectionType: .ConnectToAddress,
-                                receivePriority: priority.receive,
-                                sendPriority: priority.send,
+                                receivePriority: socket.receivePriority,
+                                sendPriority: socket.sendPriority,
                                 endPointName: endPointName)
 
         self.endPoints.insert(endPoint)
@@ -263,6 +266,7 @@ extension NanoSocket {
 ///   - endPointName:    An optional endpoint name.
 ///
 /// - Throws:  `NanoMessageError.ConnectToAddress` if there was a problem binding the socket to the address.
+///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from the
 ///            socket via the `removeEndPoint()` function.
@@ -289,7 +293,7 @@ extension NanoSocket {
         if (self.endPoints.contains(endPoint)) {
             var loopCount: UInt = 0
             // calculate the delay between re-attempts of closing the socket.
-            let millisecondsDelay = UInt32(_getClosureTimeout() / self.closureAttempts)
+            let microSecondsDelay = UInt32(_getClosureTimeout() * 1000 / self.closureAttempts)
 
             while (true) {
                 let returnCode = nn_shutdown(self.socketFd, CInt(endPoint.id))  // attempt to close down the endpoint
@@ -302,7 +306,7 @@ extension NanoSocket {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(millisecondsDelay)                               // zzzz...
+                        usleep(microSecondsDelay)                               // zzzz...
 
                         loopCount += 1
                     } else {
