@@ -29,7 +29,7 @@ public enum NanoMessageError: Error {
     case Interrupted
     case BindToAddress(code: CInt, address: String)
     case ConnectToAddress(code: CInt, address: String)
-    case RemoveEndPoint(code: CInt, address: String)
+    case RemoveEndPoint(code: CInt, address: String, endPointId: Int)
     case BindToSocket(code: CInt)
     case LoopBack(code: CInt)
     case GetSocketOption(code: CInt, option: SocketOption)
@@ -72,8 +72,8 @@ extension NanoMessageError: CustomStringConvertible {
                 return "bindToAddress('\(address)') failed: " + errorString(code)
             case .ConnectToAddress(let code, let address):
                 return "connectToAddress('\(address)') failed: " + errorString(code)
-            case .RemoveEndPoint(let code, let address):
-                return "removeEndPoint('\(address)') failed: " + errorString(code)
+            case .RemoveEndPoint(let code, let address, let endPointId):
+                return "removeEndPoint('\(address)' #(\(endPointId))) failed: " + errorString(code)
             case .BindToSocket(let code):
                 return "bindToSocket() failed: " + errorString(code)
             case .LoopBack(let code):

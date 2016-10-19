@@ -310,7 +310,7 @@ extension NanoSocket {
 
                         loopCount += 1
                     } else {
-                        throw NanoMessageError.RemoveEndPoint(code: errno, address: endPoint.address)
+                        throw NanoMessageError.RemoveEndPoint(code: errno, address: endPoint.address, endPointId: endPoint.id)
                     }
                 } else {
                     break                                                       // we've closed the endpoint succesfully
