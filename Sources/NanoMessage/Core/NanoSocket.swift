@@ -345,6 +345,41 @@ extension NanoSocket {
         return false
     }
 
+/// Check a socket and reports whether it’s possible to send a message to the socket and/or receive a message from the socket.
+///
+/// - Parameters:
+///   - timeout milliseconds: The maximum number of milliseconds to poll the socket for an event to occur,
+///                           default is 1000 milliseconds (1 second).
+///
+/// - Throws: `NanoMessageError.PollSocket` if polling the socket fails.
+///
+/// - Returns: Message waiting and send queue blocked as a tuple of bools.
+    public func pollSocket(timeout milliseconds: Int = 1000) throws -> (messageIsWaiting: Bool, sendIsBlocked: Bool) {
+        let pollinMask = CShort(NN_POLLIN)                                      // define nn_poll event masks as short's so we only
+        let polloutMask = CShort(NN_POLLOUT)                                    // cast once in the function
+
+        var eventMask = CShort.allZeros                                         //
+        if let _: Int = try? getSocketOption(self.socketFd, .ReceiveFd) {       // rely on the fact that getting the for example receive
+            eventMask = pollinMask                                              // file descriptor for a socket type that does not support
+        }                                                                       // receiving will throw a nil return value to determine
+        if let _: Int = try? getSocketOption(self.socketFd, .SendFd) {          // what our polling event mask will be.
+            eventMask = eventMask | polloutMask                                 //
+        }                                                                       //
+
+        var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
+
+        let returnCode = nn_poll(&pfd, 1, CInt(milliseconds))                   // poll the nano socket
+
+        guard (returnCode >= 0) else {
+            throw NanoMessageError.PollSocket(code: nn_errno())
+        }
+
+        let messageIsWaiting = ((pfd.revents & pollinMask) != 0) ? true : false // using the event masks determine our return values
+        let sendIsBlocked = ((pfd.revents & polloutMask) != 0) ? true : false   //
+
+        return (messageIsWaiting, sendIsBlocked)
+    }
+
 /// Starts a device to bind the socket to another and forward messages between two sockets
 ///
 /// - Parameters:

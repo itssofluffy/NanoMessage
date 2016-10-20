@@ -21,6 +21,7 @@
 */
 
 import FNVHashValue
+import ISFLibrary
 
 /// Nanomsg symbol.
 public struct SymbolProperty {
