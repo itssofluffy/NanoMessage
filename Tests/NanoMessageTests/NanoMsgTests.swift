@@ -43,9 +43,11 @@ class NanoMsgTests: XCTestCase {
         XCTAssertEqual(nanomsgSymbol["EAGAIN"], EAGAIN, "nanomsg symbol value for EAGAIN is different than expected.")
         XCTAssertEqual(nanomsgSymbol["ETIMEDOUT"], ETIMEDOUT, "nanomsg symbol value for ETIMEDOUT is different than expected.")
 
-        XCTAssertEqual(nanomsgError[Int(EINTR)], "EINTR", "nanomsgError[EINTR] != \"EINTR\"")
-        XCTAssertEqual(nanomsgError[Int(EAGAIN)], "EAGAIN", "nanomsgError[EAGAIN] != \"EAGAIN\"")
-        XCTAssertEqual(nanomsgError[Int(ETIMEDOUT)], "ETIMEDOUT", "nanomsgError[ETIMEDOUT] != \"ETIMEDOUT\"")
+        XCTAssertEqual(nanomsgError[EINTR], "EINTR", "nanomsgError[EINTR] != \"EINTR\"")
+        XCTAssertEqual(nanomsgError[EAGAIN], "EAGAIN", "nanomsgError[EAGAIN] != \"EAGAIN\"")
+        XCTAssertEqual(nanomsgError[ETIMEDOUT], "ETIMEDOUT", "nanomsgError[ETIMEDOUT] != \"ETIMEDOUT\"")
+
+        XCTAssertEqual(nanoMessageError(EINTR), "Interrupted system call", "nanoMessageError(EINTR) returned an unexpected result.")
     }
 
 #if !os(OSX)

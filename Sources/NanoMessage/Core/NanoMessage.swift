@@ -32,12 +32,22 @@ public func getNanoMsgABIVersion() -> (current: Int, revision: Int, age: Int) {
 
 /// NanoMessage library ABI version.
 public func getABIVersion() -> (current: Int, revision: Int, age: Int) {
-    return (current: 0, revision: 0, age: 6)
+    return (current: 0, revision: 0, age: 7)
 }
 
 /// Notify all sockets about process termination.
 public func terminate() {
     nn_term()
+}
+
+/// Obtain the underlying libraries error message as a string.
+///
+/// - Parameters:
+///   - code:  Error code.
+///
+/// - Returns: The error string.
+public func nanoMessageError(_ code: CInt) -> String {
+    return String(cString: nn_strerror(code))
 }
 
 /// Get a nanomsg symbol.
@@ -91,7 +101,11 @@ public var symbolProperty: Set<SymbolProperty> {
                 break
             }
 
-            _symbolProperty.insert(SymbolProperty(value: buffer.value, name: String(cString: buffer.name), namespace: buffer.ns, type: buffer.type, unit: buffer.unit))
+            _symbolProperty.insert(SymbolProperty(value: buffer.value,
+                                                  name: String(cString: buffer.name),
+                                                  namespace: buffer.ns,
+                                                  type: buffer.type,
+                                                  unit: buffer.unit))
 
             index += 1
         }
@@ -100,13 +114,13 @@ public var symbolProperty: Set<SymbolProperty> {
     return _symbolProperty
 }
 
-private var _nanomsgError = Dictionary<Int, String>()
+private var _nanomsgError = Dictionary<CInt, String>()
 /// A dictionary of Posix nanomsg error codes and strings.
-public var nanomsgError: Dictionary<Int, String> {
+public var nanomsgError: Dictionary<CInt, String> {
     if (_nanomsgError.isEmpty) {
         for symbol in symbolProperty {
             if (symbol.namespace == NN_NS_ERROR) {              // we have a symbol property of the error namespace
-                _nanomsgError[Int(symbol.value)] = symbol.name
+                _nanomsgError[symbol.value] = symbol.name
             }
         }
     }
