@@ -40,25 +40,19 @@ public func terminate() {
     nn_term()
 }
 
-/// Get a nanomsg symbol.
-///
-/// - Parameters:
-///   - index: The index of the nanomsg symbol we require.
-///
-/// - Returns: The nanomsg libraries symbol name and value as a tuple.
-private func _getSymbol(_ index: CInt) -> (name: String, value: CInt)? {
-    var value: CInt = 0
-
-    if let symbolName = nn_symbol(index, &value) {
-        return (String(cString: symbolName), value)
-    }
-
-    return nil
-}
-
 private var _nanomsgSymbol = Dictionary<String, CInt>()
 /// A dictionary of nanomsg symbol names and values.
 public var nanomsgSymbol: Dictionary<String, CInt> {
+    func _getSymbol(_ index: CInt) -> (name: String, value: CInt)? {
+        var value: CInt = 0
+
+        if let symbolName = nn_symbol(index, &value) {
+            return (String(cString: symbolName), value)
+        }
+
+        return nil
+    }
+
     if (_nanomsgSymbol.isEmpty) {
         var index: CInt = 0
 

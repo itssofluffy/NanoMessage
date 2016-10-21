@@ -55,27 +55,6 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
     return Int(bytesSent)
 }
 
-/// The underlying nanomsg library zero copy message size NN_MSG = ((size_t)-1) cannot be reproduced using the clang compiler see:
-/// https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
-///
-/// - Parameters:
-///   - socketFd: The nano socket file descriptor.
-///
-/// - Returns: The maximum message size that can be received.
-private func _maxBufferSize(_ socketFd: CInt) -> Int {
-    let defaultReceiveMaximumMessageSize: CInt = 1048576 // 1024 * 1024 bytes = 1 MiB
-
-    if var bufferSize: CInt = try? getSocketOption(socketFd, .ReceiveMaximumMessageSize) {
-        if (bufferSize <= 0) {
-            bufferSize = defaultReceiveMaximumMessageSize
-        }
-
-        return Int(bufferSize)
-    }
-
-    return Int(defaultReceiveMaximumMessageSize)
-}
-
 /// The low-level receive a message function.
 ///
 /// - Parameters:
@@ -89,7 +68,21 @@ private func _maxBufferSize(_ socketFd: CInt) -> Int {
 ///            `NanoMessageError.TimedOut` the receive timedout.
 ///
 /// - Returns: The number of bytes received and the received message
-internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> (Int, Data) {
+internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> (bytes: Int, message: Data) {
+// The underlying nanomsg library zero copy message size NN_MSG = ((size_t)-1) cannot be reproduced using the clang compiler see:
+// https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
+    func _maxBufferSize(_ socketFd: CInt) -> Int {
+        var maxBufferSize = 1048576                      // 1024 * 1024 bytes = 1 MiB
+
+        if let bufferSize: Int = try? getSocketOption(socketFd, .ReceiveMaximumMessageSize) {
+            if (bufferSize > 0) {                        // cater for unlimited message size.
+                maxBufferSize = bufferSize
+            }
+        }
+
+        return maxBufferSize
+    }
+
     let bufferSize = _maxBufferSize(socketFd)
     var buffer = Data.buffer(with: bufferSize)
 

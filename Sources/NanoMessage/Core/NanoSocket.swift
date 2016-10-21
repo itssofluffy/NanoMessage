@@ -385,7 +385,7 @@ extension NanoSocket {
 
         guard (returnCode >= 0) else {
             let errno = nn_errno()
-            var nanoSocketName: String = String(nanoSocket.socketFd)
+            var nanoSocketName = String(nanoSocket.socketFd)
 
             if let socketName = try? nanoSocket.getSocketName() {
                 nanoSocketName = socketName
