@@ -22,6 +22,30 @@
 
 import CNanoMessage
 
+/// Obtain the underlying libraries error message as a string.
+///
+/// - Parameters:
+///   - code:  Error code.
+///
+/// - Returns: The error string.
+public func nanoMessageError(_ code: CInt) -> String {
+    return String(cString: nn_strerror(code))
+}
+
+private var _nanomsgError = Dictionary<CInt, String>()
+/// A dictionary of Posix nanomsg error codes and strings.
+public var nanomsgError: Dictionary<CInt, String> {
+    if (_nanomsgError.isEmpty) {
+        for symbol in symbolProperty {
+            if (symbol.namespace == NN_NS_ERROR) {              // we have a symbol property of the error namespace
+                _nanomsgError[symbol.value] = symbol.name
+            }
+        }
+    }
+
+    return _nanomsgError
+}
+
 /// NanoMessage Error Domain.
 public enum NanoMessageError: Error {
     case NanoSocket(code: CInt)
@@ -53,8 +77,8 @@ extension NanoMessageError: CustomStringConvertible {
         func errorString(_ code: CInt) -> String {
             var errorMessage = nanoMessageError(code)
 
-            if let posixError = nanomsgError[code] {
-                errorMessage += " (#\(code) '\(posixError)')"
+            if let errorCode = nanomsgError[code] {
+                errorMessage += " (#\(code) '\(errorCode)')"
             } else {
                 errorMessage += " (#\(code))"
             }

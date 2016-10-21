@@ -26,25 +26,25 @@ import XCTest
 
 class VersionTests: XCTestCase {
     func testNanoMsgABIVersion() {
-        let (current, revision, age) = getNanoMsgABIVersion()
+        let (current, revision, age) = nanoMsgABIVersion
 
          XCTAssertEqual(current, 5, "nanomsg ABI current not as expected")
          XCTAssertEqual(revision, 0, "nanomsg ABI revision not as expected")
          XCTAssertEqual(age, 0, "nanomsg ABI age not as expected")
     }
 
-    func testABIVersion() {
-        let (current, revision, age) = getABIVersion()
+    func testNanoMessageVersion() {
+        let (current, revision, age) = nanoMessageVersion
 
-         XCTAssertEqual(current, 0, "ABI current not as expected")
-         XCTAssertEqual(revision, 0, "ABI revision not as expected")
-         XCTAssertGreaterThanOrEqual(age, 6, "ABI age not as expected")
+         XCTAssertEqual(current, 0, "NanoMessage current not as expected")
+         XCTAssertEqual(revision, 0, "NanoMessage revision not as expected")
+         XCTAssertGreaterThanOrEqual(age, 7, "NanoMessage age not as expected")
     }
 
 #if !os(OSX)
     static let allTests = [
         ("testNanoMsgABIVersion", testNanoMsgABIVersion),
-        ("testABIVersion", testABIVersion)
+        ("testNanoMessageVersion", testNanoMessageVersion)
    ]
 #endif
 }

@@ -26,28 +26,18 @@ import CNanoMessage
 public let maximumTopicLength = 128
 
 /// The underlying nanomsg libraries ABI version.
-public func getNanoMsgABIVersion() -> (current: Int, revision: Int, age: Int) {
+public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
     return (Int(NN_VERSION_CURRENT), Int(NN_VERSION_REVISION), Int(NN_VERSION_AGE))
 }
 
-/// NanoMessage library ABI version.
-public func getABIVersion() -> (current: Int, revision: Int, age: Int) {
+/// NanoMessage library version.
+public var nanoMessageVersion: (current: Int, revision: Int, age: Int) {
     return (current: 0, revision: 0, age: 7)
 }
 
 /// Notify all sockets about process termination.
 public func terminate() {
     nn_term()
-}
-
-/// Obtain the underlying libraries error message as a string.
-///
-/// - Parameters:
-///   - code:  Error code.
-///
-/// - Returns: The error string.
-public func nanoMessageError(_ code: CInt) -> String {
-    return String(cString: nn_strerror(code))
 }
 
 /// Get a nanomsg symbol.
@@ -112,18 +102,4 @@ public var symbolProperty: Set<SymbolProperty> {
     }
 
     return _symbolProperty
-}
-
-private var _nanomsgError = Dictionary<CInt, String>()
-/// A dictionary of Posix nanomsg error codes and strings.
-public var nanomsgError: Dictionary<CInt, String> {
-    if (_nanomsgError.isEmpty) {
-        for symbol in symbolProperty {
-            if (symbol.namespace == NN_NS_ERROR) {              // we have a symbol property of the error namespace
-                _nanomsgError[symbol.value] = symbol.name
-            }
-        }
-    }
-
-    return _nanomsgError
 }
