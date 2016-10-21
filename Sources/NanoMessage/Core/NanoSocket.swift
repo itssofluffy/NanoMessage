@@ -45,6 +45,18 @@ public class NanoSocket {
             self._closureAttempts = clamp(value: attempts, lower: 1, upper: 1000)
         }
     }
+/// The socket/end-point closure time in microseconds.
+    fileprivate var _closureDelay: UInt32 {
+        var milliseconds = 1000
+
+        if let linger = try? self.getLinger() {
+            if (linger > 0) {                               // account for infinate linger timeout.
+                milliseconds = linger
+            }
+        }
+
+        return UInt32((milliseconds * 1000) / self.closureAttempts)
+    }
 /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
 ///
 /// - Warning: Please not that if true this will block until the class has been de-referenced.
@@ -113,21 +125,6 @@ public class NanoSocket {
                 terminateLoop = true
             }
         } while (!terminateLoop)
-    }
-
-/// Get the time in milliseconds to allow to attempt to close a socket or endpoint.
-///
-/// - Returns: The closure time in microseconds.
-    fileprivate var _closureDelay: UInt32 {
-        var milliseconds = 1000
-
-        if let linger = try? self.getLinger() {
-            if (linger > 0) {                               // account for infinate linger timeout.
-                milliseconds = linger
-            }
-        }
-
-        return UInt32((milliseconds * 1000) / self.closureAttempts)
     }
 }
 
