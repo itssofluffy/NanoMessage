@@ -24,6 +24,20 @@ import C7
 
 /// Receiver socket protocol.
 public protocol Receiver {
+    // I-O functions.
     func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: Data)
     func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: String)
+    // socket option functions.
+    func getReceiveBufferSize() throws -> UInt
+    func setReceiveBufferSize(bytes: UInt) throws
+    func getMaximumMessageSize() throws -> Int
+    func setMaximumMessageSize(bytes: Int) throws
+    func getReceiveTimeout() throws -> Int
+    func setReceiveTimeout(milliseconds: Int) throws
+    func getReceivePriority() throws -> Int
+    func setReceivePriority(_ priority: Int) throws
+    func getReceiveFd() throws -> Int
+    // socket statistics functions.
+    func getMessagesReceived() throws -> UInt64
+    func getBytesReceived() throws -> UInt64
 }

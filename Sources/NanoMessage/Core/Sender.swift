@@ -24,6 +24,19 @@ import C7
 
 /// Sender socket protocol.
 public protocol Sender {
+    // I-O functions.
     func sendMessage(_ message: Data, blockingMode: BlockingMode) throws -> Int
     func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int
+    // socket option functions.
+    func getSendBufferSize() throws -> UInt
+    func setSendBufferSize(bytes: UInt) throws
+    func getSendTimeout() throws -> Int
+    func setSendTimeout(milliseconds: Int) throws
+    func getSendPriority() throws -> Int
+    func setSendPriority(_ priority: Int) throws
+    func getSendFd() throws -> Int
+    // socket statistics functions.
+    func getMessagesSent() throws -> UInt64
+    func getBytesSent() throws -> UInt64
+    func getCurrentSendPriority() throws -> UInt64
 }
