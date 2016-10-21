@@ -22,6 +22,7 @@
 
 import Foundation
 import CNanoMessage
+import ISFLibrary
 
 /// A NanoMessage base socket.
 public class NanoSocket {
@@ -30,18 +31,18 @@ public class NanoSocket {
 /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
-    private var _closureAttempts: UInt = 10
-/// The number of attempts to close down a socket or endpoint.
+    private var _closureAttempts: Int = 100
+/// The number of attempts to close down a socket or endpoint, this is clamped to between 1 and 1000.
 ///
 /// - Note:  The `getLinger()` function is called to determine the number of milliseconds to
 ///          wait for a socket/endpoint to clear and close, this is divided by `closureAttempts`
 ///          to determine the minimum pause between each attempt.
-    public var closureAttempts: UInt {
+    public var closureAttempts: Int {
         get {
             return self._closureAttempts
         }
         set (attempts) {
-            self._closureAttempts = (attempts > 0) ? attempts : 1
+            self._closureAttempts = clamp(value: attempts, lower: 1, upper: 1000)
         }
     }
 /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
@@ -65,9 +66,9 @@ public class NanoSocket {
     }
 
     deinit {
-        func closeSocket(_ microSecondsDelay: UInt32) throws {
+        func closeSocket() throws {
             if (self.socketFd >= 0) {                                   // if we have a valid nanomsg socket file descriptor then...
-                var loopCount: UInt = 0
+                var loopCount = 0
 
                 while (true) {
                     let returnCode = nn_close(self.socketFd)            // try and close the nanomsg socket
@@ -83,7 +84,7 @@ public class NanoSocket {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(microSecondsDelay)                       // zzzz...
+                        usleep(self._closureDelay)                      // zzzz...
 
                         loopCount += 1
                     } else {
@@ -93,14 +94,12 @@ public class NanoSocket {
             }
         }
 
-        // calculate the delay between re-attempts of closing the socket.
-        let microSecondsDelay = UInt32(_getClosureTimeout() * 1000 / self.closureAttempts)
         // are we going to terminate the `repeat` loop below.
         var terminateLoop = true
 
         repeat {
             do {
-                try closeSocket(microSecondsDelay)
+                try closeSocket()
             } catch NanoMessageError.Interrupted {
                 print("NanoSocket.deinit(): \(NanoMessageError.Interrupted))")
                 if (self.blockTillCloseSuccess) {
@@ -118,17 +117,17 @@ public class NanoSocket {
 
 /// Get the time in milliseconds to allow to attempt to close a socket or endpoint.
 ///
-/// - Returns: The closure time in milliseconds.
-    fileprivate func _getClosureTimeout() -> UInt {
-        if var milliseconds = try? self.getLinger() {
-            if (milliseconds <= 0) {
-                milliseconds = 1000
-            }
+/// - Returns: The closure time in microseconds.
+    fileprivate var _closureDelay: UInt32 {
+        var milliseconds = 1000
 
-            return UInt(milliseconds)
+        if let linger = try? self.getLinger() {
+            if (linger > 0) {                               // account for infinate linger timeout.
+                milliseconds = linger
+            }
         }
 
-        return 1000
+        return UInt32((milliseconds * 1000) / self.closureAttempts)
     }
 }
 
@@ -291,9 +290,7 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         if (self.endPoints.contains(endPoint)) {
-            var loopCount: UInt = 0
-            // calculate the delay between re-attempts of closing the socket.
-            let microSecondsDelay = UInt32(_getClosureTimeout() * 1000 / self.closureAttempts)
+            var loopCount = 0
 
             while (true) {
                 let returnCode = nn_shutdown(self.socketFd, CInt(endPoint.id))  // attempt to close down the endpoint
@@ -306,7 +303,7 @@ extension NanoSocket {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(microSecondsDelay)                               // zzzz...
+                        usleep(self._closureDelay)                              // zzzz...
 
                         loopCount += 1
                     } else {
