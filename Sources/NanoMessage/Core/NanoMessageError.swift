@@ -33,7 +33,7 @@ public func nanoMessageError(_ code: CInt) -> String {
 }
 
 private var _nanomsgError = Dictionary<CInt, String>()
-/// A dictionary of Posix nanomsg error codes and strings.
+/// A dictionary of nanomsg error codes and their POSIX codes as strings.
 public var nanomsgError: Dictionary<CInt, String> {
     if (_nanomsgError.isEmpty) {
         for symbol in symbolProperty {
@@ -54,7 +54,7 @@ public enum NanoMessageError: Error {
     case BindToAddress(code: CInt, address: String)
     case ConnectToAddress(code: CInt, address: String)
     case RemoveEndPoint(code: CInt, address: String, endPointId: Int)
-    case BindToSocket(code: CInt)
+    case BindToSocket(code: CInt, nanoSocketName: String)
     case LoopBack(code: CInt)
     case GetSocketOption(code: CInt, option: SocketOption)
     case SetSocketOption(code: CInt, option: SocketOption)
@@ -99,8 +99,8 @@ extension NanoMessageError: CustomStringConvertible {
                 return "connectToAddress('\(address)') failed: " + errorString(code)
             case .RemoveEndPoint(let code, let address, let endPointId):
                 return "removeEndPoint('\(address)' #(\(endPointId))) failed: " + errorString(code)
-            case .BindToSocket(let code):
-                return "bindToSocket() failed: " + errorString(code)
+            case .BindToSocket(let code, let nanoSocketName):
+                return "bindToSocket('\(nanoSocketName)') failed: " + errorString(code)
             case .LoopBack(let code):
                 return "loopBack() failed: " + errorString(code)
             case .GetSocketOption(let code, let option):

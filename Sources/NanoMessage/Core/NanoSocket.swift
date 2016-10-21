@@ -384,7 +384,14 @@ extension NanoSocket {
         let returnCode = nn_device(self.socketFd, nanoSocket.socketFd)
 
         guard (returnCode >= 0) else {
-            throw NanoMessageError.BindToSocket(code: nn_errno())
+            let errno = nn_errno()
+            var nanoSocketName: String = String(nanoSocket.socketFd)
+
+            if let socketName = try? nanoSocket.getSocketName() {
+                nanoSocketName = socketName
+            }
+
+            throw NanoMessageError.BindToSocket(code: errno, nanoSocketName: nanoSocketName)
         }
     }
 
@@ -585,7 +592,7 @@ extension NanoSocket {
 ///
 /// Default value is false.
 ///
-/// - Returns: Is Nagele's algorithm enabled.
+/// - Returns: Is Nagle's algorithm enabled.
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
     public func getTCPNoDelay(transportMechanism: TransportMechanism = .TCP) throws -> Bool {
