@@ -34,6 +34,10 @@ class BusProtocolFamilyTests: XCTestCase {
             let node1 = try BusSocket()
             let node2 = try BusSocket()
 
+            try node0.setReceiveTimeout(milliseconds: 1000)
+            try node1.setReceiveTimeout(milliseconds: 1000)
+            try node2.setReceiveTimeout(milliseconds: 1000)
+
             let _: Int = try node0.bindToAddress(address1)
 
             let _: Int = try node1.connectToAddress(address1)
@@ -42,7 +46,7 @@ class BusProtocolFamilyTests: XCTestCase {
             let _: Int = try node2.connectToAddress(address1)
             let _: Int = try node2.connectToAddress(address2)
 
-            sleep(1)    // give nn_bind a chance to asynchronously bind to the port
+            pauseForBind()
 
             try node0.sendMessage("A")
             try node1.sendMessage("AB")

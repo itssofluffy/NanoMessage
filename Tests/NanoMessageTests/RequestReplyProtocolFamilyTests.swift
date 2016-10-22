@@ -35,13 +35,18 @@ class RequestReplyProtocolFamilyTests: XCTestCase {
             let node0 = try RequestSocket()
             let node1 = try ReplySocket()
 
+            try node0.setSendTimeout(milliseconds: 1000)
+            try node0.setReceiveTimeout(milliseconds: 1000)
+            try node1.setSendTimeout(milliseconds: 1000)
+            try node1.setReceiveTimeout(milliseconds: 1000)
+
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
             let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
-            sleep(1)    // give nn_bind a chance to asynchronously bind to the port
+            pauseForBind()
 
             var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")

@@ -34,6 +34,9 @@ class EndPointTests: XCTestCase {
             let node0 = try PushSocket()
             let node1 = try PullSocket()
 
+            try node0.setSendTimeout(milliseconds: 1000)
+            try node1.setReceiveTimeout(milliseconds: 1000)
+
             XCTAssertEqual(node0.endPoints.count, 0, "node0.endPoints.count != 0")
             XCTAssertEqual(node1.endPoints.count, 0, "node1.endPoints.count != 0")
 
@@ -43,7 +46,7 @@ class EndPointTests: XCTestCase {
             let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') != 0")
 
-            sleep(1)    // give nn_bind a chance to asynchronously bind to the port
+            pauseForBind()
 
             XCTAssertEqual(node0.endPoints.count, 1, "node0.endPoints.count != 1")
             XCTAssertEqual(node1.endPoints.count, 1, "node1.endPoints.count != 1")
@@ -67,7 +70,7 @@ class EndPointTests: XCTestCase {
             if let _ = node0EndPoint.receivePriority {
                 XCTAssert(false, "node0EndPoint.receivePriority != nil")
             }
-            XCTAssertEqual(node0EndPoint.sendPriority, 2, "node0EndPoint.address != 8")
+            XCTAssertEqual(node0EndPoint.sendPriority, 2, "node0EndPoint.address != 2")
             XCTAssertEqual(node0EndPoint.name, endPointName, "node0EndPoint.name != '\(endPointName)'")
 
             completed = true

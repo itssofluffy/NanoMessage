@@ -20,9 +20,14 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
 import XCTest
 
-public let payload = "This above all...to thine own self be true."
+let payload = "This above all...to thine own self be true."
+
+func pauseForBind() {
+    usleep(250000)
+}
 
 #if !os(OSX)
 public let allTests = [

@@ -34,13 +34,16 @@ class PollSocketTests: XCTestCase {
             let node0 = try PushSocket()
             let node1 = try PullSocket()
 
+            try node0.setSendTimeout(milliseconds: 1000)
+            try node1.setReceiveTimeout(milliseconds: 1000)
+
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
             let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
 
-            sleep(1)    // give nn_bind a chance to asynchronously bind to the port
+            pauseForBind()
 
             var node1Poll: (messageIsWaiting: Bool, sendIsBlocked: Bool) = try node1.pollSocket(timeout: 1000)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
@@ -49,7 +52,7 @@ class PollSocketTests: XCTestCase {
             let bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
 
-            node1Poll = try node1.pollSocket()
+            node1Poll = try node1.pollSocket(timeout: 500)
             XCTAssertEqual(node1Poll.messageIsWaiting, true, "node1Poll.messageIsWaiting != true")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
