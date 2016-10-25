@@ -23,7 +23,7 @@ do {
 } catch let error as NanoMessageError {
     print(error)
 } catch {
-    print("an unexpected error '\(error)' has occured in the library NanoMessage.")
+    print("an unexpected error '\(error)' has occured in the library libNanoMessage.")
 }
 
 ```
@@ -44,7 +44,7 @@ do {
 } catch let error as NanoMessageError {
     print(error)
 } catch {
-    print("an unexpected error '\(error)' has occured in the library NanoMessage.")
+    print("an unexpected error '\(error)' has occured in the library libNanoMessage.")
 }
 
 ```

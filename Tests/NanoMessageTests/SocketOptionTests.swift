@@ -147,7 +147,7 @@ class SocketOptionTests: XCTestCase {
         } catch let error as NanoMessageError {
             XCTAssert(false, "\(error)")
         } catch {
-            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
+            XCTAssert(false, "an unexpected error '\(error)' has occured in the library libNanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")

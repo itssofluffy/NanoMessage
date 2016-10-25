@@ -57,7 +57,7 @@ class EndPointTests: XCTestCase {
             let node1EndPointRemoved = try node1.removeEndPoint(node1EndPointId)
             XCTAssertEqual(node1EndPointRemoved, true, "node1.removeEndPoint(\(node1EndPointId))")
 
-            let endPointName = "end-point at the end of time"
+            let endPointName = "end-point at the end of the line"
 
             try node0.setSendPriority(2)
 
@@ -77,7 +77,7 @@ class EndPointTests: XCTestCase {
         } catch let error as NanoMessageError {
             XCTAssert(false, "\(error)")
         } catch {
-            XCTAssert(false, "an unknown error '\(error)' has occured in the library NanoMessage.")
+            XCTAssert(false, "an unexpected error '\(error)' has occured in the library libNanoMessage.")
         }
 
         XCTAssert(completed, "test not completed")
