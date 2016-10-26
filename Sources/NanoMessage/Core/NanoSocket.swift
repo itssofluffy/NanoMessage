@@ -704,6 +704,17 @@ extension NanoSocket {
         return try getSocketStatistic(self.socketFd, .AcceptErrors)
     }
 
+/// The number of connections currently in progress to this socket.
+///
+/// - Returns: As per description.
+///
+/// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Note:    This feature is undocumented in the underlying nanomsg library
+    public func getCurrentInProgressConnections() throws -> UInt64 {
+        return try getSocketStatistic(self.socketFd, .CurrentInProgressConnections)
+    }
+
 /// The number of connections currently estabalished to this socket.
 ///
 /// - Returns: As per description.

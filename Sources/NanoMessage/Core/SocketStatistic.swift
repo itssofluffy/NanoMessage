@@ -23,20 +23,21 @@
 import CNanoMessage
 
 public enum SocketStatistic: CInt {
-    case EstablishedConnections     // The number of connections successfully established that were initiated from this socket.
-    case AcceptedConnections        // The number of connections successfully established that were accepted by this socket.
-    case DroppedConnections         // The number of established connections that were dropped by this socket.
-    case BrokenConnections          // The number of established connections that were closed by this socket, typically due to protocol errors.
-    case ConnectErrors              // The number of errors encountered by this socket trying to connect to a remote peer.
-    case BindErrors                 // The number of errors encountered by this socket trying to bind to a local address.
-    case AcceptErrors               // The number of errors encountered by this socket trying to accept a a connection from a remote peer.
-    case CurrentConnections         // The number of connections currently estabalished to this socket.
-    case MessagesSent               // The number messages sent by this socket.
-    case MessagesReceived           // The number messages received by this socket.
-    case BytesSent                  // The number of bytes sent by this socket.
-    case BytesReceived              // The number of bytes received by this socket.
-    case CurrentSendPriority        // The current send priority of the socket - undocumented socket statistic.
-    case CurrentEndPointErrors      // The current number of end-point errors - undocumented socket statistic.
+    case EstablishedConnections         // The number of connections successfully established that were initiated from this socket.
+    case AcceptedConnections            // The number of connections successfully established that were accepted by this socket.
+    case DroppedConnections             // The number of established connections that were dropped by this socket.
+    case BrokenConnections              // The number of established connections that were closed by this socket, typically due to protocol errors.
+    case ConnectErrors                  // The number of errors encountered by this socket trying to connect to a remote peer.
+    case BindErrors                     // The number of errors encountered by this socket trying to bind to a local address.
+    case AcceptErrors                   // The number of errors encountered by this socket trying to accept a a connection from a remote peer.
+    case CurrentConnections             // The number of connections currently estabalished to this socket.
+    case MessagesSent                   // The number messages sent by this socket.
+    case MessagesReceived               // The number messages received by this socket.
+    case BytesSent                      // The number of bytes sent by this socket.
+    case BytesReceived                  // The number of bytes received by this socket.
+    case CurrentInProgressConnections   // The number of current connections that are in progress - undocumented socket statistic.
+    case CurrentSendPriority            // The current send priority of the socket - undocumented socket statistic.
+    case CurrentEndPointErrors          // The current number of end-point errors - undocumented socket statistic.
 
     public var rawValue: CInt {
         switch self {
@@ -64,6 +65,8 @@ public enum SocketStatistic: CInt {
                 return NN_STAT_BYTES_SENT
             case .BytesReceived:
                 return NN_STAT_BYTES_RECEIVED
+            case .CurrentInProgressConnections:
+                return NN_STAT_INPROGRESS_CONNECTIONS
             case .CurrentSendPriority:
                 return NN_STAT_CURRENT_SND_PRIORITY
             case .CurrentEndPointErrors:
@@ -99,6 +102,8 @@ extension SocketStatistic: CustomStringConvertible {
                 return "bytes sent"
             case .BytesReceived:
                 return "bytes received"
+            case .CurrentInProgressConnections:
+                return "current in progress connections"
             case .CurrentSendPriority:
                 return "current send priority"
             case .CurrentEndPointErrors:
