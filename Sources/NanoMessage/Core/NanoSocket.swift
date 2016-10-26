@@ -444,8 +444,8 @@ extension NanoSocket {
 ///
 /// - Returns: The linger time on the socket.
 ///
-/// - Note:    The nanomsg library no longer supports setting the linger option, linger time will
-///            therefore always it's default value.
+/// - Note:    The underlying nanomsg library no longer supports setting the linger option,
+///            linger time will therefore always it's default value.
     public func getLinger() throws -> Int {
         return try getSocketOption(self.socketFd, .Linger)
     }
@@ -458,7 +458,7 @@ extension NanoSocket {
 ///
 /// - Throws: `NanoMessageError.SetSocketOption`
 ///
-/// - Note:   The nanomsg library no longer supports this feature, linger time is always it's default value.
+/// - Note:   The underlying nanomsg library no longer supports this feature, linger time is always it's default value.
     @available(*, unavailable, message: "nanomsg library no longer supports this feature")
     public func setLinger(milliseconds: Int) throws {
         try setSocketOption(self.socketFd, .Linger, milliseconds)
@@ -526,7 +526,7 @@ extension NanoSocket {
 ///
 /// - Returns: The sockets name.
 ///
-/// - Note:    This feature is deamed as experimental by the nanomsg library.
+/// - Note:    This feature is deamed as experimental by the underlying nanomsg library.
     public func getSocketName() throws -> String {
         return try getSocketOption(self.socketFd, .SocketName)
     }
@@ -538,7 +538,7 @@ extension NanoSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
 ///
-/// - Note:    This feature is deamed as experimental by the nanomsg library.
+/// - Note:    This feature is deamed as experimental by the underlying nanomsg library.
     public func setSocketName(_ socketName: String) throws {
         try setSocketOption(self.socketFd, .SocketName, socketName)
     }
@@ -709,7 +709,20 @@ extension NanoSocket {
 /// - Returns: As per description.
 ///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentConnections() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .CurrentConnections)
+    }
+
+/// The number of end-point errors.
+///
+/// - Returns: As per description.
+///
+/// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Note:    This feature is undocumented in the underlying nanomsg library
+    public func getCurrentEndPointErrors() throws -> UInt64 {
+        return try getSocketStatistic(self.socketFd, .CurrentEndPointErrors)
     }
 }

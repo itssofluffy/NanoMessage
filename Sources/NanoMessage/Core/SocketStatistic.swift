@@ -35,7 +35,8 @@ public enum SocketStatistic: CInt {
     case MessagesReceived           // The number messages received by this socket.
     case BytesSent                  // The number of bytes sent by this socket.
     case BytesReceived              // The number of bytes received by this socket.
-    case CurrentSendPriority        // The current send priority of the socket.
+    case CurrentSendPriority        // The current send priority of the socket - undocumented socket statistic.
+    case CurrentEndPointErrors      // The current number of end-point errors - undocumented socket statistic.
 
     public var rawValue: CInt {
         switch self {
@@ -65,6 +66,8 @@ public enum SocketStatistic: CInt {
                 return NN_STAT_BYTES_RECEIVED
             case .CurrentSendPriority:
                 return NN_STAT_CURRENT_SND_PRIORITY
+            case .CurrentEndPointErrors:
+                return NN_STAT_CURRENT_EP_ERRORS
         }
     }
 }
@@ -98,6 +101,8 @@ extension SocketStatistic: CustomStringConvertible {
                 return "bytes received"
             case .CurrentSendPriority:
                 return "current send priority"
+            case .CurrentEndPointErrors:
+                return "current end-point errors"
         }
     }
 }

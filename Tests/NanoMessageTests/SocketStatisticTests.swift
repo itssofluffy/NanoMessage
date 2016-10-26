@@ -65,6 +65,8 @@ class SocketStatisticTests: XCTestCase {
             XCTAssertEqual(node0BytesReceived, 0, "node0.getBytesReceived() != 0")
             let node0CurrentSendPriority = try node0.getCurrentSendPriority()
             XCTAssertEqual(node0CurrentSendPriority, 0, "node0.getCurrentSendPriority() != 0")
+            let node0CurrentEndPointErrors = try node0.getCurrentEndPointErrors()
+            XCTAssertEqual(node0CurrentEndPointErrors, 0, "node0.getCurrentEndPointErrors() != 0")
 
             var node1EstablishedConnections = try node1.getEstablishedConnections()
             XCTAssertEqual(node1EstablishedConnections, 0, "node1.getEstablishedConnections() != 0")
@@ -92,6 +94,8 @@ class SocketStatisticTests: XCTestCase {
             XCTAssertEqual(node1BytesReceived, 0, "node1.getBytesReceived() != 0")
             let node1CurrentSendPriority = try node1.getCurrentSendPriority()
             XCTAssertEqual(node1CurrentSendPriority, 0, "node1.getCurrentSendPriority() != 0")
+            let node1CurrentEndPointErrors = try node1.getCurrentEndPointErrors()
+            XCTAssertEqual(node1CurrentEndPointErrors, 0, "node1.getCurrentEndPointErrors() != 0")
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
