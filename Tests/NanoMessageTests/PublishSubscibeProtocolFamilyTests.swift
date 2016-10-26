@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class PublishSubscribeProtocolFamilyTests: XCTestCase {
-    func testPublishSubscribeStandard(connectAddress: String, bindAddress: String = "") {
+    func testPublishSubscribeTests(connectAddress: String, bindAddress: String = "") {
         let bAddress = (bindAddress == "") ? connectAddress : bindAddress
 
         var completed = false
@@ -51,7 +51,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             // standard publisher -> subscriber where the topic known.
             print("subscribe to an expected topic...")
-            let done = try node1.subscribeTo(topic: node0.sendTopic)
+            var done = try node1.subscribeTo(topic: node0.sendTopic)
             XCTAssertEqual(done, true, "node1.subscribeTo(topic: \(node0.sendTopic))")
             XCTAssertEqual(node1.isTopicSubscribed(node0.sendTopic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
@@ -81,38 +81,11 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut))")   // we have timedout
             }
 
-            completed = true
-        } catch let error as NanoMessageError {
-            XCTAssert(false, "\(error)")
-        } catch {
-            XCTAssert(false, "an unexpected error '\(error)' has occured in the library libNanoMessage.")
-        }
+            try node1.unsubscribeFromAllTopics()
 
-        XCTAssert(completed, "test not completed")
-    }
-
-    func testPublishSubscribeAllTopics(connectAddress: String, bindAddress: String = "") {
-        let bAddress = (bindAddress == "") ? connectAddress : bindAddress
-
-        var completed = false
-
-        do {
             print("subscribe to all topics...")
-            let node0 = try PublisherSocket()
-            let node1 = try SubscriberSocket()
 
-            try node0.setSendTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
-
-            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
-
-            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
-
-            pauseForBind()
-
-            let done = try node1.subscribeToAllTopics()
+            done = try node1.subscribeToAllTopics()
             XCTAssertEqual(done, true, "node1.subscribeToAllTopics()")
 
             let planets = [ "mercury", "venus", "mars", "earth", "mars", "jupiter", "saturn", "uranus", "neptune" ]
@@ -137,11 +110,11 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 let _: (bytes: Int, message: String) = try node1.receiveMessage()
             }
 
-            XCTAssertEqual(node0.sentTopics.count, 2, "node0.sentTopics.count != 2")
+            XCTAssertEqual(node0.sentTopics.count, 1 + 2, "node0.sentTopics.count != 3")
             XCTAssertEqual(node0.sentTopics[node0.sendTopic]!, UInt(dwarfPlanets.count), "node0.sentTopics[\"\(node0.sendTopic)\"] != \(dwarfPlanets.count)")
 
             XCTAssertEqual(node1.subscribedTopics.count, 0, "node1.subscribedTopics.count != 0")
-            XCTAssertEqual(node1.receivedTopics.count, 2, "node1.receivedTopics.count != 1")
+            XCTAssertEqual(node1.receivedTopics.count, 1 + 2, "node1.receivedTopics.count != 3")
             XCTAssertEqual(UInt(planets.count), node1.receivedTopics["planet"]!, "planets.count != node1.receivedTopics[\"planet\"]")
             XCTAssertEqual(UInt(dwarfPlanets.count), node1.receivedTopics["dwarfPlanet"]!, "planets.count != node1.receivedTopics[\"dwarfPlanet\"]")
 
@@ -170,40 +143,13 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
 
-            let received: (bytes: Int, message: String) = try node1.receiveMessage()
+            var received: (bytes: Int, message: String) = try node1.receiveMessage()
             XCTAssertEqual(node1.receivedTopic, node0.sendTopic, "node1.receivedTopic != node0.sendTopic")
             XCTAssertEqual(received.message, dwarfPlanets[0], "received.message != \"\(dwarfPlanets[0])\"")
 
-            completed = true
-        } catch let error as NanoMessageError {
-            XCTAssert(false, "\(error)")
-        } catch {
-            XCTAssert(false, "an unexpected error '\(error)' has occured in the library libNanoMessage.")
-        }
+            try node1.unsubscribeFromAllTopics()
 
-        XCTAssert(completed, "test not completed")
-    }
-
-    func testPublishSubscribeIgnoreTopicSeperator(connectAddress: String, bindAddress: String = "") {
-        let bAddress = (bindAddress == "") ? connectAddress : bindAddress
-
-        var completed = false
-
-        do {
             print("ignore topic seperator...")
-            let node0 = try PublisherSocket()
-            let node1 = try SubscriberSocket()
-
-            try node0.setSendTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
-
-            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
-
-            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
-
-            pauseForBind()
 
             node0.ignoreTopicSeperator = true
 
@@ -228,7 +174,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let _ = try node0.sendMessage(payload)
 
-            let received: (bytes: Int, message: String) = try node1.receiveMessage()
+//            received: (bytes: Int, message: String) = try node1.receiveMessage()
+            received = try node1.receiveMessage()
 
             XCTAssertEqual(node1.receivedTopic.count, node0.sendTopic.count, "node1.receivedTopic.count != node0.sendTopic.count")
             XCTAssertEqual(node1.receivedTopic, node0.sendTopic, "node1.receivedTopic != node0.sendTopic")
@@ -246,30 +193,22 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
     func testTCPPublishSubscribe() {
         print("TCP tests...")
-        testPublishSubscribeStandard(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
-        testPublishSubscribeAllTopics(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
-        testPublishSubscribeIgnoreTopicSeperator(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testPublishSubscribeTests(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessPublishSubscribe() {
         print("In-Process tests...")
-        testPublishSubscribeStandard(connectAddress: "inproc:///tmp/pipeline.inproc")
-        testPublishSubscribeAllTopics(connectAddress: "inproc:///tmp/pipeline.inproc")
-        testPublishSubscribeIgnoreTopicSeperator(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testPublishSubscribeTests(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessPublishSubscribe() {
         print("Inter Process tests...")
-        testPublishSubscribeStandard(connectAddress: "ipc:///tmp/pipeline.ipc")
-        testPublishSubscribeAllTopics(connectAddress: "ipc:///tmp/pipeline.ipc")
-        testPublishSubscribeIgnoreTopicSeperator(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testPublishSubscribeTests(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketPublishSubscribe() {
         print("Web Socket tests...")
-        testPublishSubscribeStandard(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
-        testPublishSubscribeAllTopics(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
-        testPublishSubscribeIgnoreTopicSeperator(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testPublishSubscribeTests(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 
 #if !os(OSX)
