@@ -50,8 +50,8 @@ extension SymbolProperty: Hashable {
     }
 }
 
-extension SymbolProperty: CustomStringConvertible {
-    public var description: String {
+extension SymbolProperty: CustomDebugStringConvertible {
+    public var debugDescription: String {
         return "value: \(self.value), name: \(self.name), namespace: \(self.namespace), type: \(self.type), unit: \(self.unit)"
     }
 }

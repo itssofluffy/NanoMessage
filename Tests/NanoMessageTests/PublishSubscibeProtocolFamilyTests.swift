@@ -174,7 +174,6 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let _ = try node0.sendMessage(payload)
 
-//            received: (bytes: Int, message: String) = try node1.receiveMessage()
             received = try node1.receiveMessage()
 
             XCTAssertEqual(node1.receivedTopic.count, node0.sendTopic.count, "node1.receivedTopic.count != node0.sendTopic.count")
