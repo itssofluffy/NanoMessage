@@ -111,12 +111,12 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             }
 
             XCTAssertEqual(node0.sentTopics.count, 1 + 2, "node0.sentTopics.count != 3")
-            XCTAssertEqual(node0.sentTopics[node0.sendTopic]!, UInt(dwarfPlanets.count), "node0.sentTopics[\"\(node0.sendTopic)\"] != \(dwarfPlanets.count)")
+            XCTAssertEqual(node0.sentTopics[node0.sendTopic]!, UInt64(dwarfPlanets.count), "node0.sentTopics[\"\(node0.sendTopic)\"] != \(dwarfPlanets.count)")
 
             XCTAssertEqual(node1.subscribedTopics.count, 0, "node1.subscribedTopics.count != 0")
             XCTAssertEqual(node1.receivedTopics.count, 1 + 2, "node1.receivedTopics.count != 3")
-            XCTAssertEqual(UInt(planets.count), node1.receivedTopics["planet"]!, "planets.count != node1.receivedTopics[\"planet\"]")
-            XCTAssertEqual(UInt(dwarfPlanets.count), node1.receivedTopics["dwarfPlanet"]!, "planets.count != node1.receivedTopics[\"dwarfPlanet\"]")
+            XCTAssertEqual(UInt64(planets.count), node1.receivedTopics["planet"]!, "planets.count != node1.receivedTopics[\"planet\"]")
+            XCTAssertEqual(UInt64(dwarfPlanets.count), node1.receivedTopics["dwarfPlanet"]!, "planets.count != node1.receivedTopics[\"dwarfPlanet\"]")
 
             print("unsubscribe from all topics and subscribe to only one topic...")
             try node1.unsubscribeFromAllTopics()

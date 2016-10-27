@@ -78,7 +78,7 @@ public class NanoSocket {
     }
 
     deinit {
-        func closeSocket() throws {
+        func _closeSocket() throws {
             if (self.socketFd >= 0) {                                   // if we have a valid nanomsg socket file descriptor then...
                 var loopCount = 0
 
@@ -111,7 +111,7 @@ public class NanoSocket {
 
         repeat {
             do {
-                try closeSocket()
+                try _closeSocket()
             } catch NanoMessageError.Interrupted {
                 print("NanoSocket.deinit(): \(NanoMessageError.Interrupted))")
                 if (self.blockTillCloseSuccess) {

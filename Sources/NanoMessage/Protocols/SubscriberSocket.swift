@@ -24,7 +24,7 @@ import C7
 import CNanoMessage
 
 /// Subscriber socket.
-public final class SubscriberSocket: NanoSocket, ProtocolSocket, Receiver, PublisherSubscriber {
+public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, PublisherSubscriber {
     public var _nanoSocket: NanoSocket {
         return self
     }
@@ -37,9 +37,9 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Receiver, Publi
 /// The topic last received.
     public fileprivate(set) var receivedTopic = Data()
 /// A dictionary of topics and their count that have been received
-    public fileprivate(set) var receivedTopics = Dictionary<Data, UInt>()
+    public fileprivate(set) var receivedTopics = Dictionary<Data, UInt64>()
 /// Remove the topic from the received data.
-    public var removeTopicFromMessage: Bool = true
+    public var removeTopicFromMessage = true
 /// A set of all the subscribed topics.
     public fileprivate(set) var subscribedTopics = Set<Data>()
 /// Is the socket subscribed to all topics
@@ -55,39 +55,6 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Receiver, Publi
 }
 
 extension SubscriberSocket {
-/// Does the message/payload contain the specified topic
-///
-/// - Parameters:
-///   - topic:   Topic is look for.
-///   - message: Message/Payload to search.
-///
-/// - Returns: Topic is in message/payload.
-    private func _messageHasTopic(_ topic: Data, _ message: Data) -> Bool {
-        if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
-            if (Data(message[0 ..< topic.count]) != topic) {
-                return false
-            } else if (self.ignoreTopicSeperator || message[topic.count] == self.topicSeperator) {
-                return true
-            }
-        }
-
-        return false
-    }
-
-/// Get the topic from the message/payload if it exists using the topic seperator.
-///
-/// - Parameters:
-///   - message: The message/payload to extract from.
-///
-/// - Returns: The topic extrcted or returns the parameter message back.
-    private func _getTopicFromMessage(_ message: Data) -> Data {
-        if let index = message.index(of: self.topicSeperator) {
-            return Data(message[0 ..< index])
-        }
-
-        return message
-    }
-
 /// Receive a message.
 ///
 /// - Parameters:
@@ -101,6 +68,28 @@ extension SubscriberSocket {
 ///
 /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: Data) {
+/// Does the message/payload contain the specified topic
+        func _messageHasTopic(_ topic: Data, _ message: Data) -> Bool {
+            if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
+                if (Data(message[0 ..< topic.count]) != topic) {
+                    return false
+                } else if (self.ignoreTopicSeperator || message[topic.count] == self.topicSeperator) {
+                    return true
+                }
+            }
+
+            return false
+        }
+
+/// Get the topic from the message/payload if it exists using the topic seperator.
+        func _getTopicFromMessage(_ message: Data) -> Data {
+            if let index = message.index(of: self.topicSeperator) {
+                return Data(message[0 ..< index])
+            }
+
+            return message
+        }
+
         self.receivedTopic = Data()
 
         var received: (bytes: Int, message: Data) = try receivePayloadFromSocket(self.socketFd, blockingMode)
@@ -170,26 +159,6 @@ extension SubscriberSocket {
         return self.isTopicSubscribed(Data(topic))
     }
 
-/// Check topic length against (any) existing topics is see if it is of equal length.
-///
-/// - Parameters:
-///   - topic: Topic to check.
-///
-/// - Returns: Topic is/not of equal length
-    private func _validTopicLengths(_ topic: Data) -> Bool {
-        let topics: (equalLengths: Bool, count: Int) = _validateTopicLengths()
-
-        if (!topics.equalLengths) {
-            return false
-        } else if (topics.count < 0) {
-            return true
-        } else if (topic.count != topics.count) {
-            return false
-        }
-
-        return true
-    }
-
 /// Check all topics for equal lengths.
 ///
 /// - Returns: Tuple of all topics of equal length and then standard topic length/count.
@@ -246,6 +215,21 @@ extension SubscriberSocket {
 /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: Data) throws -> Bool {
+/// Check topic length against (any) existing topics is see if it is of equal length.
+        func _validTopicLengths(_ topic: Data) -> Bool {
+            let topics: (equalLengths: Bool, count: Int) = _validateTopicLengths()
+
+            if (!topics.equalLengths) {
+                return false
+            } else if (topics.count < 0) {
+                return true
+            } else if (topic.count != topics.count) {
+                return false
+            }
+
+            return true
+        }
+
         if (!topic.isEmpty) {
             let topicSubscribed = self.isTopicSubscribed(topic)
 

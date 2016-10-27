@@ -24,7 +24,7 @@ import C7
 import CNanoMessage
 
 /// Publisher socket.
-public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, PublisherSubscriber {
+public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, PublisherSubscriber {
     public var _nanoSocket: NanoSocket {
         return self
     }
@@ -35,7 +35,7 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Sender, Publishe
 /// The topic to send.
     public var sendTopic = Data()
 /// A Dictionary of the topics sent with a count of the times sent.
-    public fileprivate(set) var sentTopics = Dictionary<Data, UInt>()
+    public fileprivate(set) var sentTopics = Dictionary<Data, UInt64>()
 
 /// Prepend the topic to the start of the message when sending.
     public var prependTopic = true
