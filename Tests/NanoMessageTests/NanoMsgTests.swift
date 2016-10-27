@@ -48,6 +48,15 @@ class NanoMsgTests: XCTestCase {
         XCTAssertEqual(nanomsgError[ETIMEDOUT], "ETIMEDOUT", "nanomsgError[ETIMEDOUT] != \"ETIMEDOUT\"")
         // test underlying error strings.
         XCTAssertEqual(nanoMessageError(EINTR), "Interrupted system call", "nanoMessageError(EINTR) returned an unexpected result.")
+
+        for symbol in symbolProperty {
+            // value: 2, name: NN_SNDBUF, namespace: socket option, type: integer, unit: byte
+            if (symbol.namespace == .SocketOption && symbol.name == "NN_SNDBUF") {
+                XCTAssertEqual(symbol.type, .Integer, "symbol.type != .Integer")
+                XCTAssertEqual(symbol.unit, .Byte, "symbol.unit != .Byte")
+            }
+            debugPrint(symbol)
+        }
     }
 
 #if !os(OSX)

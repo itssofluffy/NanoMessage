@@ -37,7 +37,7 @@ private var _nanomsgError = Dictionary<CInt, String>()
 public var nanomsgError: Dictionary<CInt, String> {
     if (_nanomsgError.isEmpty) {
         for symbol in symbolProperty {
-            if (symbol.namespace == NN_NS_ERROR) {              // we have a symbol property of the error namespace
+            if (symbol.namespace == .Error) {              // we have a symbol property of the error namespace
                 _nanomsgError[symbol.value] = symbol.name
             }
         }

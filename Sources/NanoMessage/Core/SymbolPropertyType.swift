@@ -1,5 +1,5 @@
 /*
-    SymbolProperty.swift
+    SymbolPropertyType.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -20,38 +20,52 @@
     IN THE SOFTWARE.
 */
 
-import FNVHashValue
-import ISFLibrary
+import CNanoMessage
 
-/// Nanomsg symbol.
-public struct SymbolProperty {
-    public let value: CInt
-    public let name: String
-    public let namespace: SymbolPropertyNamespace
-    public let type: SymbolPropertyType
-    public let unit: SymbolPropertyUnit
+public enum SymbolPropertyType: CInt {
+    case None
+    case Integer
+    case String
+    case Unknown
 
-    public init(value: CInt, name: String, namespace: CInt, type: CInt, unit: CInt) {
-        self.value = value
-        self.name = name
-        self.namespace = SymbolPropertyNamespace(rawValue: namespace)
-        self.type = SymbolPropertyType(rawValue: type)
-        self.unit = SymbolPropertyUnit(rawValue: unit)
+    public var rawValue: CInt {
+        switch self {
+            case .None:
+                return NN_TYPE_NONE
+            case .Integer:
+                return NN_TYPE_INT
+            case .String:
+                return NN_TYPE_STR
+            case .Unknown:
+                return CInt.max
+        }
+    }
+
+    public init(rawValue: CInt) {
+        switch rawValue {
+            case NN_TYPE_NONE:
+                self = .None
+            case NN_TYPE_INT:
+                self = .Integer
+            case NN_TYPE_STR:
+                self = .String
+            default:
+                self = .Unknown
+        }
     }
 }
 
-extension SymbolProperty: Hashable {
-    public var hashValue: Int {
-        return fnv1a(typeToBytes(self.value) + typeToBytes(self.namespace))
-    }
-
-    public static func ==(lhs: SymbolProperty, rhs: SymbolProperty) -> Bool {
-        return (lhs.value == rhs.value && lhs.namespace == rhs.namespace)
-    }
-}
-
-extension SymbolProperty: CustomDebugStringConvertible {
+extension SymbolPropertyType: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "value: \(self.value), name: \(self.name), namespace: \(self.namespace), type: \(self.type), unit: \(self.unit)"
+        switch self {
+            case .None:
+                return "none"
+            case .Integer:
+                return "integer"
+            case .String:
+                return "string"
+            case .Unknown:
+                return "unknown"
+        }
     }
 }
