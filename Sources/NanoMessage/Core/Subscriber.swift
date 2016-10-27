@@ -29,4 +29,14 @@ protocol Subscriber: Receiver {
     var ignoreTopicSeperator: Bool { get }                // implement private set
     var subscribedTopics: Set<Data> { get }               // implement private set
     var subscribedToAllTopics: Bool { get }               // implement private set
+
+    func isTopicSubscribed(_ topic: Data) -> Bool
+    func isTopicSubscribed(_ topic: String) -> Bool
+    func flipIgnoreTopicSeperator() throws -> Bool
+    func subscribeTo(topic: Data) throws -> Bool
+    func subscribeTo(topic: String) throws -> Bool
+    func unsubscribeFrom(topic: Data) throws -> Bool
+    func unsubscribeFrom(topic: String) throws -> Bool
+    func subscribeToAllTopics() throws -> Bool
+    func unsubscribeFromAllTopics() throws
 }
