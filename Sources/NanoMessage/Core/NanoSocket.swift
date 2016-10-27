@@ -113,7 +113,10 @@ public class NanoSocket {
             do {
                 try _closeSocket()
             } catch NanoMessageError.Interrupted {
-                print("NanoSocket.deinit(): \(NanoMessageError.Interrupted))")
+                let dynamicType = type(of: self)
+
+                print("\(dynamicType).deinit() failed: \(NanoMessageError.Interrupted))")
+
                 if (self.blockTillCloseSuccess) {
                     terminateLoop = false
                 }

@@ -48,12 +48,16 @@ class NanoMsgTests: XCTestCase {
         XCTAssertEqual(nanomsgError[ETIMEDOUT], "ETIMEDOUT", "nanomsgError[ETIMEDOUT] != \"ETIMEDOUT\"")
         // test underlying error strings.
         XCTAssertEqual(nanoMessageError(EINTR), "Interrupted system call", "nanoMessageError(EINTR) returned an unexpected result.")
+    }
 
+    func testNanoMsgSymbolProperty() {
+        // test symbolProperty computed property and debugDescription of SymbolProperty struct.
         for symbol in symbolProperty {
-            // value: 2, name: NN_SNDBUF, namespace: socket option, type: integer, unit: byte
-            if (symbol.namespace == .SocketOption && symbol.name == "NN_SNDBUF") {
-                XCTAssertEqual(symbol.type, .Integer, "symbol.type != .Integer")
-                XCTAssertEqual(symbol.unit, .Byte, "symbol.unit != .Byte")
+            if (symbol.namespace == .SocketOption) {
+                if (symbol.name == "NN_SNDBUF") {
+                    XCTAssertEqual(symbol.type, .Integer, "NN_SNDBUF -> symbol.type != .Integer")
+                    XCTAssertEqual(symbol.unit, .Byte, "NN_SNDBUF -> symbol.unit != .Byte")
+                }
             }
             debugPrint(symbol)
         }
@@ -61,7 +65,8 @@ class NanoMsgTests: XCTestCase {
 
 #if !os(OSX)
     static let allTests = [
-        ("testNanoMsgSymbols", testNanoMsgSymbols)
+        ("testNanoMsgSymbols", testNanoMsgSymbols),
+        ("testNanoMsgSymbolProperty", testNanoMsgSymbolProperty)
    ]
 #endif
 }

@@ -45,7 +45,7 @@ class PollSocketTests: XCTestCase {
 
             pauseForBind()
 
-            var node1Poll: (messageIsWaiting: Bool, sendIsBlocked: Bool) = try node1.pollSocket(timeout: 1000)
+            var node1Poll: (messageIsWaiting: Bool, sendIsBlocked: Bool) = try node1.pollSocket(timeout: 500)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 

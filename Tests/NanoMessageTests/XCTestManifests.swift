@@ -25,8 +25,12 @@ import XCTest
 
 let payload = "This above all...to thine own self be true."
 
+public let pauseForMicroseconds: UInt32 = 250000
+public var pauseCount: UInt32 = 0
+
 func pauseForBind() {
-    usleep(250000)
+    usleep(pauseForMicroseconds)
+    pauseCount += 1
 }
 
 #if !os(OSX)
