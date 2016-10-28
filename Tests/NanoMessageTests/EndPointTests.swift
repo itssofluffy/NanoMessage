@@ -71,6 +71,7 @@ class EndPointTests: XCTestCase {
                 XCTAssert(false, "node0EndPoint.receivePriority != nil")
             }
             XCTAssertEqual(node0EndPoint.sendPriority, 2, "node0EndPoint.address != 2")
+            XCTAssertEqual(node0EndPoint.ipv4Only, true, "node0EndPoint.ipv4Only != true")
             XCTAssertEqual(node0EndPoint.name, endPointName, "node0EndPoint.name != '\(endPointName)'")
 
             completed = true

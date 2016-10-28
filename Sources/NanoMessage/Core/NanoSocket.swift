@@ -172,6 +172,7 @@ extension NanoSocket {
         var endPointId: CInt = -1
 
         let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
+        let ipv4Only = try self.getIPv4Only()
 
         endPointAddress.withCString {
             endPointId = nn_bind(self.socketFd, $0)
@@ -186,6 +187,7 @@ extension NanoSocket {
                                 connectionType: .BindToAddress,
                                 receivePriority: socket.receivePriority,
                                 sendPriority: socket.sendPriority,
+                                ipv4Only: ipv4Only,
                                 endPointName: endPointName)
 
         self.endPoints.insert(endPoint)
@@ -235,6 +237,7 @@ extension NanoSocket {
         var endPointId: CInt = -1
 
         let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
+        let ipv4Only = try self.getIPv4Only()
 
         endPointAddress.withCString {
             endPointId = nn_connect(self.socketFd, $0)
@@ -249,6 +252,7 @@ extension NanoSocket {
                                 connectionType: .ConnectToAddress,
                                 receivePriority: socket.receivePriority,
                                 sendPriority: socket.sendPriority,
+                                ipv4Only: ipv4Only,
                                 endPointName: endPointName)
 
         self.endPoints.insert(endPoint)
