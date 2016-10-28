@@ -60,7 +60,14 @@ extension EndPoint: Hashable {
 extension EndPoint: CustomStringConvertible {
     public var description: String {
         var description = "id: \(self.id), address: \(self.address), connection type: \(self.connectionType), transport: \(self.transportMechanism)"
-        if (self.name != "") {
+        if let priority = self.receivePriority {
+            description += ", receive priority: \(priority)"
+        }
+        if let priority = self.sendPriority {
+            description += ", send priority: \(priority)"
+        }
+        description += ", ipv4only: \(self.ipv4Only)"
+        if (!self.name.isEmpty) {
             description += ", name: \(self.name)"
         }
 
