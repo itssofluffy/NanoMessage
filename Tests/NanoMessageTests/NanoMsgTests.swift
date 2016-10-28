@@ -42,12 +42,12 @@ class NanoMsgTests: XCTestCase {
         XCTAssertEqual(nanomsgSymbol["EINTR"], EINTR, "nanomsg symbol value for EINTR is different than expected.")
         XCTAssertEqual(nanomsgSymbol["EAGAIN"], EAGAIN, "nanomsg symbol value for EAGAIN is different than expected.")
         XCTAssertEqual(nanomsgSymbol["ETIMEDOUT"], ETIMEDOUT, "nanomsg symbol value for ETIMEDOUT is different than expected.")
-        // test nanomsg POSIX equilivant error codes.
-        XCTAssertEqual(nanomsgError[EINTR], "EINTR", "nanomsgError[EINTR] != \"EINTR\"")
-        XCTAssertEqual(nanomsgError[EAGAIN], "EAGAIN", "nanomsgError[EAGAIN] != \"EAGAIN\"")
-        XCTAssertEqual(nanomsgError[ETIMEDOUT], "ETIMEDOUT", "nanomsgError[ETIMEDOUT] != \"ETIMEDOUT\"")
-        // test underlying error strings.
-        XCTAssertEqual(nanoMessageError(EINTR), "Interrupted system call", "nanoMessageError(EINTR) returned an unexpected result.")
+    }
+
+    func testNanoMsgError() {
+        for (code, errorCode) in nanomsgError {
+            print("code: \(code), errorCode: \(errorCode), nanoMessageError: \(nanoMessageError(code))")
+        }
     }
 
     func testNanoMsgSymbolProperty() {
@@ -66,6 +66,7 @@ class NanoMsgTests: XCTestCase {
 #if !os(OSX)
     static let allTests = [
         ("testNanoMsgSymbols", testNanoMsgSymbols),
+        ("testNanoMsgError", testNanoMsgError),
         ("testNanoMsgSymbolProperty", testNanoMsgSymbolProperty)
    ]
 #endif
