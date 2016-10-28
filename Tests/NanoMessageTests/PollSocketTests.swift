@@ -60,7 +60,7 @@ class PollSocketTests: XCTestCase {
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "bytes != message.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "message != payload")
 
-            node1Poll = try node1.pollSocket()
+            node1Poll = try node1.pollSocket(timeout: 250)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
