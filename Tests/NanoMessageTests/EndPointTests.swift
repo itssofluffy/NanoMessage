@@ -43,8 +43,8 @@ class EndPointTests: XCTestCase {
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') != 0")
 
-            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') != 0")
+            let node1EndPoint: EndPoint = try node1.bindToAddress(bAddress)
+            XCTAssertGreaterThanOrEqual(node1EndPoint.id, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') != 0")
 
             pauseForBind()
 
@@ -54,8 +54,8 @@ class EndPointTests: XCTestCase {
             let node0EndPointRemoved = try node0.removeEndPoint(node0EndPointId)
             XCTAssertEqual(node0EndPointRemoved, true, "node0.removeEndPoint(\(node0EndPointId))")
 
-            let node1EndPointRemoved = try node1.removeEndPoint(node1EndPointId)
-            XCTAssertEqual(node1EndPointRemoved, true, "node1.removeEndPoint(\(node1EndPointId))")
+            let node1EndPointRemoved = try node1.removeEndPoint(node1EndPoint)
+            XCTAssertEqual(node1EndPointRemoved, true, "node1.removeEndPoint(\(node1EndPoint.id))")
 
             let endPointName = "end-point at the end of the line"
 
