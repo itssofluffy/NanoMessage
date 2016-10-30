@@ -85,9 +85,9 @@ public var symbolProperty: Set<SymbolProperty> {
                 break
             }
 
-            _symbolProperty.insert(SymbolProperty(value: buffer.value,
+            _symbolProperty.insert(SymbolProperty(namespace: buffer.ns,
                                                   name: String(cString: buffer.name),
-                                                  namespace: buffer.ns,
+                                                  value: buffer.value,
                                                   type: buffer.type,
                                                   unit: buffer.unit))
 

@@ -51,7 +51,15 @@ extension EndPoint: Hashable {
     public var hashValue: Int {
         return fnv1a(self.id)
     }
+}
 
+extension EndPoint: Comparable {
+    public static func <(lhs: EndPoint, rhs: EndPoint) -> Bool {
+        return (lhs.id < rhs.id)
+    }
+}
+
+extension EndPoint: Equatable {
     public static func ==(lhs: EndPoint, rhs: EndPoint) -> Bool {
         return (lhs.id == rhs.id)
     }

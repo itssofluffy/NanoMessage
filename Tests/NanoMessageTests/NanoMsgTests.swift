@@ -52,7 +52,9 @@ class NanoMsgTests: XCTestCase {
 
     func testNanoMsgSymbolProperty() {
         // test symbolProperty computed property and debugDescription of SymbolProperty struct.
-        for symbol in symbolProperty {
+        let properties = symbolProperty.sorted { $0 < $1 }
+
+        for symbol in properties {
             if (symbol.namespace == .SocketOption) {
                 if (symbol.name == "NN_SNDBUF") {
                     XCTAssertEqual(symbol.type, .Integer, "NN_SNDBUF -> symbol.type != .Integer")

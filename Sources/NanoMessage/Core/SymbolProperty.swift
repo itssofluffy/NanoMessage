@@ -25,16 +25,16 @@ import ISFLibrary
 
 /// Nanomsg symbol.
 public struct SymbolProperty {
-    public let value: CInt
-    public let name: String
     public let namespace: SymbolPropertyNamespace
+    public let name: String
+    public let value: CInt
     public let type: SymbolPropertyType
     public let unit: SymbolPropertyUnit
 
-    public init(value: CInt, name: String, namespace: CInt, type: CInt, unit: CInt) {
-        self.value = value
-        self.name = name
+    public init(namespace: CInt, name: String, value: CInt, type: CInt, unit: CInt) {
         self.namespace = SymbolPropertyNamespace(rawValue: namespace)
+        self.name = name
+        self.value = value
         self.type = SymbolPropertyType(rawValue: type)
         self.unit = SymbolPropertyUnit(rawValue: unit)
     }
@@ -42,16 +42,24 @@ public struct SymbolProperty {
 
 extension SymbolProperty: Hashable {
     public var hashValue: Int {
-        return fnv1a(typeToBytes(self.value) + typeToBytes(self.namespace))
+        return fnv1a(typeToBytes(self.namespace) + typeToBytes(self.value))
     }
+}
 
+extension SymbolProperty: Comparable {
+    public static func <(lhs: SymbolProperty, rhs: SymbolProperty) -> Bool {
+        return ((lhs.namespace.rawValue < rhs.namespace.rawValue) || (lhs.namespace.rawValue == rhs.namespace.rawValue && lhs.value < rhs.value))
+    }
+}
+
+extension SymbolProperty: Equatable {
     public static func ==(lhs: SymbolProperty, rhs: SymbolProperty) -> Bool {
-        return (lhs.value == rhs.value && lhs.namespace == rhs.namespace)
+        return (lhs.namespace == rhs.namespace && lhs.value == rhs.value)
     }
 }
 
 extension SymbolProperty: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "value: \(self.value), name: \(self.name), namespace: \(self.namespace), type: \(self.type), unit: \(self.unit)"
+        return "namespace: \(self.namespace), name: \(self.name), value: \(self.value), type: \(self.type), unit: \(self.unit)"
     }
 }
