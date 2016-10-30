@@ -36,10 +36,8 @@ private var _nanomsgError = Dictionary<CInt, String>()
 /// A dictionary of nanomsg error codes and their POSIX codes as strings.
 public var nanomsgError: Dictionary<CInt, String> {
     if (_nanomsgError.isEmpty) {
-        for symbol in symbolProperty {
-            if (symbol.namespace == .Error) {              // we have a symbol property of the error namespace
-                _nanomsgError[symbol.value] = symbol.name
-            }
+        for symbol in symbolProperty.filter({ $0.namespace == .Error }) {
+            _nanomsgError[symbol.value] = symbol.name
         }
     }
 

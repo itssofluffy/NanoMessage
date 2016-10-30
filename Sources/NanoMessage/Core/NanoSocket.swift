@@ -337,11 +337,9 @@ extension NanoSocket {
 /// - Returns: If the endpoint was removed, false indicates that the endpoint was not attached to the socket.
     @discardableResult
     public func removeEndPoint(_ endPointId: Int) throws -> Bool {
-        for endPoint in self.endPoints {
-            if (endPointId == endPoint.id) {
-                return try self.removeEndPoint(endPoint)
-            }
-        }
+        if let endPoints = Optional(self.endPoints.filter({ $0.id == endPointId })) {
+            return try self.removeEndPoint(endPoints[0])        // endPoint is an Array[EndPoint] so access the first element
+        }                                                       // as end-point.id is/should be unique!?
 
         return false
     }

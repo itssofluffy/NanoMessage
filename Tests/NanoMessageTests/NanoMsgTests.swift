@@ -45,16 +45,14 @@ class NanoMsgTests: XCTestCase {
     }
 
     func testNanoMsgError() {
-        for (code, errorCode) in nanomsgError {
+        for (code, errorCode) in Array(nanomsgError).sorted(by: { $0.0 < $1.0 }) {
             print("code: \(code), errorCode: \(errorCode), nanoMessageError: \(nanoMessageError(code))")
         }
     }
 
     func testNanoMsgSymbolProperty() {
         // test symbolProperty computed property and debugDescription of SymbolProperty struct.
-        let properties = symbolProperty.sorted { $0 < $1 }
-
-        for symbol in properties {
+        for symbol in symbolProperty.sorted(by: { $0 < $1 }) {
             if (symbol.namespace == .SocketOption) {
                 if (symbol.name == "NN_SNDBUF") {
                     XCTAssertEqual(symbol.type, .Integer, "NN_SNDBUF -> symbol.type != .Integer")
