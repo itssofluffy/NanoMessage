@@ -260,7 +260,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
 internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> Bool {
     let returnValue: CInt = try getSocketOption(socketFd, option, level)
 
-    return (returnValue == 0) ? false : true
+    return (returnValue != 0)
 }
 
 /// Get socket option.
@@ -334,7 +334,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
 internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: SocketProtocol) throws -> Bool {
     let returnValue: CInt = try getSocketOption(socketFd, option, level)
 
-    return (returnValue == 0) ? false : true
+    return (returnValue != 0)
 }
 
 /// Set socket option.

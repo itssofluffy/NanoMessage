@@ -43,7 +43,7 @@ public struct EndPoint {
         self.receivePriority = receivePriority
         self.sendPriority = sendPriority
         self.ipv4Only = ipv4Only
-        self.name = endPointName
+        self.name = (endPointName.isEmpty) ? String(endPointId) : endPointName
     }
 }
 

@@ -373,8 +373,8 @@ extension NanoSocket {
             throw NanoMessageError.PollSocket(code: nn_errno())
         }
 
-        let messageIsWaiting = ((pfd.revents & pollinMask) != 0) ? true : false // using the event masks determine our return values
-        let sendIsBlocked = ((pfd.revents & polloutMask) != 0) ? true : false   //
+        let messageIsWaiting = ((pfd.revents & pollinMask) != 0)                // using the event masks determine our return values
+        let sendIsBlocked = ((pfd.revents & polloutMask) != 0)                  //
 
         return (messageIsWaiting, sendIsBlocked)
     }
@@ -603,7 +603,7 @@ extension NanoSocket {
     public func getTCPNoDelay(transportMechanism: TransportMechanism = .TCP) throws -> Bool {
         let valueReturned: CInt = try getSocketOption(self.socketFd, .TCPNoDelay, transportMechanism)
 
-        return (valueReturned == NN_TCP_NODELAY) ? true : false
+        return (valueReturned == NN_TCP_NODELAY)
     }
 
 /// When true, disables Nagle’s algorithm. It also disables delaying of TCP acknowledgments.
