@@ -49,6 +49,6 @@ class VersionTests: XCTestCase {
     static let allTests = [
         ("testNanoMsgABIVersion", testNanoMsgABIVersion),
         ("testNanoMessageVersion", testNanoMessageVersion)
-   ]
+    ]
 #endif
 }

@@ -59,6 +59,7 @@ class NanoMsgTests: XCTestCase {
                     XCTAssertEqual(symbol.unit, .Byte, "NN_SNDBUF -> symbol.unit != .Byte")
                 }
             }
+
             debugPrint(symbol)
         }
     }
@@ -68,6 +69,6 @@ class NanoMsgTests: XCTestCase {
         ("testNanoMsgSymbols", testNanoMsgSymbols),
         ("testNanoMsgError", testNanoMsgError),
         ("testNanoMsgSymbolProperty", testNanoMsgSymbolProperty)
-   ]
+    ]
 #endif
 }
