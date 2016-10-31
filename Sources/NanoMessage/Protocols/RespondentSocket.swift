@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import CNanoMessage
-
 /// Respondent socket.
 public final class RespondentSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
     public var _nanoSocket: NanoSocket {

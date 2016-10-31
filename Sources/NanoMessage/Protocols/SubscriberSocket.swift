@@ -21,7 +21,6 @@
 */
 
 import C7
-import CNanoMessage
 
 /// Subscriber socket.
 public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, PublisherSubscriber {

@@ -21,7 +21,6 @@
 */
 
 import C7
-import CNanoMessage
 import ISFLibrary
 
 /// Socket protocol protocol.

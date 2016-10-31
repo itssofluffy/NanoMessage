@@ -21,7 +21,6 @@
 */
 
 import C7
-import CNanoMessage
 
 /// Publisher socket.
 public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, PublisherSubscriber {
