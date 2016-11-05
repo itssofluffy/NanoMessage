@@ -40,22 +40,22 @@ public final class RequestSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
 extension RequestSocket {
 /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
 ///
-/// Default value is 60000 milliseconds (1 minute).
+/// Default value is 60000 milliseconds (60 seconds).
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets resend interval.
     public func getResendInterval() throws -> TimeInterval {
-        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol))
+        return try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol)
     }
 
 /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
 ///
 /// - Parameters:
-///   - milliseconds: The sockets resend interval.
+///   - seconds: The sockets resend interval.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setResendInterval(seconds: TimeInterval) throws {
-        try setSocketOption(self.socketFd, .ResendInterval, seconds.milliseconds, .RequestProtocol)
+        try setSocketOption(self.socketFd, .ResendInterval, seconds, .RequestProtocol)
     }
 }

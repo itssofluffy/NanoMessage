@@ -45,7 +45,7 @@ public class NanoSocket {
             self._closureAttempts = clamp(value: attempts, lower: 1, upper: 1000)
         }
     }
-/// The socket/end-point closure time in microseconds.
+/// The socket/end-point closure time in timeinterval.
     fileprivate var _closureDelay: TimeInterval {
         var delay = TimeInterval(seconds: 1)
 
@@ -452,13 +452,7 @@ extension NanoSocket {
 /// - Note:    The underlying nanomsg library no longer supports setting the linger option,
 ///            linger time will therefore always it's default value.
     public func getLinger() throws -> TimeInterval {
-        let linger = TimeInterval(milliseconds: try getSocketOption(self.socketFd, .Linger))
-
-        if (linger < 0) {
-            return TimeInterval(seconds: -1)
-        }
-
-        return linger
+        return try getSocketOption(self.socketFd, .Linger)
     }
 
 /// Specifies how long the socket should try to send pending outbound messages after the socket
@@ -472,11 +466,7 @@ extension NanoSocket {
 /// - Note:   The underlying nanomsg library no longer supports this feature, linger time is always it's default value.
     @available(*, unavailable, message: "nanomsg library no longer supports this feature")
     public func setLinger(seconds: TimeInterval) throws {
-        if (seconds < 0) {
-            try setSocketOption(self.socketFd, .Linger, -1)
-        } else {
-            try setSocketOption(self.socketFd, .Linger, seconds.milliseconds)
-        }
+        try setSocketOption(self.socketFd, .Linger, seconds)
     }
 
 /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
@@ -489,7 +479,7 @@ extension NanoSocket {
 ///
 /// - Returns: The sockets reconnect interval.
     public func getReconnectInterval() throws -> TimeInterval {
-        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .ReconnectInterval))
+        return try getSocketOption(self.socketFd, .ReconnectInterval)
     }
 
 /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
@@ -497,7 +487,7 @@ extension NanoSocket {
 /// may be randomised to some extent to prevent severe reconnection storms.
 ///
 /// - Parameters:
-///   - milliseconds: The reconnection interval in milliseconds.
+///   - seconds: The reconnection interval in timeinterval.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setReconnectInterval(seconds: TimeInterval) throws {
@@ -516,7 +506,7 @@ extension NanoSocket {
 ///
 /// - Returns: The sockets reconnect maximum interval.
     public func getReconnectIntervalMaximum() throws -> TimeInterval {
-        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .ReconnectIntervalMaximum))
+        return try getSocketOption(self.socketFd, .ReconnectIntervalMaximum)
     }
 
 /// This is to be used only in addition to `set/getReconnectInterval()`. It specifies maximum reconnection
@@ -526,7 +516,7 @@ extension NanoSocket {
 /// If `getReconnectIntervalMax()` is less than `getReconnectInterval()`, it is ignored.
 ///
 /// - Parameters:
-///   - milliseconds: The reconnection maximum interval in milliseconds.
+///   - seconds: The reconnection maximum interval in timeinterval.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setReconnectIntervalMaximum(seconds: TimeInterval) throws {

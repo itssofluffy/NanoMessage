@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
 import C7
 import CNanoMessage
 
@@ -186,9 +187,9 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
 /// - Throws:  `NanoMessageError.GetSocketOption` if an issue is encountered.
 ///
 /// - Returns: The result as a `Data` type.
-internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> Data {
+internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> C7.Data {
     var optvallen = maximumTopicLength
-    var optval = Data.buffer(with: optvallen)
+    var optval = C7.Data.buffer(with: optvallen)
 
     let returnCode = nn_getsockopt(socketFd, level, option.rawValue, &optval.bytes, &optvallen)
 
@@ -196,7 +197,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
         throw NanoMessageError.GetSocketOption(code: nn_errno(), option: option)
     }
 
-    return Data(optval[0 ..< optvallen])
+    return C7.Data(optval[0 ..< optvallen])
 }
 
 /// Get socket option.
@@ -210,7 +211,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
 ///
 /// - Returns: The result as a `String` type.
 internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> String {
-    let returnValue: Data = try getSocketOption(socketFd, option, level)
+    let returnValue: C7.Data = try getSocketOption(socketFd, option, level)
 
     return try String(data: returnValue)
 }
@@ -261,6 +262,26 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
     let returnValue: CInt = try getSocketOption(socketFd, option, level)
 
     return (returnValue != 0)
+}
+
+/// Get socket option.
+///
+/// - Parameters:
+///   - socketFd: Nano socket file descriptor.
+///   - option:   The option to be returned.
+///   - level:    The optional (defaults to a Standard Socket Level) socket level.
+///
+/// - Throws:  `NanoMessageError.GetSocketOption` if an issue is encountered.
+///
+/// - Returns: The result as a `TimeInterval` type.
+internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> TimeInterval {
+  let timeInterval = TimeInterval(milliseconds: try getSocketOption(socketFd, option, level))
+
+    guard (timeInterval >= 0) else {
+        return TimeInterval(seconds: -1)
+    }
+
+    return timeInterval
 }
 
 /// Get socket option.
@@ -337,6 +358,20 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
     return (returnValue != 0)
 }
 
+/// Get socket option.
+///
+/// - Parameters:
+///   - socketFd: Nano socket file descriptor.
+///   - option:   The option to be returned.
+///   - level:    The socket level as type `SocketProtocol`.
+///
+/// - Throws:  `NanoMessageError.GetSocketOption` if an issue is encountered.
+///
+/// - Returns: The result as a `TimeInterval` type.
+internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level: SocketProtocol) throws -> TimeInterval {
+    return try getSocketOption(socketFd, option, level.rawValue)
+}
+
 /// Set socket option.
 ///
 /// - Parameters:
@@ -365,7 +400,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 ///   - level:    The optional (defaults to a Standard Socket Level) socket level.
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
-internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: Data, _ level: CInt = NN_SOL_SOCKET) throws {
+internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: C7.Data, _ level: CInt = NN_SOL_SOCKET) throws {
     let returnCode = nn_setsockopt(socketFd, level, option.rawValue, optval.bytes, optval.count)
 
     guard (returnCode >= 0) else {
@@ -383,7 +418,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: String, _ level: CInt = NN_SOL_SOCKET) throws {
-    try setSocketOption(socketFd, option, Data(optval), level)
+    try setSocketOption(socketFd, option, C7.Data(optval), level)
 }
 
 /// Set socket option.
@@ -433,10 +468,27 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 ///   - socketFd: Nano socket file descriptor.
 ///   - option:   The option to be set.
 ///   - optval:   The value of the option to be set.
+///   - level:    The optional (defaults to a Standard Socket Level) socket level.
+///
+/// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
+internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: TimeInterval, _ level: CInt = NN_SOL_SOCKET) throws {
+    if (optval < 0) {
+        try setSocketOption(socketFd, option, CInt(-1), level)
+    } else {
+        try setSocketOption(socketFd, option, optval.milliseconds, level)
+    }
+}
+
+/// Set socket option.
+///
+/// - Parameters:
+///   - socketFd: Nano socket file descriptor.
+///   - option:   The option to be set.
+///   - optval:   The value of the option to be set.
 ///   - level:    The socket level as type `SocketProtocol`.
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
-internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: Data, _ level: SocketProtocol) throws {
+internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: C7.Data, _ level: SocketProtocol) throws {
     try setSocketOption(socketFd, option, optval, level.rawValue)
 }
 
@@ -450,7 +502,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: String, _ level: SocketProtocol) throws {
-    try setSocketOption(socketFd, option, Data(optval), level.rawValue)
+    try setSocketOption(socketFd, option, C7.Data(optval), level.rawValue)
 }
 
 /// Set socket option.
@@ -489,7 +541,20 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: UInt, _ level: SocketProtocol) throws {
-    try setSocketOption(socketFd, option, CInt(optval), level)
+    try setSocketOption(socketFd, option, Int(optval), level)
+}
+
+/// Set socket option.
+///
+/// - Parameters:
+///   - socketFd: Nano socket file descriptor.
+///   - option:   The option to be set.
+///   - optval:   The value of the option to be set.
+///   - level:    The socket level as type `SocketProtocol`.
+///
+/// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
+internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: TimeInterval, _ level: SocketProtocol) throws {
+    try setSocketOption(socketFd, option, optval, level.rawValue)
 }
 
 /// Set socket option.

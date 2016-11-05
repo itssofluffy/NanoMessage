@@ -35,10 +35,6 @@ extension TimeInterval {
         self = TimeInterval(milliseconds) / 1000
     }
 
-    public init(microseconds: Int) {
-        self = TimeInterval(microseconds) / 1000000
-    }
-
     public var milliseconds: Int {
         return Int(self * 1000)
     }

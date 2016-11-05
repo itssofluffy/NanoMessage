@@ -137,30 +137,20 @@ extension ProtocolSocket where Self: Sender {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
-/// - Returns: The sockets send timeout in milliseconds.
+/// - Returns: The sockets send timeout in timeinterval (-1 seconds if there is no timeout).
     public func getSendTimeout() throws -> TimeInterval {
-        let timeout = TimeInterval(milliseconds: try getSocketOption(self._nanoSocket.socketFd, .SendTimeout))
-
-        if (timeout < 0) {
-            return TimeInterval(seconds: -1)
-        }
-
-        return timeout
+        return try getSocketOption(self._nanoSocket.socketFd, .SendTimeout)
     }
 
 /// The timeout for send operation on the socket, in milliseconds. If message cannot be sent within
 /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
 ///
 /// - Parameters:
-///   - milliseconds: The send timeout.
+///   - seconds: The send timeout (-1 for no timeout).
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setSendTimeout(seconds: TimeInterval) throws {
-        if (seconds < 0) {
-            try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, -1)
-        } else {
-            try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, seconds.milliseconds)
-        }
+        try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, seconds)
     }
 
 /// Retrieves outbound priority currently set on the socket. This option has no effect on socket types that
@@ -264,30 +254,20 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
-/// - Returns: The sockets receive timeout.
+/// - Returns: The sockets receive timeout in timeinterval (-1 seconds if there is no timeout).
     public func getReceiveTimeout() throws -> TimeInterval {
-        let timeout = TimeInterval(milliseconds: try getSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout))
-
-        if (timeout < 0) {
-            return TimeInterval(seconds: -1)
-        }
-
-        return timeout
+        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout)
     }
 
 /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
 /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
 ///
 /// - Parameters:
-///   - milliseconds: The receive timeout.
+///   - seconds: The receive timeout (-1 for no timeout).
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setReceiveTimeout(seconds: TimeInterval) throws {
-        if (seconds < 0) {
-            try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, -1)
-        } else {
-            try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, seconds.milliseconds)
-        }
+        try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, seconds)
     }
 
 /// The inbound priority for endpoints subsequently added to the socket. When receiving a message, messages
