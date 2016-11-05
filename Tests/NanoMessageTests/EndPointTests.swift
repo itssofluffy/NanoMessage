@@ -67,12 +67,12 @@ class EndPointTests: XCTestCase {
 
             XCTAssertGreaterThanOrEqual(node0EndPoint.id, 0, "node0EndPoint.id != 0")
             XCTAssertEqual(node0EndPoint.url.absoluteString, connectURL!.absoluteString, "node0EndPoint.url.absoluteString != '\(connectURL)'")
-            XCTAssertEqual(node0EndPoint.connectionType, ConnectionType.ConnectToURL, "node0EndPoint.connectType != '\(ConnectionType.ConnectToURL)'")
-            XCTAssertEqual(node0EndPoint.transportMechanism, TransportMechanism.TCP, "node0EndPoint.TransportMechanism != '\(TransportMechanism.TCP)'")
+            XCTAssertEqual(node0EndPoint.type, ConnectionType.Connect, "node0EndPoint.type != '\(ConnectionType.Connect)'")
+            XCTAssertEqual(node0EndPoint.transport, TransportMechanism.TCP, "node0EndPoint.transport != '\(TransportMechanism.TCP)'")
             if let _ = node0EndPoint.receivePriority {
                 XCTAssert(false, "node0EndPoint.receivePriority != nil")
             }
-            XCTAssertEqual(node0EndPoint.sendPriority, 2, "node0EndPoint.address != 2")
+            XCTAssertEqual(node0EndPoint.sendPriority, 2, "node0EndPoint.sendPriority != 2")
             XCTAssertEqual(node0EndPoint.ipv4Only, true, "node0EndPoint.ipv4Only != true")
             XCTAssertEqual(node0EndPoint.name, endPointName, "node0EndPoint.name != '\(endPointName)'")
 

@@ -182,13 +182,13 @@ extension NanoSocket {
             throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
         }
 
-        let endPoint = EndPoint(endPointId: Int(endPointId),
-                                url: url,
-                                connectionType: .BindToURL,
+        let endPoint = EndPoint(id:              Int(endPointId),
+                                url:             url,
+                                type:            .Bind,
                                 receivePriority: socket.receivePriority,
-                                sendPriority: socket.sendPriority,
-                                ipv4Only: ipv4Only,
-                                name: name)
+                                sendPriority:    socket.sendPriority,
+                                ipv4Only:        ipv4Only,
+                                name:            name)
 
         self.endPoints.insert(endPoint)
 
@@ -245,13 +245,13 @@ extension NanoSocket {
             throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
         }
 
-        let endPoint = EndPoint(endPointId: Int(endPointId),
-                                url: url,
-                                connectionType: .ConnectToURL,
+        let endPoint = EndPoint(id:              Int(endPointId),
+                                url:             url,
+                                type:            .Connect,
                                 receivePriority: socket.receivePriority,
-                                sendPriority: socket.sendPriority,
-                                ipv4Only: ipv4Only,
-                                name: name)
+                                sendPriority:    socket.sendPriority,
+                                ipv4Only:        ipv4Only,
+                                name:            name)
 
         self.endPoints.insert(endPoint)
 
@@ -434,7 +434,7 @@ extension NanoSocket {
 ///
 /// - Returns: The sockets protocol family.
     public func getSocketProtocolFamily() throws -> ProtocolFamily {
-        return ProtocolFamily(rawValue: try self.getSocketProtocol())
+        return ProtocolFamily(socketProtocol: try self.getSocketProtocol())
     }
 
 /// Specifies how long the socket should try to send pending outbound messages after the socket

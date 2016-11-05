@@ -25,25 +25,25 @@ import Foundation
 
 /// Endpoint.
 public struct EndPoint {
-    public let id: Int                                      // end-point id
-    public let url: URL                                     // end-point address
-    public let connectionType: ConnectionType               // end-point connection type (connect/bind)
-    public var transportMechanism: TransportMechanism {     // end-points transport mechanism
+    public let id: Int                            // end-point id
+    public let url: URL                           // end-point address
+    public let type: ConnectionType               // end-point connection type (connect/bind)
+    public var transport: TransportMechanism {    // end-points transport mechanism
         return TransportMechanism(url: self.url)
     }
-    public let receivePriority: Int?                        // receive priority of the end-point.
-    public let sendPriority: Int?                           // send priority to the end-point.
-    public let ipv4Only: Bool                               // if true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
-    public var name: String                                 // user defined name of the end-point
+    public let receivePriority: Int?              // receive priority of the end-point.
+    public let sendPriority: Int?                 // send priority to the end-point.
+    public let ipv4Only: Bool                     // if true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
+    public var name: String                       // user defined name of the end-point
 
-    public init(endPointId: Int, url: URL, connectionType: ConnectionType, receivePriority: Int?, sendPriority: Int?, ipv4Only: Bool, name: String = "") {
-        self.id = endPointId
+    public init(id: Int, url: URL, type: ConnectionType, receivePriority: Int?, sendPriority: Int?, ipv4Only: Bool, name: String = "") {
+        self.id = id
         self.url = url
-        self.connectionType = connectionType
+        self.type = type
         self.receivePriority = receivePriority
         self.sendPriority = sendPriority
         self.ipv4Only = ipv4Only
-        self.name = (name.isEmpty) ? String(endPointId) : name
+        self.name = (name.isEmpty) ? String(self.id) : name
     }
 }
 
@@ -67,7 +67,7 @@ extension EndPoint: Equatable {
 
 extension EndPoint: CustomStringConvertible {
     public var description: String {
-        var description = "id: \(self.id), url: \(self.url), connection type: \(self.connectionType), transport: \(self.transportMechanism)"
+        var description = "id: \(self.id), url: \(self.url), type: \(self.type), transport: \(self.transport)"
         if let priority = self.receivePriority {
             description += ", receive priority: \(priority)"
         }

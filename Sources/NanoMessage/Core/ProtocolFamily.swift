@@ -29,8 +29,8 @@ public enum ProtocolFamily {
     case Survey            // Survey protocol family. These socket types are used to send the survrey.
     case Bus               // Message bus protocol family.
 
-    public init(rawValue: SocketProtocol) {
-        switch rawValue {
+    public init(socketProtocol: SocketProtocol) {
+        switch socketProtocol {
             case .PairProtocol:
                 self = .OneToOne
             case .PublisherProtocol, .SubscriberProtocol:

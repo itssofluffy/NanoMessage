@@ -35,7 +35,7 @@ public enum WebSocketMessageType: CInt {
             case .BinaryFrames:
                 return NN_WS_MSG_TYPE_BINARY
             case .Unknown:
-                return -1
+                return CInt.max
         }
     }
 

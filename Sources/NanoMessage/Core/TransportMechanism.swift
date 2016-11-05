@@ -29,7 +29,7 @@ public enum TransportMechanism: CInt {
     case InProcess      // In-process transport.
     case InterProcess   // Inter-process communication transport.
     case WebSocket      // Web socket transport.
-    case Unsupported    // Unsupported transport.
+    case UnSupported    // Unsupported transport.
 
     public var rawValue: CInt {
         switch self {
@@ -41,8 +41,8 @@ public enum TransportMechanism: CInt {
                 return NN_IPC
             case .WebSocket:
                 return NN_WS
-            case .Unsupported:
-                return 0
+            case .UnSupported:
+                return CInt.max
         }
     }
 
@@ -57,7 +57,7 @@ public enum TransportMechanism: CInt {
             case NN_WS:
                 self = .WebSocket
             default:
-                self = .Unsupported
+                self = .UnSupported
         }
     }
 
@@ -72,7 +72,7 @@ public enum TransportMechanism: CInt {
             case "ws":
                 self = .WebSocket
             default:
-                self = .Unsupported
+                self = .UnSupported
         }
     }
 }
@@ -88,7 +88,7 @@ extension TransportMechanism: CustomStringConvertible {
                 return "ipc"
             case .WebSocket:
                 return "web-socket"
-            case .Unsupported:
+            case .UnSupported:
                 return "unsupported"
         }
     }
