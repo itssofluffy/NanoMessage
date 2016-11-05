@@ -27,6 +27,9 @@ import Foundation
 
 class BusProtocolFamilyTests: XCTestCase {
     private func testBus(address1: String, address2: String) {
+        let address1URL = URL(string: address1)
+        let address2URL = URL(string: address2)
+
         var completed = false
 
         do {
@@ -38,13 +41,13 @@ class BusProtocolFamilyTests: XCTestCase {
             try node1.setReceiveTimeout(seconds: 1)
             try node2.setReceiveTimeout(seconds: 1)
 
-            let _: Int = try node0.bindToAddress(address1)
+            let _: Int = try node0.bindToURL(address1URL!)
 
-            let _: Int = try node1.connectToAddress(address1)
-            let _: Int = try node1.bindToAddress(address2)
+            let _: Int = try node1.connectToURL(address1URL!)
+            let _: Int = try node1.bindToURL(address2URL!)
 
-            let _: Int = try node2.connectToAddress(address1)
-            let _: Int = try node2.connectToAddress(address2)
+            let _: Int = try node2.connectToURL(address1URL!)
+            let _: Int = try node2.connectToURL(address2URL!)
 
             pauseForBind()
 

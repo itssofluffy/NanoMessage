@@ -27,7 +27,8 @@ import Foundation
 
 class PairProtocolFamilyTests: XCTestCase {
     private func testPair(connectAddress: String, bindAddress: String = "") {
-        let bAddress = (bindAddress == "") ? connectAddress : bindAddress
+        let connectURL = URL(string: connectAddress)
+        let bindURL = URL(string: (bindAddress == "") ? connectAddress : bindAddress)
 
         var completed = false
 
@@ -40,11 +41,11 @@ class PairProtocolFamilyTests: XCTestCase {
             try node1.setSendTimeout(seconds: 1)
             try node1.setReceiveTimeout(seconds: 1)
 
-            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
+            let node0EndPointId: Int = try node0.connectToURL(connectURL!)
+            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
 
-            let node1EndPointId: Int = try node1.bindToAddress(bAddress)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
+            let node1EndPointId: Int = try node1.bindToURL(bindURL!)
+            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL)') < 0")
 
             pauseForBind()
 

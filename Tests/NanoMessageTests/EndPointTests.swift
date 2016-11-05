@@ -27,7 +27,9 @@ import Foundation
 
 class EndPointTests: XCTestCase {
     private func testEndPoints(connectAddress: String, bindAddress: String = "") {
-        let bAddress = (bindAddress == "") ? connectAddress : bindAddress
+        let connectURL = URL(string: connectAddress)
+        let bindURL = URL(string: (bindAddress == "") ? connectAddress : bindAddress)
+
         var completed = false
 
         do {
@@ -40,11 +42,11 @@ class EndPointTests: XCTestCase {
             XCTAssertEqual(node0.endPoints.count, 0, "node0.endPoints.count != 0")
             XCTAssertEqual(node1.endPoints.count, 0, "node1.endPoints.count != 0")
 
-            let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') != 0")
+            let node0EndPointId: Int = try node0.connectToURL(connectURL!)
+            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') != 0")
 
-            let node1EndPoint: EndPoint = try node1.bindToAddress(bAddress)
-            XCTAssertGreaterThanOrEqual(node1EndPoint.id, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') != 0")
+            let node1EndPoint: EndPoint = try node1.bindToURL(bindURL!)
+            XCTAssertGreaterThanOrEqual(node1EndPoint.id, 0, "node1.bindToURL('\(bindURL)') != 0")
 
             pauseForBind()
 
@@ -61,11 +63,11 @@ class EndPointTests: XCTestCase {
 
             try node0.setSendPriority(2)
 
-            let node0EndPoint: EndPoint = try node0.connectToAddress(connectAddress, endPointName: endPointName)
+            let node0EndPoint: EndPoint = try node0.connectToURL(connectURL!, name: endPointName)
 
             XCTAssertGreaterThanOrEqual(node0EndPoint.id, 0, "node0EndPoint.id != 0")
-            XCTAssertEqual(node0EndPoint.address, connectAddress, "node0EndPoint.address != '\(connectAddress)'")
-            XCTAssertEqual(node0EndPoint.connectionType, ConnectionType.ConnectToAddress, "node0EndPoint.connectType != '\(ConnectionType.ConnectToAddress)'")
+            XCTAssertEqual(node0EndPoint.url.absoluteString, connectURL!.absoluteString, "node0EndPoint.url.absoluteString != '\(connectURL)'")
+            XCTAssertEqual(node0EndPoint.connectionType, ConnectionType.ConnectToURL, "node0EndPoint.connectType != '\(ConnectionType.ConnectToURL)'")
             XCTAssertEqual(node0EndPoint.transportMechanism, TransportMechanism.TCP, "node0EndPoint.TransportMechanism != '\(TransportMechanism.TCP)'")
             if let _ = node0EndPoint.receivePriority {
                 XCTAssert(false, "node0EndPoint.receivePriority != nil")

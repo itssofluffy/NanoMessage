@@ -21,6 +21,7 @@
 */
 
 import CNanoMessage
+import Foundation
 
 /// Transport mechanism.
 public enum TransportMechanism: CInt {
@@ -60,17 +61,18 @@ public enum TransportMechanism: CInt {
         }
     }
 
-    public init(rawValue: String) {
-        if (rawValue.hasPrefix("tcp:")) {
-            self = .TCP
-        } else if (rawValue.hasPrefix("inproc:")) {
-            self = .InProcess
-        } else if (rawValue.hasPrefix("ipc:")) {
-            self = .InterProcess
-        } else if (rawValue.hasPrefix("ws:")) {
-            self = .WebSocket
-        } else {
-            self = .Unsupported
+    public init(url: URL) {
+        switch url.scheme! {
+            case "tcp":
+                self = .TCP
+            case "inproc":
+                self = .InProcess
+            case "ipc":
+                self = .InterProcess
+            case "ws":
+                self = .WebSocket
+            default:
+                self = .Unsupported
         }
     }
 }

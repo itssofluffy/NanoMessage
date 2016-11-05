@@ -21,6 +21,7 @@
 */
 
 import CNanoMessage
+import Foundation
 
 /// Obtain the underlying libraries error message as a string.
 ///
@@ -49,9 +50,9 @@ public enum NanoMessageError: Error {
     case NanoSocket(code: CInt)
     case Close(code: CInt)
     case Interrupted
-    case BindToAddress(code: CInt, address: String)
-    case ConnectToAddress(code: CInt, address: String)
-    case RemoveEndPoint(code: CInt, address: String, endPointId: Int)
+    case BindToURL(code: CInt, url: URL)
+    case ConnectToURL(code: CInt, url: URL)
+    case RemoveEndPoint(code: CInt, url: URL, endPointId: Int)
     case BindToSocket(code: CInt, nanoSocketName: String)
     case LoopBack(code: CInt)
     case GetSocketOption(code: CInt, option: SocketOption)
@@ -91,12 +92,12 @@ extension NanoMessageError: CustomStringConvertible {
                 return "nn_close() failed: " + errorString(code)
             case .Interrupted:
                 return "operation was interrupted"
-            case .BindToAddress(let code, let address):
-                return "bindToAddress('\(address)') failed: " + errorString(code)
-            case .ConnectToAddress(let code, let address):
-                return "connectToAddress('\(address)') failed: " + errorString(code)
-            case .RemoveEndPoint(let code, let address, let endPointId):
-                return "removeEndPoint('\(address)' #(\(endPointId))) failed: " + errorString(code)
+            case .BindToURL(let code, let url):
+                return "bindToURL('\(url)') failed: " + errorString(code)
+            case .ConnectToURL(let code, let url):
+                return "connectToURL('\(url)') failed: " + errorString(code)
+            case .RemoveEndPoint(let code, let url, let endPointId):
+                return "removeEndPoint('\(url)' #(\(endPointId))) failed: " + errorString(code)
             case .BindToSocket(let code, let nanoSocketName):
                 return "bindToSocket('\(nanoSocketName)') failed: " + errorString(code)
             case .LoopBack(let code):

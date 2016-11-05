@@ -23,6 +23,7 @@
 import Foundation
 import CNanoMessage
 import ISFLibrary
+import C7
 
 /// A NanoMessage base socket.
 public class NanoSocket {
@@ -155,40 +156,39 @@ extension NanoSocket {
 /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
 ///
 /// - Parameters:
-///   - endPointAddress: Consists of two parts as follows: transport://address. The transport specifies the
-///                      underlying transport protocol to use. The meaning of the address part is specific
-///                      to the underlying transport protocol.
-///   - endPointName:    An optional endpoint name.
+///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
+///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
+///   - name: An optional endpoint name.
 ///
-/// - Throws:  `NanoMessageError.BindToAddress` if there was a problem binding the socket to the address.
+/// - Throws:  `NanoMessageError.BindToURL` if there was a problem binding the socket to the address.
 ///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: An endpoint that has just been binded too. The endpoint can be later used to remove the
 ///            endpoint from the socket via `removeEndPoint()` function.
 ///
-/// - Note:    Note that `bindToAddress()` may be called multiple times on the same socket thus allowing the
+/// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
 ///            socket to communicate with multiple heterogeneous endpoints.
-    public func bindToAddress(_ endPointAddress: String, endPointName: String = "") throws -> EndPoint {
+    public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
         let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
-        endPointAddress.withCString {
+        url.absoluteString.withCString {
             endPointId = nn_bind(self.socketFd, $0)
         }
 
         guard (endPointId >= 0) else {
-            throw NanoMessageError.BindToAddress(code: nn_errno(), address: endPointAddress)
+            throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
         }
 
         let endPoint = EndPoint(endPointId: Int(endPointId),
-                                endPointAddress: endPointAddress,
-                                connectionType: .BindToAddress,
+                                url: url,
+                                connectionType: .BindToURL,
                                 receivePriority: socket.receivePriority,
                                 sendPriority: socket.sendPriority,
                                 ipv4Only: ipv4Only,
-                                endPointName: endPointName)
+                                name: name)
 
         self.endPoints.insert(endPoint)
 
@@ -198,21 +198,20 @@ extension NanoSocket {
 /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
 ///
 /// - Parameters:
-///   - endPointAddress: Consists of two parts as follows: transport://address. The transport specifies the
-///                      underlying transport protocol to use. The meaning of the address part is specific
-///                      to the underlying transport protocol.
-///   - endPointName:    An optional endpoint name.
+///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
+///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
+///   - name: An optional endpoint name.
 ///
-/// - Throws:  `NanoMessageError.BindToAddress` if there was a problem binding the socket to the address.
+/// - Throws:  `NanoMessageError.BindToURL` if there was a problem binding the socket to the address.
 ///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from
 ///            the socket via `removeEndPoint()` function.
 ///
-/// - Note:    Note that `bindToAddress()` may be called multiple times on the same socket thus allowing the
+/// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
 ///            socket to communicate with multiple heterogeneous endpoints.
-    public func bindToAddress(_ endPointAddress: String, endPointName: String = "") throws -> Int {
-        let endPoint: EndPoint = try self.bindToAddress(endPointAddress, endPointName: endPointName)
+    public func bindToURL(_ url: URL, name: String = "") throws -> Int {
+        let endPoint: EndPoint = try self.bindToURL(url, name: name)
 
         return endPoint.id
     }
@@ -220,40 +219,39 @@ extension NanoSocket {
 /// Adds a remote endpoint to the socket. The library would then try to connect to the specified remote endpoint.
 ///
 /// - Parameters:
-///   - endPointAddress: Consists of two parts as follows: transport://address. The transport specifies the
-///                      underlying transport protocol to use. The meaning of the address part is specific
-///                      to the underlying transport protocol.
-///   - endPointName:    An optional endpoint name.
+///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
+///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
+///   - name: An optional endpoint name.
 ///
-/// - Throws:  `NanoMessageError.ConnectToAddress` if there was a problem binding the socket to the address.
+/// - Throws:  `NanoMessageError.ConnectToURL` if there was a problem binding the socket to the address.
 ///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The endpoint that has just been connected too. The endpoint can be later used to remove the
 ///            endpoint from the socket via `removeEndPoint()` function.
 ///
-/// - Note:    Note that `connectToAddress()` may be called multiple times on the same socket thus allowing the
+/// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
 ///            socket to communicate with multiple heterogeneous endpoints.
-    public func connectToAddress(_ endPointAddress: String, endPointName: String = "") throws -> EndPoint {
+    public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
         let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
-        endPointAddress.withCString {
+        url.absoluteString.withCString {
             endPointId = nn_connect(self.socketFd, $0)
         }
 
         guard (endPointId >= 0) else {
-            throw NanoMessageError.ConnectToAddress(code: nn_errno(), address: endPointAddress)
+            throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
         }
 
         let endPoint = EndPoint(endPointId: Int(endPointId),
-                                endPointAddress: endPointAddress,
-                                connectionType: .ConnectToAddress,
+                                url: url,
+                                connectionType: .ConnectToURL,
                                 receivePriority: socket.receivePriority,
                                 sendPriority: socket.sendPriority,
                                 ipv4Only: ipv4Only,
-                                endPointName: endPointName)
+                                name: name)
 
         self.endPoints.insert(endPoint)
 
@@ -263,21 +261,20 @@ extension NanoSocket {
 /// Adds a remote endpoint to the socket. The library would then try to connect to the specified remote endpoint.
 ///
 /// - Parameters:
-///   - endPointAddress: Consists of two parts as follows: transport://address. The transport specifies the
-///                      underlying transport protocol to use. The meaning of the address part is specific
-///                      to the underlying transport protocol.
-///   - endPointName:    An optional endpoint name.
+///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
+///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
+///   - name: An optional endpoint name.
 ///
-/// - Throws:  `NanoMessageError.ConnectToAddress` if there was a problem binding the socket to the address.
+/// - Throws:  `NanoMessageError.ConnectToURL` if there was a problem binding the socket to the address.
 ///            `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from the
 ///            socket via the `removeEndPoint()` function.
 ///
-/// - Note:    Note that `connectToAddress()` may be called multiple times on the same socket thus allowing the
+/// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
 ///            socket to communicate with multiple heterogeneous endpoints.
-    public func connectToAddress(_ endPointAddress: String, endPointName: String = "") throws -> Int {
-        let endPoint: EndPoint = try self.connectToAddress(endPointAddress, endPointName: endPointName)
+    public func connectToURL(_ url: URL, name: String = "") throws -> Int {
+        let endPoint: EndPoint = try self.connectToURL(url, name: name)
 
         return endPoint.id
     }
@@ -311,7 +308,7 @@ extension NanoSocket {
 
                         loopCount += 1
                     } else {
-                        throw NanoMessageError.RemoveEndPoint(code: errno, address: endPoint.address, endPointId: endPoint.id)
+                        throw NanoMessageError.RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
                     }
                 } else {
                     break                                                       // we've closed the endpoint succesfully

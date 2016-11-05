@@ -22,16 +22,16 @@
 
 /// Socket endpoint connection type
 public enum ConnectionType: UInt8 {
-    case BindToAddress      // endpoint is local to the socket
-    case ConnectToAddress   // endpoint is remote to the socket
+    case BindToURL      // endpoint is local to the socket
+    case ConnectToURL   // endpoint is remote to the socket
 }
 
 extension ConnectionType: CustomStringConvertible {
     public var description: String {
         switch self {
-            case .BindToAddress:
+            case .BindToURL:
                 return "bind"
-            case .ConnectToAddress:
+            case .ConnectToURL:
                 return "connect"
         }
     }
