@@ -34,8 +34,8 @@ class PollSocketTests: XCTestCase {
             let node0 = try PushSocket()
             let node1 = try PullSocket()
 
-            try node0.setSendTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
+            try node0.setSendTimeout(seconds: 1)
+            try node1.setReceiveTimeout(seconds: 1)
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
@@ -45,14 +45,14 @@ class PollSocketTests: XCTestCase {
 
             pauseForBind()
 
-            var node1Poll: (messageIsWaiting: Bool, sendIsBlocked: Bool) = try node1.pollSocket(timeout: 500)
+            var node1Poll: (messageIsWaiting: Bool, sendIsBlocked: Bool) = try node1.pollSocket(seconds: 0.5)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
             let bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
 
-            node1Poll = try node1.pollSocket(timeout: 500)
+            node1Poll = try node1.pollSocket(seconds: 0.5)
             XCTAssertEqual(node1Poll.messageIsWaiting, true, "node1Poll.messageIsWaiting != true")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
@@ -60,7 +60,7 @@ class PollSocketTests: XCTestCase {
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "bytes != message.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "message != payload")
 
-            node1Poll = try node1.pollSocket(timeout: 250)
+            node1Poll = try node1.pollSocket(seconds: 0.25)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 

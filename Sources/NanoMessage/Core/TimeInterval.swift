@@ -1,5 +1,5 @@
 /*
-    Sender.swift
+    TimeInterval.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -21,23 +21,29 @@
 */
 
 import Foundation
-import C7
 
-/// Sender socket protocol.
-public protocol Sender {
-    // I-O functions.
-    func sendMessage(_ message: C7.Data, blockingMode: BlockingMode) throws -> Int
-    func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int
-    // socket option functions.
-    func getSendBufferSize() throws -> UInt
-    func setSendBufferSize(bytes: UInt) throws
-    func getSendTimeout() throws -> TimeInterval
-    func setSendTimeout(seconds: TimeInterval) throws
-    func getSendPriority() throws -> Int
-    func setSendPriority(_ priority: Int) throws
-    func getSendFd() throws -> Int
-    // socket statistics functions.
-    func getMessagesSent() throws -> UInt64
-    func getBytesSent() throws -> UInt64
-    func getCurrentSendPriority() throws -> UInt64
+extension TimeInterval {
+    public init(seconds: Int) {
+        self = TimeInterval(seconds)
+    }
+
+    public init(seconds: Double) {
+        self = seconds
+    }
+
+    public init(milliseconds: Int) {
+        self = TimeInterval(milliseconds) / 1000
+    }
+
+    public init(microseconds: Int) {
+        self = TimeInterval(microseconds) / 1000000
+    }
+
+    public var milliseconds: Int {
+        return Int(self * 1000)
+    }
+
+    public var microseconds: Int {
+        return Int(self * 1000000)
+    }
 }

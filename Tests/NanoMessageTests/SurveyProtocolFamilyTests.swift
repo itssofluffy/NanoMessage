@@ -37,15 +37,15 @@ class SurveyProtocolFamilyTests: XCTestCase {
             let node0 = try SurveyorSocket()
             let node1 = try RespondentSocket()
 
-            try node0.setSendTimeout(milliseconds: 1000)          // set send timeout to 1 seconds.
-            try node0.setReceiveTimeout(milliseconds: 1000)       // set receive timeout to 1 seconds.
-            try node1.setSendTimeout(milliseconds: 1000)          // set send timeout to 1 seconds.
-            try node1.setReceiveTimeout(milliseconds: 1000)       // set receive timeout to 1 seconds.
+            try node0.setSendTimeout(seconds: 1)          // set send timeout to 1 seconds.
+            try node0.setReceiveTimeout(seconds: 1)       // set receive timeout to 1 seconds.
+            try node1.setSendTimeout(seconds: 1)          // set send timeout to 1 seconds.
+            try node1.setReceiveTimeout(seconds: 1)       // set receive timeout to 1 seconds.
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
 
-            try node0.setDeadline(milliseconds: 500)              // set the suryeyor deadline to 1/2 second.
+            try node0.setDeadline(seconds: 0.5)           // set the suryeyor deadline to 1/2 second.
 
             let node1EndPointId: Int = try node1.bindToAddress(bAddress)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToAddress(endPointAddress: '\(bAddress)') < 0")
@@ -55,7 +55,7 @@ class SurveyProtocolFamilyTests: XCTestCase {
             var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
 
-            usleep(750000)     // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
+            usleep(UInt32(TimeInterval(seconds: 0.75).microseconds)) // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
 
             var node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")

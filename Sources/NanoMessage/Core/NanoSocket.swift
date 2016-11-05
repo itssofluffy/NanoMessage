@@ -46,16 +46,16 @@ public class NanoSocket {
         }
     }
 /// The socket/end-point closure time in microseconds.
-    fileprivate var _closureDelay: UInt32 {
-        var milliseconds = 1000
+    fileprivate var _closureDelay: TimeInterval {
+        var delay = TimeInterval(seconds: 1)
 
         if let linger = try? self.getLinger() {
             if (linger > 0) {                               // account for infinate linger timeout.
-                milliseconds = linger
+                delay = linger
             }
         }
 
-        return UInt32((milliseconds * 1000) / self.closureAttempts)
+        return delay / Double(self.closureAttempts)
     }
 /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
 ///
@@ -96,7 +96,7 @@ public class NanoSocket {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(self._closureDelay)                      // zzzz...
+                        usleep(UInt32(self._closureDelay.microseconds)) // zzzz...
 
                         loopCount += 1
                     } else {
@@ -307,7 +307,7 @@ extension NanoSocket {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(self._closureDelay)                              // zzzz...
+                        usleep(UInt32(self._closureDelay.microseconds))         // zzzz...
 
                         loopCount += 1
                     } else {
@@ -353,7 +353,7 @@ extension NanoSocket {
 /// - Throws: `NanoMessageError.PollSocket` if polling the socket fails.
 ///
 /// - Returns: Message waiting and send queue blocked as a tuple of bools.
-    public func pollSocket(timeout milliseconds: Int = 1000) throws -> (messageIsWaiting: Bool, sendIsBlocked: Bool) {
+    public func pollSocket(seconds: TimeInterval = 1) throws -> (messageIsWaiting: Bool, sendIsBlocked: Bool) {
         let pollinMask = CShort(NN_POLLIN)                                      // define nn_poll event masks as short's so we only
         let polloutMask = CShort(NN_POLLOUT)                                    // cast once in the function
 
@@ -367,7 +367,7 @@ extension NanoSocket {
 
         var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
 
-        let returnCode = nn_poll(&pfd, 1, CInt(milliseconds))                   // poll the nano socket
+        let returnCode = nn_poll(&pfd, 1, CInt(seconds.milliseconds))           // poll the nano socket
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.PollSocket(code: nn_errno())
@@ -451,22 +451,32 @@ extension NanoSocket {
 ///
 /// - Note:    The underlying nanomsg library no longer supports setting the linger option,
 ///            linger time will therefore always it's default value.
-    public func getLinger() throws -> Int {
-        return try getSocketOption(self.socketFd, .Linger)
+    public func getLinger() throws -> TimeInterval {
+        let linger = TimeInterval(milliseconds: try getSocketOption(self.socketFd, .Linger))
+
+        if (linger < 0) {
+            return TimeInterval(seconds: -1)
+        }
+
+        return linger
     }
 
 /// Specifies how long the socket should try to send pending outbound messages after the socket
 /// has been de-referenced, in milliseconds. A Negative value means infinite linger.
 ///
 /// - Parameters:
-///   - milliseconds: The linger time in milliseconds.
+///   - seconds: The linger time.
 ///
 /// - Throws: `NanoMessageError.SetSocketOption`
 ///
 /// - Note:   The underlying nanomsg library no longer supports this feature, linger time is always it's default value.
     @available(*, unavailable, message: "nanomsg library no longer supports this feature")
-    public func setLinger(milliseconds: Int) throws {
-        try setSocketOption(self.socketFd, .Linger, milliseconds)
+    public func setLinger(seconds: TimeInterval) throws {
+        if (seconds < 0) {
+            try setSocketOption(self.socketFd, .Linger, -1)
+        } else {
+            try setSocketOption(self.socketFd, .Linger, seconds.milliseconds)
+        }
     }
 
 /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
@@ -478,8 +488,8 @@ extension NanoSocket {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets reconnect interval.
-    public func getReconnectInterval() throws -> UInt {
-        return try getSocketOption(self.socketFd, .ReconnectInterval)
+    public func getReconnectInterval() throws -> TimeInterval {
+        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .ReconnectInterval))
     }
 
 /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
@@ -490,8 +500,8 @@ extension NanoSocket {
 ///   - milliseconds: The reconnection interval in milliseconds.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReconnectInterval(milliseconds: UInt) throws {
-        try setSocketOption(self.socketFd, .ReconnectInterval, milliseconds)
+    public func setReconnectInterval(seconds: TimeInterval) throws {
+        try setSocketOption(self.socketFd, .ReconnectInterval, seconds.milliseconds)
     }
 
 /// This is to be used only in addition to `set/getReconnectInterval()`. It specifies maximum reconnection
@@ -505,8 +515,8 @@ extension NanoSocket {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets reconnect maximum interval.
-    public func getReconnectIntervalMaximum() throws -> UInt {
-        return try getSocketOption(self.socketFd, .ReconnectIntervalMaximum)
+    public func getReconnectIntervalMaximum() throws -> TimeInterval {
+        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .ReconnectIntervalMaximum))
     }
 
 /// This is to be used only in addition to `set/getReconnectInterval()`. It specifies maximum reconnection
@@ -519,8 +529,8 @@ extension NanoSocket {
 ///   - milliseconds: The reconnection maximum interval in milliseconds.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReconnectIntervalMaximum(milliseconds: UInt) throws {
-        try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, milliseconds)
+    public func setReconnectIntervalMaximum(seconds: TimeInterval) throws {
+        try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, seconds.milliseconds)
     }
 
 /// Socket name for error reporting and statistics.

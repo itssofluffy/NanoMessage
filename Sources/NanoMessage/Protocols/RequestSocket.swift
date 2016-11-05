@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
+
 /// Request socket.
 public final class RequestSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
     public var _nanoSocket: NanoSocket {
@@ -43,8 +45,8 @@ extension RequestSocket {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets resend interval.
-    public func getResendInterval() throws -> Int {
-        return try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol)
+    public func getResendInterval() throws -> TimeInterval {
+        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol))
     }
 
 /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
@@ -53,7 +55,7 @@ extension RequestSocket {
 ///   - milliseconds: The sockets resend interval.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setResendInterval(milliseconds: Int) throws {
-        try setSocketOption(self.socketFd, .ResendInterval, milliseconds, .RequestProtocol)
+    public func setResendInterval(seconds: TimeInterval) throws {
+        try setSocketOption(self.socketFd, .ResendInterval, seconds.milliseconds, .RequestProtocol)
     }
 }

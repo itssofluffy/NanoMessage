@@ -35,10 +35,10 @@ class PairProtocolFamilyTests: XCTestCase {
             let node0 = try PairSocket()
             let node1 = try PairSocket()
 
-            try node0.setSendTimeout(milliseconds: 1000)
-            try node0.setReceiveTimeout(milliseconds: 1000)
-            try node1.setSendTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
+            try node0.setSendTimeout(seconds: 1)
+            try node0.setReceiveTimeout(seconds: 1)
+            try node1.setSendTimeout(seconds: 1)
+            try node1.setReceiveTimeout(seconds: 1)
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")

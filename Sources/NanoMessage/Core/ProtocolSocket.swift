@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
 import C7
 import ISFLibrary
 
@@ -46,7 +47,7 @@ extension ProtocolSocket where Self: Sender {
 ///
 /// - Returns: The number of bytes sent.
     @discardableResult
-    public func sendMessage(_ message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
+    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         return try sendPayloadToSocket(self._nanoSocket.socketFd, message, blockingMode)
     }
 
@@ -65,7 +66,7 @@ extension ProtocolSocket where Self: Sender {
 /// - Returns: the number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        return try self.sendMessage(Data(message), blockingMode: blockingMode)
+        return try self.sendMessage(C7.Data(message), blockingMode: blockingMode)
     }
 }
 
@@ -82,7 +83,7 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.TimedOut` the receive timedout.
 ///
 /// - Returns: the number of bytes received and the received message
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: Data) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: C7.Data) {
         return try receivePayloadFromSocket(self._nanoSocket.socketFd, blockingMode)
     }
 
@@ -99,7 +100,7 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: String) {
-        let received: (bytes: Int, message: Data) = try self.receiveMessage(blockingMode: blockingMode)
+        let received: (bytes: Int, message: C7.Data) = try self.receiveMessage(blockingMode: blockingMode)
 
         return (received.bytes, try String(data: received.message))
     }
@@ -137,8 +138,14 @@ extension ProtocolSocket where Self: Sender {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets send timeout in milliseconds.
-    public func getSendTimeout() throws -> Int {
-        return try getSocketOption(self._nanoSocket.socketFd, .SendTimeout)
+    public func getSendTimeout() throws -> TimeInterval {
+        let timeout = TimeInterval(milliseconds: try getSocketOption(self._nanoSocket.socketFd, .SendTimeout))
+
+        if (timeout < 0) {
+            return TimeInterval(seconds: -1)
+        }
+
+        return timeout
     }
 
 /// The timeout for send operation on the socket, in milliseconds. If message cannot be sent within
@@ -148,8 +155,12 @@ extension ProtocolSocket where Self: Sender {
 ///   - milliseconds: The send timeout.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setSendTimeout(milliseconds: Int) throws {
-        try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, milliseconds)
+    public func setSendTimeout(seconds: TimeInterval) throws {
+        if (seconds < 0) {
+            try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, -1)
+        } else {
+            try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, seconds.milliseconds)
+        }
     }
 
 /// Retrieves outbound priority currently set on the socket. This option has no effect on socket types that
@@ -254,8 +265,14 @@ extension ProtocolSocket where Self: Receiver {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets receive timeout.
-    public func getReceiveTimeout() throws -> Int {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout)
+    public func getReceiveTimeout() throws -> TimeInterval {
+        let timeout = TimeInterval(milliseconds: try getSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout))
+
+        if (timeout < 0) {
+            return TimeInterval(seconds: -1)
+        }
+
+        return timeout
     }
 
 /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
@@ -265,8 +282,12 @@ extension ProtocolSocket where Self: Receiver {
 ///   - milliseconds: The receive timeout.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReceiveTimeout(milliseconds: Int) throws {
-        try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, milliseconds)
+    public func setReceiveTimeout(seconds: TimeInterval) throws {
+        if (seconds < 0) {
+            try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, -1)
+        } else {
+            try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, seconds.milliseconds)
+        }
     }
 
 /// The inbound priority for endpoints subsequently added to the socket. When receiving a message, messages

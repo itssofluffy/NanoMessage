@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
+
 /// Surveyor socket.
 public final class SurveyorSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
     public var _nanoSocket: NanoSocket {
@@ -45,8 +47,8 @@ extension SurveyorSocket {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets deadline timeout.
-    public func getDeadline() throws -> Int {
-        return try getSocketOption(self.socketFd, .SurveyDeadline, .SurveyorProtocol)
+    public func getDeadline() throws -> TimeInterval {
+        return TimeInterval(milliseconds: try getSocketOption(self.socketFd, .SurveyDeadline, .SurveyorProtocol))
     }
 
 /// Specifies how long to wait for responses to the survey. Once the deadline expires,
@@ -57,7 +59,7 @@ extension SurveyorSocket {
 ///   - milliseconds: The deadline timeout in milliseconds.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setDeadline(milliseconds: Int) throws {
-        try setSocketOption(self.socketFd, .SurveyDeadline, milliseconds, .SurveyorProtocol)
+    public func setDeadline(seconds: TimeInterval) throws {
+        try setSocketOption(self.socketFd, .SurveyDeadline, seconds.milliseconds, .SurveyorProtocol)
     }
 }

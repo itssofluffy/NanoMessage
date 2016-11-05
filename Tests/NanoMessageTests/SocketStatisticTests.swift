@@ -34,10 +34,10 @@ class SocketStatisticTests: XCTestCase {
             let node0 = try PairSocket()
             let node1 = try PairSocket()
 
-            try node0.setSendTimeout(milliseconds: 1000)
-            try node0.setReceiveTimeout(milliseconds: 1000)
-            try node1.setSendTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
+            try node0.setSendTimeout(seconds: 1)
+            try node0.setReceiveTimeout(seconds: 1)
+            try node1.setSendTimeout(seconds: 1)
+            try node1.setReceiveTimeout(seconds: 1)
 
             var node0EstablishedConnections = try node0.getEstablishedConnections()
             XCTAssertEqual(node0EstablishedConnections, 0, "node0.getEstablishedConnections() != 0")

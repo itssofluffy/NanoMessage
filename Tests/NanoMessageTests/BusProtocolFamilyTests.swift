@@ -34,9 +34,9 @@ class BusProtocolFamilyTests: XCTestCase {
             let node1 = try BusSocket()
             let node2 = try BusSocket()
 
-            try node0.setReceiveTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
-            try node2.setReceiveTimeout(milliseconds: 1000)
+            try node0.setReceiveTimeout(seconds: 1)
+            try node1.setReceiveTimeout(seconds: 1)
+            try node2.setReceiveTimeout(seconds: 1)
 
             let _: Int = try node0.bindToAddress(address1)
 

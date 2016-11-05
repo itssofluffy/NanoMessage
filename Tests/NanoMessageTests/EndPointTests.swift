@@ -34,8 +34,8 @@ class EndPointTests: XCTestCase {
             let node0 = try PushSocket()
             let node1 = try PullSocket()
 
-            try node0.setSendTimeout(milliseconds: 1000)
-            try node1.setReceiveTimeout(milliseconds: 1000)
+            try node0.setSendTimeout(seconds: 1)
+            try node1.setReceiveTimeout(seconds: 1)
 
             XCTAssertEqual(node0.endPoints.count, 0, "node0.endPoints.count != 0")
             XCTAssertEqual(node1.endPoints.count, 0, "node1.endPoints.count != 0")

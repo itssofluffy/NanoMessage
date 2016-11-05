@@ -35,8 +35,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0 = try PublisherSocket()
             let node1 = try SubscriberSocket()
 
-            try node0.setSendTimeout(milliseconds: 500)
-            try node1.setReceiveTimeout(milliseconds: 500)
+            try node0.setSendTimeout(seconds: 0.5)
+            try node1.setReceiveTimeout(seconds: 0.5)
 
             let node0EndPointId: Int = try node0.connectToAddress(connectAddress)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToAddress(endPointAddress: '\(connectAddress)') < 0")
