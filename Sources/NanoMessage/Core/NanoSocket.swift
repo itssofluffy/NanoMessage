@@ -97,7 +97,7 @@ public class NanoSocket {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(UInt32(self._closureDelay.microseconds)) // zzzz...
+                        usleep(self._closureDelay.asMicroseconds)       // zzzz...
 
                         loopCount += 1
                     } else {
@@ -304,7 +304,7 @@ extension NanoSocket {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(UInt32(self._closureDelay.microseconds))         // zzzz...
+                        usleep(self._closureDelay.asMicroseconds)               // zzzz...
 
                         loopCount += 1
                     } else {
@@ -364,7 +364,7 @@ extension NanoSocket {
 
         var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
 
-        let returnCode = nn_poll(&pfd, 1, CInt(seconds.milliseconds))           // poll the nano socket
+        let returnCode = nn_poll(&pfd, 1, CInt(seconds.asMilliseconds))         // poll the nano socket
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.PollSocket(code: nn_errno())

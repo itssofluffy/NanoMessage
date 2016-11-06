@@ -475,7 +475,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
     if (optval < 0) {
         try setSocketOption(socketFd, option, CInt(-1), level)
     } else {
-        try setSocketOption(socketFd, option, optval.milliseconds, level)
+        try setSocketOption(socketFd, option, optval.asMilliseconds, level)
     }
 }
 

@@ -24,7 +24,7 @@ import Foundation
 
 extension TimeInterval {
     public init(seconds: Int) {
-        self = TimeInterval(seconds)
+        self = Double(seconds)
     }
 
     public init(seconds: Double) {
@@ -35,11 +35,11 @@ extension TimeInterval {
         self = TimeInterval(milliseconds) / 1000
     }
 
-    public var milliseconds: Int {
+    public var asMilliseconds: Int {
         return Int(self * 1000)
     }
 
-    public var microseconds: Int {
-        return Int(self * 1000000)
+    public var asMicroseconds: CUnsignedInt {
+        return CUnsignedInt(self * 1000000)
     }
 }
