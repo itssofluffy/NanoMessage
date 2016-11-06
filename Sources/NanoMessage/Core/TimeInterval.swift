@@ -23,43 +23,19 @@
 import Foundation
 
 extension TimeInterval {
-    public init(seconds: Int) {
-        self = Double(seconds)
-    }
-
-    public init(seconds: Double) {
-        self = seconds
-    }
-
     public init(seconds: Timeout) {
         self = seconds.rawValue
     }
 }
 
 extension TimeInterval {
-    public init(milliseconds: Int) {
-        self = TimeInterval(milliseconds) / 1000
-    }
-
     public init(milliseconds: Timeout) {
         self = milliseconds.rawValue
-    }
-
-    public var asMilliseconds: Int {
-        return Int(self * 1000)
     }
 }
 
 extension TimeInterval {
-    public init(microseconds: CUnsignedInt) {
-        self = Double(microseconds) / 1000000
-    }
-
     public init(microseconds: Timeout) {
         self = microseconds.rawValue
-    }
-
-    public var asMicroseconds: CUnsignedInt {
-        return CUnsignedInt(self * 1000000)
     }
 }

@@ -23,6 +23,7 @@
 import Foundation
 import C7
 import CNanoMessage
+import ISFLibrary
 
 public enum SocketOption: CInt {
     case Domain
