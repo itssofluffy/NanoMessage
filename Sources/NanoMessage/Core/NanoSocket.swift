@@ -122,7 +122,7 @@ public class NanoSocket {
                     terminateLoop = false
                 }
             } catch let error as NanoMessageError {
-                print(error)
+                print(error, to: &errorStream)
                 terminateLoop = true
             } catch {
                 print("an unexpected error '\(error)' has occured in the library libNanoMessage.", to: &errorStream)
