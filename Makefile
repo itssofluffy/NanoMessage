@@ -4,7 +4,7 @@ all: build
 build:
 	swift build $(NN_CONFIG_OPTS)
 
-build-release:
+release:
 	swift build --configuration release $(NN_CONFIG_OPTS)
 
 test:
@@ -19,4 +19,4 @@ docs:
 clean:
 	swift build --clean
 
-.PHONY: build build-release test runtest docs clean
+.PHONY: build release test runtest docs clean

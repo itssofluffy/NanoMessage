@@ -488,7 +488,7 @@ extension NanoSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setReconnectInterval(seconds: TimeInterval) throws {
-        try setSocketOption(self.socketFd, .ReconnectInterval, seconds.milliseconds)
+        try setSocketOption(self.socketFd, .ReconnectInterval, seconds)
     }
 
 /// This is to be used only in addition to `set/getReconnectInterval()`. It specifies maximum reconnection
@@ -517,7 +517,7 @@ extension NanoSocket {
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
     public func setReconnectIntervalMaximum(seconds: TimeInterval) throws {
-        try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, seconds.milliseconds)
+        try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, seconds)
     }
 
 /// Socket name for error reporting and statistics.
