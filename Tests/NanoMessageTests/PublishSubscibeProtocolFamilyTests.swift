@@ -75,12 +75,16 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.utf8.count")
 
+            try node1.setReceiveTimeout(seconds: .Never)
+
             do {
-                node1Received = try node1.receiveMessage()
+                node1Received = try node1.receiveMessage(timeout: TimeInterval(seconds: 0.5))
                 XCTAssert(false, "received a message on node1")
             } catch NanoMessageError.ReceiveTimedOut {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut))")   // we have timedout
             }
+
+            try node1.setReceiveTimeout(seconds: 0.5)
 
             try node1.unsubscribeFromAllTopics()
 

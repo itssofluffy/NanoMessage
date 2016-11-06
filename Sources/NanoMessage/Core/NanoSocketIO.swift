@@ -46,7 +46,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotSent
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.SendTimedOut
+            throw NanoMessageError.SendTimedOut(timeout: try! getSocketOption(socketFd, .SendTimeout))
         }
 
         throw NanoMessageError.SendMessage(code: errno)
@@ -94,7 +94,7 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotAvailable
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.ReceiveTimedOut
+            throw NanoMessageError.ReceiveTimedOut(timeout: try! getSocketOption(socketFd, .ReceiveTimeout))
         }
 
         throw NanoMessageError.ReceiveMessage(code: errno)

@@ -28,6 +28,8 @@ public protocol Sender {
     // I-O functions.
     func sendMessage(_ message: C7.Data, blockingMode: BlockingMode) throws -> Int
     func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int
+    func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int
+    func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int
     // socket option functions.
     func getSendBufferSize() throws -> UInt
     func setSendBufferSize(bytes: UInt) throws

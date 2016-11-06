@@ -37,10 +37,6 @@ class BusProtocolFamilyTests: XCTestCase {
             let node1 = try BusSocket()
             let node2 = try BusSocket()
 
-            try node0.setReceiveTimeout(seconds: 1)
-            try node1.setReceiveTimeout(seconds: 1)
-            try node2.setReceiveTimeout(seconds: 1)
-
             let _: Int = try node0.bindToURL(address1URL!)
 
             let _: Int = try node1.connectToURL(address1URL!)
@@ -55,22 +51,24 @@ class BusProtocolFamilyTests: XCTestCase {
             try node1.sendMessage("AB")
             try node2.sendMessage("ABC")
 
+            let timeout = TimeInterval(seconds: 1)
+
             for _ in 0 ... 1 {
-                let received: (bytes: Int, message: String) = try node0.receiveMessage()
+                let received: (bytes: Int, message: String) = try node0.receiveMessage(timeout: timeout)
                 XCTAssertGreaterThanOrEqual(received.bytes, 0, "node0.received.bytes < 0")
                 let boolTest = (received.bytes == 2 || received.bytes == 3) ? true : false
                 XCTAssertEqual(boolTest, true, "node0.received.bytes != 2 && node0.received.bytes != 3")
             }
 
             for _ in 0 ... 1 {
-                let received: (bytes: Int, message: String) = try node1.receiveMessage()
+                let received: (bytes: Int, message: String) = try node1.receiveMessage(timeout: timeout)
                 XCTAssertGreaterThanOrEqual(received.bytes, 0, "node1.received.bytes < 0")
                 let boolTest = (received.bytes == 1 || received.bytes == 3) ? true : false
                 XCTAssertEqual(boolTest, true, "node1.received.bytes != 2 && node1.received.bytes != 3")
             }
 
             for _ in 0 ... 1 {
-                let received: (bytes: Int, message: String) = try node2.receiveMessage()
+                let received: (bytes: Int, message: String) = try node2.receiveMessage(timeout: timeout)
                 XCTAssertGreaterThanOrEqual(received.bytes, 0, "node2.received.bytes < 0")
                 let boolTest = (received.bytes == 1 || received.bytes == 2) ? true : false
                 XCTAssertEqual(boolTest, true, "node2.received.bytes != 2 && node2.received.bytes != 2")

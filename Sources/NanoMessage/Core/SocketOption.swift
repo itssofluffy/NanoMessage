@@ -278,7 +278,7 @@ internal func getSocketOption(_ socketFd: CInt, _ option: SocketOption, _ level:
   let timeInterval = TimeInterval(milliseconds: try getSocketOption(socketFd, option, level))
 
     guard (timeInterval >= 0) else {
-        return TimeInterval(seconds: -1)
+        return TimeInterval(seconds: .Never)
     }
 
     return timeInterval
@@ -473,7 +473,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: TimeInterval, _ level: CInt = NN_SOL_SOCKET) throws {
     if (optval < 0) {
-        try setSocketOption(socketFd, option, CInt(-1), level)
+        try setSocketOption(socketFd, option, CInt(TimeInterval(seconds: .Never)), level)
     } else {
         try setSocketOption(socketFd, option, optval.asMilliseconds, level)
     }

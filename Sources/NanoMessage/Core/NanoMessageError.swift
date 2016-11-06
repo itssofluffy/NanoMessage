@@ -61,10 +61,12 @@ public enum NanoMessageError: Error {
     case PollSocket(code: CInt)
     case SendMessage(code: CInt)
     case MessageNotSent
-    case SendTimedOut
+    case SendTimedOut(timeout: TimeInterval)
+    case InvalidSendTimeout(timeout: TimeInterval)
     case ReceiveMessage(code: CInt)
     case MessageNotAvailable
-    case ReceiveTimedOut
+    case ReceiveTimedOut(timeout: TimeInterval)
+    case InvalidReceiveTimeout(timeout: TimeInterval)
     case NoTopic
     case TopicLength
     case InvalidTopic
@@ -118,8 +120,10 @@ extension NanoMessageError: CustomStringConvertible {
                 return "receiveMessage() failed: " + errorString(code)
             case .MessageNotAvailable:
                 return "no message received"
-            case .SendTimedOut, .ReceiveTimedOut:
-                return "operation has timed out"
+            case .SendTimedOut(let timeout), .ReceiveTimedOut(let timeout):
+                return "operation has timed out " + ((timeout == .Never) ? "with an infinite timeout!" : "in \(timeout) seconds")
+            case .InvalidSendTimeout(let timeout), .InvalidReceiveTimeout(let timeout):
+                return "timeout of \(timeout) seconds is invalid"
             case .NoTopic:
                 return "topic undefined"
             case .TopicLength:

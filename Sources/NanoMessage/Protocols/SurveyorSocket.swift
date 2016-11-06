@@ -40,7 +40,7 @@ public final class SurveyorSocket: NanoSocket, ProtocolSocket, Receiver, Sender 
 extension SurveyorSocket {
 /// Specifies how long to wait for responses to the survey. Once the deadline expires,
 /// receive function will throw `NanoMessageError.TimedOut` and all subsequent responses
-/// to the survey will be silently dropped. The deadline is measured in milliseconds.
+/// to the survey will be silently dropped. The deadline is measured in timeinterval.
 ///
 /// Default value is 1000 milliseconds (1 second).
 ///
@@ -53,7 +53,7 @@ extension SurveyorSocket {
 
 /// Specifies how long to wait for responses to the survey. Once the deadline expires,
 /// receive function will throw `NanoMessageError.TimedOut` and all subsequent responses
-/// to the survey will be silently dropped. The deadline is measured in milliseconds.
+/// to the survey will be silently dropped. The deadline is measured in timeinterval.
 ///
 /// - Parameters:
 ///   - seconds: The deadline timeout in timeinterval.

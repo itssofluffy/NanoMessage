@@ -1,5 +1,5 @@
 /*
-    Receiver.swift
+    Timeout.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -21,26 +21,17 @@
 */
 
 import Foundation
-import C7
 
-/// Receiver socket protocol.
-public protocol Receiver {
-    // I-O functions.
-    func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: C7.Data)
-    func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: String)
-    func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: C7.Data)
-    func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: String)
-    // socket option functions.
-    func getReceiveBufferSize() throws -> UInt
-    func setReceiveBufferSize(bytes: UInt) throws
-    func getMaximumMessageSize() throws -> Int
-    func setMaximumMessageSize(bytes: Int) throws
-    func getReceiveTimeout() throws -> TimeInterval
-    func setReceiveTimeout(seconds: TimeInterval) throws
-    func getReceivePriority() throws -> Int
-    func setReceivePriority(_ priority: Int) throws
-    func getReceiveFd() throws -> Int
-    // socket statistics functions.
-    func getMessagesReceived() throws -> UInt64
-    func getBytesReceived() throws -> UInt64
+public enum Timeout: TimeInterval {
+    case Never = -1
+}
+
+extension Timeout: Equatable {
+    public static func ==(lhs: TimeInterval, rhs: Timeout) -> Bool {
+        return (lhs == rhs.rawValue)
+    }
+
+    public static func ==(lhs: Timeout, rhs: TimeInterval) -> Bool {
+        return (lhs.rawValue == rhs)
+    }
 }
