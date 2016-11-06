@@ -26,9 +26,16 @@ import Foundation
 @testable import NanoMessage
 
 class SurveyProtocolFamilyTests: XCTestCase {
-    private func testPair(connectAddress: String, bindAddress: String = "") {
-        let connectURL = URL(string: connectAddress)
-        let bindURL = URL(string: (bindAddress.isEmpty) ? connectAddress : bindAddress)
+    private func testSurvey(connectAddress: String, bindAddress: String = "") {
+        guard let connectURL = URL(string: connectAddress) else {
+            XCTAssert(false, "connectURL is invalid")
+            return
+        }
+
+        guard let bindURL = URL(string: (bindAddress.isEmpty) ? connectAddress : bindAddress) else {
+            XCTAssert(false, "bindURL is invalid")
+            return
+        }
 
         var completed = false
 
@@ -43,12 +50,12 @@ class SurveyProtocolFamilyTests: XCTestCase {
             try node1.setSendTimeout(seconds: 1)          // set send timeout to 1 seconds.
             try node1.setReceiveTimeout(seconds: 1)       // set receive timeout to 1 seconds.
 
-            let node0EndPointId: Int = try node0.connectToURL(connectURL!)
+            let node0EndPointId: Int = try node0.connectToURL(connectURL)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
 
             try node0.setDeadline(seconds: 0.5)           // set the suryeyor deadline to 1/2 second.
 
-            let node1EndPointId: Int = try node1.bindToURL(bindURL!)
+            let node1EndPointId: Int = try node1.bindToURL(bindURL)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL)') < 0")
 
             pauseForBind()
@@ -84,22 +91,22 @@ class SurveyProtocolFamilyTests: XCTestCase {
 
     func testTCPSurvey() {
         print("TCP tests...")
-        testPair(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testSurvey(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessSurvey() {
         print("In-Process tests...")
-        testPair(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testSurvey(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessSurvey() {
         print("Inter Process tests...")
-        testPair(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testSurvey(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketSurvey() {
         print("Web Socket tests...")
-        testPair(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testSurvey(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 
 #if !os(OSX)

@@ -13,11 +13,16 @@ used, add this package as a dependency in `Package.swift`,
 
 Push
 ```swift
+import Foundation
 import NanoMessage
 
 do {
+    guard let url = URL(string: "inproc:///tmp/pipeline.inproc") else {
+        fatalError("url is not valid")
+    }
+
     let node0 = try PushSocket()
-    let _: Int = try node0.connectToURL("inproc:///tmp/pipeline.inproc")
+    let _: Int = try node0.connectToURL(url)
 
     try node0.sendMessage("This is earth calling...earth calling...")
 } catch let error as NanoMessageError {
@@ -31,11 +36,16 @@ do {
 Pull
 
 ```swift
+import Foundation
 import NanoMessage
 
 do {
+    guard let url = URL(string: "inproc:///tmp/pipeline.inproc") else {
+        fatalError("url is not valid")
+    }
+
     let node0 = try PullSocket()
-    let _: EndPoint = try node0.bindToURL("inproc:///tmp/pipeline.inproc")
+    let _: EndPoint = try node0.bindToURL(url, name: "my local end-point")
 
     let received: (bytes: Int, message: String) = try node0.receiveMessage(timeout: TimeInterval(seconds: 1))
 

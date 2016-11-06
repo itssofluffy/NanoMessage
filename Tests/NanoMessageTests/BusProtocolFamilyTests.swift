@@ -27,8 +27,15 @@ import Foundation
 
 class BusProtocolFamilyTests: XCTestCase {
     private func testBus(address1: String, address2: String) {
-        let address1URL = URL(string: address1)
-        let address2URL = URL(string: address2)
+        guard let address1URL = URL(string: address1) else {
+            XCTAssert(false, "address1URL is invalid")
+            return
+        }
+
+        guard let address2URL = URL(string: address2) else {
+            XCTAssert(false, "address2URL is invalid")
+            return
+        }
 
         var completed = false
 
@@ -37,13 +44,13 @@ class BusProtocolFamilyTests: XCTestCase {
             let node1 = try BusSocket()
             let node2 = try BusSocket()
 
-            let _: Int = try node0.bindToURL(address1URL!)
+            let _: Int = try node0.bindToURL(address1URL)
 
-            let _: Int = try node1.connectToURL(address1URL!)
-            let _: Int = try node1.bindToURL(address2URL!)
+            let _: Int = try node1.connectToURL(address1URL)
+            let _: Int = try node1.bindToURL(address2URL)
 
-            let _: Int = try node2.connectToURL(address1URL!)
-            let _: Int = try node2.connectToURL(address2URL!)
+            let _: Int = try node2.connectToURL(address1URL)
+            let _: Int = try node2.connectToURL(address2URL)
 
             pauseForBind()
 

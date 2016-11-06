@@ -27,8 +27,15 @@ import Foundation
 
 class PollSocketTests: XCTestCase {
     private func testPollSocket(connectAddress: String, bindAddress: String = "") {
-        let connectURL = URL(string: connectAddress)
-        let bindURL = URL(string: (bindAddress.isEmpty) ? connectAddress : bindAddress)
+        guard let connectURL = URL(string: connectAddress) else {
+            XCTAssert(false, "connectURL is invalid")
+            return
+        }
+
+        guard let bindURL = URL(string: (bindAddress.isEmpty) ? connectAddress : bindAddress) else {
+            XCTAssert(false, "bindURL is invalid")
+            return
+        }
 
         var completed = false
 
@@ -39,10 +46,10 @@ class PollSocketTests: XCTestCase {
             try node0.setSendTimeout(seconds: 1)
             try node1.setReceiveTimeout(seconds: 1)
 
-            let node0EndPointId: Int = try node0.connectToURL(connectURL!)
+            let node0EndPointId: Int = try node0.connectToURL(connectURL)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
 
-            let node1EndPointId: Int = try node1.bindToURL(bindURL!)
+            let node1EndPointId: Int = try node1.bindToURL(bindURL)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL)') < 0")
 
             pauseForBind()
