@@ -95,7 +95,11 @@ extension ProtocolSocket where Self: Sender {
 
         defer {
             if (oldTimeout != timeout) {
-                try! self.setSendTimeout(seconds: oldTimeout)
+                do {
+                    try self.setSendTimeout(seconds: oldTimeout)
+                } catch {
+                    print(error, to: &errorStream)
+                }
             }
         }
 
@@ -184,7 +188,11 @@ extension ProtocolSocket where Self: Receiver {
 
         defer {
             if (oldTimeout != timeout) {
-                try! self.setReceiveTimeout(seconds: oldTimeout)
+                do {
+                    try self.setReceiveTimeout(seconds: oldTimeout)
+                } catch {
+                    print(error, to: &errorStream)
+                }
             }
         }
 
