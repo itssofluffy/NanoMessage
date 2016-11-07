@@ -95,11 +95,11 @@ extension NanoMessageError: CustomStringConvertible {
             case .Interrupted:
                 return "operation was interrupted"
             case .BindToURL(let code, let url):
-                return "bindToURL('\(url)') failed: " + errorString(code)
+                return "bindToURL('\(url.absoluteString)') failed: " + errorString(code)
             case .ConnectToURL(let code, let url):
-                return "connectToURL('\(url)') failed: " + errorString(code)
+                return "connectToURL('\(url.absoluteString)') failed: " + errorString(code)
             case .RemoveEndPoint(let code, let url, let endPointId):
-                return "removeEndPoint('\(url)' #(\(endPointId))) failed: " + errorString(code)
+                return "removeEndPoint('\(url.absoluteString)' #(\(endPointId))) failed: " + errorString(code)
             case .BindToSocket(let code, let nanoSocketName):
                 return "bindToSocket('\(nanoSocketName)') failed: " + errorString(code)
             case .LoopBack(let code):
