@@ -35,3 +35,12 @@ extension Timeout: Equatable {
         return (lhs.rawValue == rhs)
     }
 }
+
+extension Timeout: CustomStringConvertible {
+    public var description: String {
+        switch self {
+            case .Never:
+                return "never"
+        }
+    }
+}

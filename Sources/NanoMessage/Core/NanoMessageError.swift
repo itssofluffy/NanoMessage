@@ -121,9 +121,9 @@ extension NanoMessageError: CustomStringConvertible {
             case .MessageNotAvailable:
                 return "no message received"
             case .SendTimedOut(let timeout), .ReceiveTimedOut(let timeout):
-                return "operation has timed out " + ((timeout == .Never) ? "with an infinite timeout!" : "in \(timeout) seconds")
+                return "operation has timed out " + ((timeout == .Never) ? "with an infinite timeout!" : "in \(timeout) second(s)")
             case .InvalidSendTimeout(let timeout), .InvalidReceiveTimeout(let timeout):
-                return "timeout of \(timeout) seconds is invalid"
+                return "timeout of \(timeout) second(s) is invalid"
             case .NoTopic:
                 return "topic undefined"
             case .TopicLength:
