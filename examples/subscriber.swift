@@ -36,7 +36,7 @@ do {
 
     usleep(TimeInterval(seconds: 0.25).asMicroseconds)
 
-    try node0.subscribeTo(topic: "bob calvert")
+    try node0.subscribeTo(topic: "interesting")
 
     while (true) {
         let received: (bytes: Int, message: String) = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))

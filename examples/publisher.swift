@@ -54,11 +54,12 @@ do {
 
     var messages = Set<DataSet>()
 
-    messages.insert(DataSet(topic: "bob calvert",   message: "This is earth calling...earth calling..."))
-    messages.insert(DataSet(topic: "rodger waters", message: "We're just two lost souls, swimming in a fish bowl...year after year"))
-    messages.insert(DataSet(topic: "bob calvert",   message: "Oh, for the wings of any bird, other than a battery hen..."))
+    messages.insert(DataSet(topic: "interesting", message: "this is message #1"))
+    messages.insert(DataSet(topic: "not-really",  message: "this is message #2"))
+    messages.insert(DataSet(topic: "interesting", message: "this is message #3"))
+    messages.insert(DataSet(topic: "interesting", message: "this is message #4"))
 
-    for dataSet in messages {
+    for dataSet in messages.sorted(by: { $0.message < $1.message }) {
         node0.sendTopic = C7.Data(dataSet.topic)
 
         print("sending topic: \(node0.sendTopic), message: \(dataSet.message)")
