@@ -17,7 +17,7 @@ import Foundation
 import NanoMessage
 
 do {
-    guard let url = URL(string: "ipc:///tmp/pipeline.ipc") else {
+    guard let url = URL(string: "tcp://localhost:5555") else {
         fatalError("url is not valid")
     }
 
@@ -40,7 +40,7 @@ import Foundation
 import NanoMessage
 
 do {
-    guard let url = URL(string: "ipc:///tmp/pipeline.ipc") else {
+    guard let url = URL(string: "tcp://*:5555") else {
         fatalError("url is not valid")
     }
 
