@@ -22,19 +22,19 @@
 
 import Foundation
 
-extension TimeInterval {
+public extension TimeInterval {
     public init(seconds: Timeout) {
         self = seconds.rawValue
     }
 }
 
-extension TimeInterval {
+public extension TimeInterval {
     public init(milliseconds: Timeout) {
         self = milliseconds.rawValue
     }
 }
 
-extension TimeInterval {
+public extension TimeInterval {
     public init(microseconds: Timeout) {
         self = microseconds.rawValue
     }
