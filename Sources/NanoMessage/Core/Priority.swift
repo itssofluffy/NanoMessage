@@ -1,5 +1,5 @@
 /*
-    Sender.swift
+    Priority.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -20,26 +20,30 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-import C7
+import ISFLibrary
 
-/// Sender socket protocol.
-public protocol Sender {
-    // I-O functions.
-    func sendMessage(_ message: C7.Data, blockingMode: BlockingMode) throws -> Int
-    func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int
-    func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int
-    func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int
-    // socket option functions.
-    func getSendBufferSize() throws -> UInt
-    func setSendBufferSize(bytes: UInt) throws
-    func getSendTimeout() throws -> TimeInterval
-    func setSendTimeout(seconds: TimeInterval) throws
-    func getSendPriority() throws -> Priority
-    func setSendPriority(_ priority: Priority) throws
-    func getSendFd() throws -> Int
-    // socket statistics functions.
-    func getMessagesSent() throws -> UInt64
-    func getBytesSent() throws -> UInt64
-    func getCurrentSendPriority() throws -> UInt64
+public struct Priority {
+    let level: Int
+
+    public init(level: Int) {
+        self.level = clamp(value: level, lower: 1, upper: 16)
+    }
+}
+
+extension Priority: Comparable {
+    public static func <(lhs: Priority, rhs: Priority) -> Bool {
+        return (lhs.level < rhs.level)
+    }
+}
+
+extension Priority: Equatable {
+    public static func ==(lhs: Priority, rhs: Priority) -> Bool {
+        return (lhs.level == rhs.level)
+    }
+}
+
+extension Priority: CustomStringConvertible {
+    public var description: String {
+        return "level: \(self.level)"
+    }
 }

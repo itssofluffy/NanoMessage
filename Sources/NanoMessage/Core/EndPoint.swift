@@ -31,12 +31,12 @@ public struct EndPoint {
     public var transport: TransportMechanism {    // end-points transport mechanism
         return TransportMechanism(url: self.url)
     }
-    public let receivePriority: Int?              // receive priority of the end-point.
-    public let sendPriority: Int?                 // send priority to the end-point.
+    public let receivePriority: Priority?         // receive priority of the end-point.
+    public let sendPriority: Priority?            // send priority to the end-point.
     public let ipv4Only: Bool                     // if true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
     public var name: String                       // user defined name of the end-point
 
-    public init(id: Int, url: URL, type: ConnectionType, receivePriority: Int?, sendPriority: Int?, ipv4Only: Bool, name: String = "") {
+    public init(id: Int, url: URL, type: ConnectionType, receivePriority: Priority?, sendPriority: Priority?, ipv4Only: Bool, name: String = "") {
         self.id = id
         self.url = url
         self.type = type

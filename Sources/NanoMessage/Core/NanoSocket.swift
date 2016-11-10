@@ -139,9 +139,9 @@ extension NanoSocket {
 ///
 /// - Returns: Tuple of receive and send send priorities, if either is nil then
 ///            socket is either not a receiver or sender.
-    private func _socketPriorities() throws -> (receivePriority: Int?, sendPriority: Int?) {
-        var receivePriority: Int?
-        var sendPriority: Int?
+    private func _socketPriorities() throws -> (receivePriority: Priority?, sendPriority: Priority?) {
+        var receivePriority: Priority?
+        var sendPriority: Priority?
 
         if let _: Int = try? getSocketOption(socketFd, .ReceiveFd) {                  // if this is a receiver socket then...
             receivePriority = try getSocketOption(self.socketFd, .ReceivePriority)    // obtain the receive priority for the end-point.
@@ -171,7 +171,7 @@ extension NanoSocket {
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
-        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
+        let socket: (receivePriority: Priority?, sendPriority: Priority?) = try _socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
         url.absoluteString.withCString {
@@ -234,7 +234,7 @@ extension NanoSocket {
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
-        let socket: (receivePriority: Int?, sendPriority: Int?) = try _socketPriorities()
+        let socket: (receivePriority: Priority?, sendPriority: Priority?) = try _socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
         url.absoluteString.withCString {

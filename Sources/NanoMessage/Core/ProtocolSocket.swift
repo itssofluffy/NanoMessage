@@ -290,7 +290,7 @@ extension ProtocolSocket where Self: Sender {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets send priority.
-    public func getSendPriority() throws -> Int {
+    public func getSendPriority() throws -> Priority {
         return try getSocketOption(self._nanoSocket.socketFd, .SendPriority)
     }
 
@@ -303,8 +303,8 @@ extension ProtocolSocket where Self: Sender {
 ///   - priority: The sockets send priority.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setSendPriority(_ priority: Int) throws {
-        try setSocketOption(self._nanoSocket.socketFd, .SendPriority, clamp(value: priority, lower: 1, upper: 16))
+    public func setSendPriority(_ priority: Priority) throws {
+        try setSocketOption(self._nanoSocket.socketFd, .SendPriority, priority)
     }
 
 /// Retrieves the underlying file descriptor for the messages that can be sent to the socket.
@@ -417,7 +417,7 @@ extension ProtocolSocket where Self: Receiver {
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///
 /// - Returns: The sockets receive timeout.
-    public func getReceivePriority() throws -> Int {
+    public func getReceivePriority() throws -> Priority {
         return try getSocketOption(self._nanoSocket.socketFd, .ReceivePriority)
     }
 
@@ -429,8 +429,8 @@ extension ProtocolSocket where Self: Receiver {
 ///   - priority: The receive priority.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReceivePriority(_ priority: Int) throws {
-        try setSocketOption(self._nanoSocket.socketFd, .ReceivePriority, clamp(value: priority, lower: 1, upper: 16))
+    public func setReceivePriority(_ priority: Priority) throws {
+        try setSocketOption(self._nanoSocket.socketFd, .ReceivePriority, priority)
     }
 
 /// Retrieves the underlying file descriptor for the messages that are received on the socket.
