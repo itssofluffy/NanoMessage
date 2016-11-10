@@ -75,7 +75,7 @@ class SocketStatisticTests: XCTestCase {
             let node0CurrentInProgressConnections = try node0.getCurrentInProgressConnections()
             XCTAssertEqual(node0CurrentInProgressConnections, 0, "node0.getCurrentInProgressConnections() != 0")
             let node0CurrentSendPriority = try node0.getCurrentSendPriority()
-            XCTAssertEqual(node0CurrentSendPriority, 0, "node0.getCurrentSendPriority() != 0")
+            XCTAssertEqual(node0CurrentSendPriority, Priority(level: 0), "node0.getCurrentSendPriority() != Priority(level: 0)")
             let node0CurrentEndPointErrors = try node0.getCurrentEndPointErrors()
             XCTAssertEqual(node0CurrentEndPointErrors, 0, "node0.getCurrentEndPointErrors() != 0")
 
@@ -106,7 +106,7 @@ class SocketStatisticTests: XCTestCase {
             let node1CurrentInProgressConnections = try node1.getCurrentInProgressConnections()
             XCTAssertEqual(node1CurrentInProgressConnections, 0, "node1.getCurrentInProgressConnections() != 0")
             let node1CurrentSendPriority = try node1.getCurrentSendPriority()
-            XCTAssertEqual(node1CurrentSendPriority, 0, "node1.getCurrentSendPriority() != 0")
+            XCTAssertEqual(node1CurrentSendPriority, Priority(level: 0), "node1.getCurrentSendPriority() != Priority(level: 0)")
             let node1CurrentEndPointErrors = try node1.getCurrentEndPointErrors()
             XCTAssertEqual(node1CurrentEndPointErrors, 0, "node1.getCurrentEndPointErrors() != 0")
 

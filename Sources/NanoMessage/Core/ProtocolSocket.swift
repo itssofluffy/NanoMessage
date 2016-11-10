@@ -105,7 +105,7 @@ extension ProtocolSocket where Self: Sender {
 
         try self.setSendTimeout(seconds: timeout)
 
-        return try self.sendMessage(C7.Data(message), blockingMode: .Blocking)   // chain down the sendMessage signature stack
+        return try self.sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
     }
 
 /// Send a message.
@@ -468,7 +468,7 @@ extension ProtocolSocket where Self: Sender {
 /// - Returns: As per description.
 ///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    public func getCurrentSendPriority() throws -> UInt64 {
+    public func getCurrentSendPriority() throws -> Priority {
         return try getSocketStatistic(self._nanoSocket.socketFd, .CurrentSendPriority)
     }
 }

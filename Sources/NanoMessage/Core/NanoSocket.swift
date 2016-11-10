@@ -171,7 +171,7 @@ extension NanoSocket {
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
-        let socket: (receivePriority: Priority?, sendPriority: Priority?) = try _socketPriorities()
+        let socket: (receivePriority: Priority?, sendPriority: Priority?) = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
         url.absoluteString.withCString {
@@ -234,7 +234,7 @@ extension NanoSocket {
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
-        let socket: (receivePriority: Priority?, sendPriority: Priority?) = try _socketPriorities()
+        let socket: (receivePriority: Priority?, sendPriority: Priority?) = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
         url.absoluteString.withCString {

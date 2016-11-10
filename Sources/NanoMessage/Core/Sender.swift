@@ -41,5 +41,5 @@ public protocol Sender {
     // socket statistics functions.
     func getMessagesSent() throws -> UInt64
     func getBytesSent() throws -> UInt64
-    func getCurrentSendPriority() throws -> UInt64
+    func getCurrentSendPriority() throws -> Priority
 }

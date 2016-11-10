@@ -136,3 +136,28 @@ internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) th
 
     return statistic
 }
+
+/// Retrieves the value of a statistic from the socket. Not all statistics are relevant to all transports.
+/// For example, the nn_inproc(7) transport does not maintain any of the connection related statistics.
+///
+/// - Parameters:
+///   - socketFd: The NanoSocket file descriptor
+///   - option:   The nanomsg statistic option.
+///
+/// - Throws: `NanoMessageError.GetSocketStatistic` if an issue was encountered.
+///
+/// - Returns: the resulting statistic.
+///
+/// - Note:    While this extension API is stable, these statistics are intended for human consumption,
+///            to facilitate observability and debugging. The actual statistics themselves as well as
+///            their meanings are unstable, and subject to change without notice. Programs should not
+///            depend on the presence or values of any particular statistic. 
+internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) throws -> Priority {
+    let statistic = nn_get_statistic(socketFd, option.rawValue)
+
+    guard (statistic >= 0) else {
+        throw NanoMessageError.GetSocketStatistic(code: nn_errno(), option: option)
+    }
+
+    return Priority(level: Int(statistic))
+}
