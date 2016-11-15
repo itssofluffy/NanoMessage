@@ -86,10 +86,10 @@ public var symbolProperty: Set<SymbolProperty> {
             }
 
             _symbolProperty.insert(SymbolProperty(namespace: buffer.ns,
-                                                  name: String(cString: buffer.name),
-                                                  value: buffer.value,
-                                                  type: buffer.type,
-                                                  unit: buffer.unit))
+                                                  name:      String(cString: buffer.name),
+                                                  value:     buffer.value,
+                                                  type:      buffer.type,
+                                                  unit:      buffer.unit))
 
             index += 1
         }

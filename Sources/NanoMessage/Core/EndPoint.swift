@@ -69,10 +69,10 @@ extension EndPoint: CustomStringConvertible {
     public var description: String {
         var description = "id: \(self.id), url: \(self.url.absoluteString), type: \(self.type), transport: \(self.transport)"
         if let priority = self.receivePriority {
-            description += ", receive priority: \(priority)"
+            description += ", receive priority: (\(priority))"
         }
         if let priority = self.sendPriority {
-            description += ", send priority: \(priority)"
+            description += ", send priority: (\(priority))"
         }
         description += ", ipv4only: \(self.ipv4Only)"
         if (!self.name.isEmpty) {
