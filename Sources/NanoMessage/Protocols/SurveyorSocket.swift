@@ -58,7 +58,8 @@ extension SurveyorSocket {
 /// - Parameters:
 ///   - seconds: The deadline timeout in timeinterval.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets deadline timeout before being set.
     @discardableResult

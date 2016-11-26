@@ -187,7 +187,7 @@ extension SubscriberSocket {
     public func flipIgnoreTopicSeperator() throws -> Bool {
         if (!self.subscribedToAllTopics) {
             if (!self.ignoreTopicSeperator) {
-                let topics: (equalLengths: Bool, _: Int) = _validateTopicLengths()
+                let topics = self._validateTopicLengths()
 
                 if (!topics.equalLengths) {
                     throw NanoMessageError.InvalidTopic
@@ -216,7 +216,7 @@ extension SubscriberSocket {
     public func subscribeTo(topic: Data) throws -> Bool {
 /// Check topic length against (any) existing topics is see if it is of equal length.
         func _validTopicLengths(_ topic: Data) -> Bool {
-            let topics: (equalLengths: Bool, count: Int) = _validateTopicLengths()
+            let topics = self._validateTopicLengths()
 
             if (!topics.equalLengths) {
                 return false
@@ -239,11 +239,12 @@ extension SubscriberSocket {
                     throw NanoMessageError.InvalidTopic
                 }
 
-                if (topic.count > maximumTopicLength) {
+                if (topic.count > NanoMessage.maximumTopicLength) {
                     throw NanoMessageError.TopicLength
                 }
 
                 try setSocketOption(self.socketFd, .Subscribe, topic, .SubscriberProtocol)
+
                 self.subscribedTopics.insert(topic)
             }
 
@@ -283,6 +284,7 @@ extension SubscriberSocket {
 
             if (topicSubscribed) {
                 try setSocketOption(self.socketFd, .UnSubscribe, topic, .SubscriberProtocol)
+
                 self.subscribedTopics.remove(topic)
 
                 if (self.subscribedTopics.isEmpty) {

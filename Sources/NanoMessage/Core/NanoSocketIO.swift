@@ -34,7 +34,7 @@ import CNanoMessage
 ///
 /// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
-///            `NanoMessageError.TimedOut` the send timedout.
+///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: The number of bytes sent.
 internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
@@ -64,8 +64,8 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 ///                   will throw `NanoMessageError.MessageNotReceived`.
 ///
 /// - Throws:  `NanoMessageError.receiveMessage` there was an issue when receiving the message.
-///            `NanoMessageError.MessageNotReceived` in non-blocking mode there was no message to receive.
-///            `NanoMessageError.TimedOut` the receive timedout.
+///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
+///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
 /// - Returns: The number of bytes received and the received message
 internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> (bytes: Int, message: Data) {

@@ -54,7 +54,8 @@ extension RequestSocket {
 /// - Parameters:
 ///   - seconds: The sockets resend interval.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets resend interval before being set.
     @discardableResult

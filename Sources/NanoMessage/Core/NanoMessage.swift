@@ -32,7 +32,7 @@ public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
 
 /// NanoMessage library version.
 public var nanoMessageVersion: (current: Int, revision: Int, age: Int) {
-    return (current: 0, revision: 0, age: 9)
+    return (current: 0, revision: 0, age: 10)
 }
 
 /// Notify all sockets about process termination.
@@ -57,7 +57,7 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
         var index: CInt = 0
 
         while (true) {
-            if let symbol: (name: String, value: CInt) = _getSymbol(index) {
+            if let symbol = _getSymbol(index) {
                 _nanomsgSymbol[symbol.name] = symbol.value
             } else {
                 break     // no more symbols
