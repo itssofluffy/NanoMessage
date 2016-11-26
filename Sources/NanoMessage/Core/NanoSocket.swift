@@ -56,7 +56,7 @@ public class NanoSocket {
             }
         }
 
-        return delay / Double(self.closureAttempts)
+        return TimeInterval(seconds: delay / Double(self.closureAttempts))
     }
 /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
 ///
@@ -458,12 +458,20 @@ extension NanoSocket {
 /// - Parameters:
 ///   - seconds: The linger time.
 ///
-/// - Throws: `NanoMessageError.SetSocketOption`
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The linger time on the socket before being set.
 ///
 /// - Note:   The underlying nanomsg library no longer supports this feature, linger time is always it's default value.
     @available(*, unavailable, message: "nanomsg library no longer supports this feature")
-    public func setLinger(seconds: TimeInterval) throws {
+    @discardableResult
+    public func setLinger(seconds: TimeInterval) throws -> TimeInterval {
+        let originalValue = try self.getLinger()
+
         try setSocketOption(self.socketFd, .Linger, seconds)
+
+        return originalValue
     }
 
 /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
@@ -486,9 +494,17 @@ extension NanoSocket {
 /// - Parameters:
 ///   - seconds: The reconnection interval in timeinterval.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReconnectInterval(seconds: TimeInterval) throws {
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The sockets reconnect interval before being set.
+    @discardableResult
+    public func setReconnectInterval(seconds: TimeInterval) throws -> TimeInterval {
+        let originalValue = try self.getReconnectInterval()
+
         try setSocketOption(self.socketFd, .ReconnectInterval, seconds)
+
+        return originalValue
     }
 
 /// This is to be used only in addition to `set/getReconnectInterval()`. It specifies maximum reconnection
@@ -515,9 +531,17 @@ extension NanoSocket {
 /// - Parameters:
 ///   - seconds: The reconnection maximum interval in timeinterval.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setReconnectIntervalMaximum(seconds: TimeInterval) throws {
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The sockets reconnect maximum interval before being set.
+    @discardableResult
+    public func setReconnectIntervalMaximum(seconds: TimeInterval) throws -> TimeInterval {
+        let originalValue = try self.getReconnectInterval()
+
         try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, seconds)
+
+        return originalValue
     }
 
 /// Socket name for error reporting and statistics.
@@ -538,20 +562,28 @@ extension NanoSocket {
 /// - Parameters:
 ///   - socketName: Name of the socket.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The sockets name before being set.
 ///
 /// - Note:    This feature is deamed as experimental by the underlying nanomsg library.
-    public func setSocketName(_ socketName: String) throws {
+    @discardableResult
+    public func setSocketName(_ socketName: String) throws -> String {
+        let originalValue = try self.getSocketName()
+
         try setSocketOption(self.socketFd, .SocketName, socketName)
+
+        return originalValue
     }
 
 /// If true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
 ///
 /// Default value is true.
 ///
-/// - Returns: The IP4v4/Ipv6 type.
-///
 /// - Throws:  `NanoMessageError.GetSocketOption`
+///
+/// - Returns: The IP4v4/Ipv6 type.
     public func getIPv4Only() throws -> Bool {
         return try getSocketOption(self.socketFd, .IPv4Only)
     }
@@ -561,18 +593,26 @@ extension NanoSocket {
 /// - Parameters:
 ///   - ip4Only: Use IPv4 or IPv4 and IPv6.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setIPv4Only(_ ip4Only: Bool) throws {
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The IP4v4/Ipv6 type before being set.
+    @discardableResult
+    public func setIPv4Only(_ ip4Only: Bool) throws -> Bool {
+        let originalValue = try self.getIPv4Only()
+
         try setSocketOption(self.socketFd, .IPv4Only, ip4Only)
+
+        return originalValue
     }
 
 /// The maximum number of "hops" a message can go through before it is dropped. Each time the
 /// message is received (for example via the `bindToSocket()` function) counts as a single hop.
 /// This provides a form of protection against inadvertent loops.
 ///
-/// - Returns: The number of hops before a message is dropped.
-///
 /// - Throws:  `NanoMessageError.GetSocketOption`
+///
+/// - Returns: The number of hops before a message is dropped.
     public func getMaxTTL() throws -> Int {
         return try getSocketOption(self.socketFd, .MaxTTL)
     }
@@ -584,9 +624,17 @@ extension NanoSocket {
 /// - Parameters:
 ///   - hops: The number of hops before a message is dropped.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setMaxTTL(hops: Int) throws {
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The number of hops before a message is dropped before being set.
+    @discardableResult
+    public func setMaxTTL(hops: Int) throws -> Int {
+        let originalValue = try self.getMaxTTL()
+
         try setSocketOption(self.socketFd, .MaxTTL, hops)
+
+        return originalValue
     }
 
 /// When true, disables Nagle’s algorithm. It also disables delaying of TCP acknowledgments.
@@ -594,9 +642,9 @@ extension NanoSocket {
 ///
 /// Default value is false.
 ///
-/// - Returns: Is Nagle's algorithm enabled.
-///
 /// - Throws:  `NanoMessageError.GetSocketOption`
+///
+/// - Returns: Is Nagle's algorithm enabled.
     public func getTCPNoDelay(transportMechanism: TransportMechanism = .TCP) throws -> Bool {
         let valueReturned: CInt = try getSocketOption(self.socketFd, .TCPNoDelay, transportMechanism)
 
@@ -609,11 +657,19 @@ extension NanoSocket {
 /// - Parameters:
 ///   - disableNagles: Disable or enable Nagle's algorithm.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setTCPNoDelay(disableNagles: Bool, transportMechanism: TransportMechanism = .TCP) throws {
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: Is Nagle's algorithm enabled before being set.
+    @discardableResult
+    public func setTCPNoDelay(disableNagles: Bool, transportMechanism: TransportMechanism = .TCP) throws -> Bool {
         let valueToSet: CInt = (disableNagles) ? NN_TCP_NODELAY : 0
 
+        let originalValue = try self.getTCPNoDelay()
+
         try setSocketOption(self.socketFd, .TCPNoDelay, valueToSet, transportMechanism)
+
+        return originalValue
     }
 
 /// This value determines whether data messages are sent as WebSocket text frames, or binary frames,
@@ -622,9 +678,9 @@ extension NanoSocket {
 ///
 /// The default is to send binary frames.
 ///
-/// - Returns: The web sockets message type.
-///
 /// - Throws:  `NanoMessageError.GetSocketOption`
+///
+/// - Returns: The web sockets message type.
     public func getWebSocketMessageType() throws -> WebSocketMessageType {
         return WebSocketMessageType(rawValue: try getSocketOption(self.socketFd, .WebSocketMessageType, .WebSocket))
     }
@@ -636,81 +692,89 @@ extension NanoSocket {
 /// - Parameters:
 ///   - type: Define the web socket message type.
 ///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setWebSocketMessageType(_ type: WebSocketMessageType) throws {
+/// - Throws: `NanoMessageError.GetSocketOption`
+///           `NanoMessageError.SetSocketOption`
+///
+/// - Returns: The web sockets message type before being set.
+    @discardableResult
+    public func setWebSocketMessageType(_ type: WebSocketMessageType) throws -> WebSocketMessageType {
+        let originalValue = try self.getWebSocketMessageType()
+
         try setSocketOption(self.socketFd, .WebSocketMessageType, type, .WebSocket)
+
+        return originalValue
     }
 }
 
 extension NanoSocket {
 /// The number of connections successfully established that were initiated from this socket.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getEstablishedConnections() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .EstablishedConnections)
     }
 
 /// The number of connections successfully established that were accepted by this socket.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getAcceptedConnections() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .AcceptedConnections)
     }
 
 /// The number of established connections that were dropped by this socket.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getDroppedConnections() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .DroppedConnections)
     }
 
 /// The number of established connections that were closed by this socket, typically due to protocol errors.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getBrokenConnections() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .BrokenConnections)
     }
 
 /// The number of errors encountered by this socket trying to connect to a remote peer.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getConnectErrors() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .ConnectErrors)
     }
 
 /// The number of errors encountered by this socket trying to bind to a local address.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getBindErrors() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .BindErrors)
     }
 
 /// The number of errors encountered by this socket trying to accept a a connection from a remote peer.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
     public func getAcceptErrors() throws -> UInt64 {
         return try getSocketStatistic(self.socketFd, .AcceptErrors)
     }
 
 /// The number of connections currently in progress to this socket.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
 ///
 /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentInProgressConnections() throws -> UInt64 {
@@ -719,9 +783,9 @@ extension NanoSocket {
 
 /// The number of connections currently estabalished to this socket.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
 ///
 /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentConnections() throws -> UInt64 {
@@ -730,9 +794,9 @@ extension NanoSocket {
 
 /// The number of end-point errors.
 ///
-/// - Returns: As per description.
-///
 /// - Throws:  `NanoMessageError.GetSocketStatistic`
+///
+/// - Returns: As per description.
 ///
 /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentEndPointErrors() throws -> UInt64 {

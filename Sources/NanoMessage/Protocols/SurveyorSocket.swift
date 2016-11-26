@@ -59,7 +59,14 @@ extension SurveyorSocket {
 ///   - seconds: The deadline timeout in timeinterval.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setDeadline(seconds: TimeInterval) throws {
+///
+/// - Returns: The sockets deadline timeout before being set.
+    @discardableResult
+    public func setDeadline(seconds: TimeInterval) throws -> TimeInterval {
+        let originalValue = try self.getDeadline()
+
         try setSocketOption(self.socketFd, .SurveyDeadline, seconds, .SurveyorProtocol)
+
+        return originalValue
     }
 }

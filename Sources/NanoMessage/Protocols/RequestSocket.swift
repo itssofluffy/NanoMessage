@@ -55,7 +55,14 @@ extension RequestSocket {
 ///   - seconds: The sockets resend interval.
 ///
 /// - Throws:  `NanoMessageError.SetSocketOption`
-    public func setResendInterval(seconds: TimeInterval) throws {
+///
+/// - Returns: The sockets resend interval before being set.
+    @discardableResult
+    public func setResendInterval(seconds: TimeInterval) throws -> TimeInterval {
+        let originalValue = try self.getResendInterval()
+
         try setSocketOption(self.socketFd, .ResendInterval, seconds, .RequestProtocol)
+
+        return originalValue
     }
 }

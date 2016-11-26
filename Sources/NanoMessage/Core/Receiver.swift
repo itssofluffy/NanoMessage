@@ -32,13 +32,19 @@ public protocol Receiver {
     func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: String)
     // socket option functions.
     func getReceiveBufferSize() throws -> UInt
-    func setReceiveBufferSize(bytes: UInt) throws
+    @discardableResult
+    func setReceiveBufferSize(bytes: UInt) throws -> UInt
     func getMaximumMessageSize() throws -> Int
-    func setMaximumMessageSize(bytes: Int) throws
+    @discardableResult
+    func setMaximumMessageSize(bytes: Int) throws -> Int
     func getReceiveTimeout() throws -> TimeInterval
-    func setReceiveTimeout(seconds: TimeInterval) throws
+    @discardableResult
+    func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
+    @discardableResult
+    func setReceiveTimeout(seconds: Timeout) throws -> TimeInterval
     func getReceivePriority() throws -> Priority
-    func setReceivePriority(_ priority: Priority) throws
+    @discardableResult
+    func setReceivePriority(_ priority: Priority) throws -> Priority
     func getReceiveFd() throws -> Int
     // socket statistics functions.
     func getMessagesReceived() throws -> UInt64
