@@ -46,6 +46,7 @@ extension ProtocolSocket where Self: Sender {
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: The number of bytes sent.
+    @discardableResult
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         return try sendPayloadToSocket(self._nanoSocket.socketFd, message, blockingMode)
     }
@@ -63,6 +64,7 @@ extension ProtocolSocket where Self: Sender {
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: the number of bytes sent.
+    @discardableResult
     public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
         return try self.sendMessage(C7.Data(message), blockingMode: blockingMode)   // chain down the sendMessage signature stack
     }
@@ -85,6 +87,7 @@ extension ProtocolSocket where Self: Sender {
 ///
 /// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
 ///            guaranteed and no error will be thrown. 
+    @discardableResult
     public func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int {
         guard (timeout >= 0) else {
             throw NanoMessageError.InvalidSendTimeout(timeout: timeout)
@@ -123,6 +126,7 @@ extension ProtocolSocket where Self: Sender {
 ///
 /// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
 ///            guaranteed behaviour and no error will be thrown. 
+    @discardableResult
     public func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int {
         return try self.sendMessage(C7.Data(message), timeout: timeout)   // chain down the sendMessage signature stack
     }
@@ -246,6 +250,7 @@ extension ProtocolSocket where Self: Sender {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets send buffer size before being set.
+    @discardableResult
     public func setSendBufferSize(bytes: UInt) throws -> UInt {
         let originalValue = try self.getSendBufferSize()
 
@@ -276,6 +281,7 @@ extension ProtocolSocket where Self: Sender {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets send timeout in timeinterval before being set.
+    @discardableResult
     public func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getSendTimeout()
 
@@ -294,6 +300,7 @@ extension ProtocolSocket where Self: Sender {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets send timeout in timeinterval before being set.
+    @discardableResult
     public func setSendTimeout(seconds: Timeout) throws -> TimeInterval {
         let originalValue = try self.getSendTimeout()
 
@@ -328,6 +335,7 @@ extension ProtocolSocket where Self: Sender {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets send priority before being set.
+    @discardableResult
     public func setSendPriority(_ priority: Priority) throws -> Priority {
         let originalValue = try self.getSendPriority()
 
@@ -370,6 +378,7 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets receive buffer size before being set.
+    @discardableResult
     public func setReceiveBufferSize(bytes: UInt) throws -> UInt {
         let originalValue = try self.getReceiveBufferSize()
 
@@ -405,6 +414,7 @@ extension ProtocolSocket where Self: Receiver {
 /// - Returns: The sockets receive buffer size before being set.
 ///
 /// - Note:    The receive size is unlimited is not currently supported
+    @discardableResult
     public func setMaximumMessageSize(bytes: Int) throws -> Int {
         if (bytes < 0) {
             throw NanoMessageError.FeatureNotSupported(function: #function, description: "unlimited message size is not currently supported")
@@ -439,6 +449,7 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets receive timeout in timeinterval before being set.
+    @discardableResult
     public func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getReceiveTimeout()
 
@@ -457,6 +468,7 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets receive timeout in timeinterval before being set.
+    @discardableResult
     public func setReceiveTimeout(seconds: Timeout) throws -> TimeInterval {
         let originalValue = try self.getReceiveTimeout()
 
@@ -489,6 +501,7 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.SetSocketOption`
 ///
 /// - Returns: The sockets receive timeout before being set.
+    @discardableResult
     public func setReceivePriority(_ priority: Priority) throws -> Priority {
         let originalValue = try self.getReceivePriority()
 

@@ -75,7 +75,7 @@ extension PublisherSocket {
         if (self.prependTopic) {                                  // we are prepending the topic to the start of the message.
             if (self.sendTopic.isEmpty) {                         // check that we have a topic to send.
                 throw NanoMessageError.NoTopic
-            } else if (self.sendTopic.count > maximumTopicLength) {
+            } else if (self.sendTopic.count > NanoMessage.maximumTopicLength) {
                 throw NanoMessageError.TopicLength
             }
 
