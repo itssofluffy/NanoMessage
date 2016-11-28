@@ -472,9 +472,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
 ///
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval: Bool, _ level: CInt = NN_SOL_SOCKET) throws {
-    let valueToSet: CInt = (optval) ? 1 : 0
-
-    try setSocketOption(socketFd, option, valueToSet, level)
+    try setSocketOption(socketFd, option, CInt((optval) ? 1 : 0), level)
 }
 
 /// Set socket option.

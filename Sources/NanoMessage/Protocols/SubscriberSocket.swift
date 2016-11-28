@@ -91,7 +91,7 @@ extension SubscriberSocket {
 
         self.receivedTopic = Data()
 
-        var received: (bytes: Int, message: Data) = try receivePayloadFromSocket(self.socketFd, blockingMode)
+        var received = try receivePayloadFromSocket(self.socketFd, blockingMode)
 
         if (received.bytes > 0) {                                               // we have a message to process...
             if (!self.subscribedToAllTopics || self.ignoreTopicSeperator) {     // determine how to extract the topic.
