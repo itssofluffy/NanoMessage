@@ -128,7 +128,53 @@ extension ProtocolSocket where Self: Sender {
 ///            guaranteed behaviour and no error will be thrown. 
     @discardableResult
     public func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int {
-        return try self.sendMessage(C7.Data(message), timeout: timeout)   // chain down the sendMessage signature stack
+        return try self.sendMessage(C7.Data(message), timeout: timeout)           // chain down the sendMessage signature stack
+    }
+
+/// Send a message.
+///
+/// - Parameters:
+///   - message: The message to send.
+///   - timeout: .Never
+///
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
+///            `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+///
+/// - Returns: The number of bytes sent.
+    @discardableResult
+    public func sendMessage(_ message: C7.Data, timeout: Timeout) throws -> Int {
+        let originalTimeout = try self.setSendTimeout(seconds: timeout)
+
+        defer {
+            if (originalTimeout != timeout) {
+                do {
+                    try self.setSendTimeout(seconds: originalTimeout)
+                } catch {
+                    print(error, to: &errorStream)
+                }
+            }
+        }
+
+        return try self.sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
+    }
+
+/// Send a message.
+///
+/// - Parameters:
+///   - message: The message to send.
+///   - timeout: .Never
+///
+/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+///
+/// - Returns: The number of bytes sent.
+///
+/// - Note:    This is the same as sendMessage(..., blockingMode: .Blocking) and is included for symantics.
+    @discardableResult
+    public func sendMessage(_ message: String, timeout: Timeout) throws -> Int {
+        return try self.sendMessage(C7.Data(message), timeout: timeout)           // chain down the sendMessage signature stack.
     }
 }
 
@@ -216,11 +262,63 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
-/// - Returns: the number of bytes received and the received message
+/// - Returns: the number of bytes received and the received message as a string.
 ///
 /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
 ///            guaranteed behaviour and no error will be thrown. 
     public func receiveMessage(timeout: TimeInterval) throws -> ReceiveString {
+        let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
+
+        return (received.bytes, try String(data: received.message))
+    }
+
+/// Receive a message.
+///
+/// - Parameters:
+///   - timeout: .Never
+///
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
+///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
+///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+///
+/// - Returns: the number of bytes received and the received message
+///
+/// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
+///            guaranteed behaviour and no error will be thrown. 
+    public func receiveMessage(timeout: Timeout) throws -> ReceiveData {
+        let originalTimeout = try self.setReceiveTimeout(seconds: timeout)
+
+        defer {
+            if (originalTimeout != timeout) {
+                do {
+                    try self.setReceiveTimeout(seconds: originalTimeout)
+                } catch {
+                    print(error, to: &errorStream)
+                }
+            }
+        }
+
+        return try self.receiveMessage(blockingMode: .Blocking)    // chain down the receiveMessage signature stock.
+    }
+
+/// Receive a message.
+///
+/// - Parameters:
+///   - timeout: .Never
+///
+/// - Throws:  `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
+///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
+///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+///
+/// - Returns: the number of bytes received and the received message as a string.
+///
+/// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
+///            guaranteed behaviour and no error will be thrown. 
+    public func receiveMessage(timeout: Timeout) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
         return (received.bytes, try String(data: received.message))

@@ -30,6 +30,8 @@ public protocol Receiver {
     func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveString
     func receiveMessage(timeout: TimeInterval) throws -> ReceiveData
     func receiveMessage(timeout: TimeInterval) throws -> ReceiveString
+    func receiveMessage(timeout: Timeout) throws -> ReceiveData
+    func receiveMessage(timeout: Timeout) throws -> ReceiveString
     // socket option functions.
     func getReceiveBufferSize() throws -> UInt
     @discardableResult

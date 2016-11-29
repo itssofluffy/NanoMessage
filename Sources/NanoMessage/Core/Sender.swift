@@ -34,6 +34,10 @@ public protocol Sender {
     func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int
     @discardableResult
     func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int
+    @discardableResult
+    func sendMessage(_ message: C7.Data, timeout: Timeout) throws -> Int
+    @discardableResult
+    func sendMessage(_ message: String, timeout: Timeout) throws -> Int
     // socket option functions.
     func getSendBufferSize() throws -> UInt
     @discardableResult
