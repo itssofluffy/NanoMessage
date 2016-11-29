@@ -350,7 +350,7 @@ extension NanoSocket {
 /// - Throws: `NanoMessageError.PollSocket` if polling the socket fails.
 ///
 /// - Returns: Message waiting and send queue blocked as a tuple of bools.
-    public func pollSocket(seconds: TimeInterval = 1) throws -> (messageIsWaiting: Bool, sendIsBlocked: Bool) {
+    public func pollSocket(seconds: TimeInterval = 1) throws -> PollResult {
         let pollinMask = CShort(NN_POLLIN)                                      // define nn_poll event masks as short's so we only
         let polloutMask = CShort(NN_POLLOUT)                                    // cast once in the function
 
