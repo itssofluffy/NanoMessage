@@ -39,7 +39,7 @@ do {
     try node0.subscribeTo(topic: "interesting")
 
     while (true) {
-        let received: (bytes: Int, message: String) = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+        let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
 
         print("topic            : \(node0.receivedTopic)")
         print("message          : \(received.message)")

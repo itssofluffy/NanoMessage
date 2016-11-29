@@ -66,7 +66,7 @@ extension SubscriberSocket {
 ///            `NanoMessageError.TimedOut` the receive timedout.
 ///
 /// - Returns: the number of bytes received and the received message
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: Data) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
 /// Does the message/payload contain the specified topic
         func _messageHasTopic(_ topic: Data, _ message: Data) -> Bool {
             if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {

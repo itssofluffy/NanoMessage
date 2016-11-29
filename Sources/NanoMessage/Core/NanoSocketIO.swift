@@ -68,7 +68,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
 /// - Returns: The number of bytes received and the received message
-internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> (bytes: Int, message: Data) {
+internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> ReceiveData {
 // The underlying nanomsg library zero copy message size NN_MSG = ((size_t)-1) cannot be reproduced using the clang compiler see:
 // https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
     func _maxBufferSize(_ socketFd: CInt) -> Int {

@@ -26,10 +26,10 @@ import C7
 /// Receiver socket protocol.
 public protocol Receiver {
     // I-O functions.
-    func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: C7.Data)
-    func receiveMessage(blockingMode: BlockingMode) throws -> (bytes: Int, message: String)
-    func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: C7.Data)
-    func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: String)
+    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveData
+    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveString
+    func receiveMessage(timeout: TimeInterval) throws -> ReceiveData
+    func receiveMessage(timeout: TimeInterval) throws -> ReceiveString
     // socket option functions.
     func getReceiveBufferSize() throws -> UInt
     @discardableResult

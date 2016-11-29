@@ -67,7 +67,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.utf8.count")
 
-            var node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
+            var node1Received: ReceiveString = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1.receivedTopic.count + 1 + node1Received.message.utf8.count, "node1.bytes != node1.receivedTopic.count + 1 + message.utf8.count")
             XCTAssertEqual(node1Received.message.utf8.count, payload.utf8.count, "node1.message.utf8.count != payload.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
@@ -108,7 +108,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 let bytesSent = try node0.sendMessage(planet)
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + planet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + planet.utf8.count")
 
-                let _: (bytes: Int, message: String) = try node1.receiveMessage()
+                let _: ReceiveString = try node1.receiveMessage()
             }
 
             let dwarfPlanets = [ "Eris", "Pluto", "Makemake", "Or", "Haumea", "Quaoar", "Senda", "Orcus", "2002 MS", "Ceres", "Salacia" ]
@@ -119,7 +119,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 let bytesSent = try node0.sendMessage(dwarfPlanet)
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
 
-                let _: (bytes: Int, message: String) = try node1.receiveMessage()
+                let _: ReceiveString = try node1.receiveMessage()
             }
 
             XCTAssertEqual(node0.sentTopics.count, 1 + 2, "node0.sentTopics.count != 3")
@@ -142,7 +142,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             }
 
             do {
-                let _: (bytes: Int, message: String) = try node1.receiveMessage()
+                let _: ReceiveString = try node1.receiveMessage()
                 XCTAssert(false, "received a message on node1")
             } catch NanoMessageError.ReceiveTimedOut {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")
@@ -155,7 +155,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
 
-            var received: (bytes: Int, message: String) = try node1.receiveMessage()
+            var received: ReceiveString = try node1.receiveMessage()
             XCTAssertEqual(node1.receivedTopic, node0.sendTopic, "node1.receivedTopic != node0.sendTopic")
             XCTAssertEqual(received.message, dwarfPlanets[0], "received.message != \"\(dwarfPlanets[0])\"")
 

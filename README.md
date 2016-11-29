@@ -47,7 +47,7 @@ do {
     let node0 = try PullSocket()
     let _: EndPoint = try node0.bindToURL(url, name: "my local end-point")
 
-    let received: (bytes: Int, message: String) = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+    let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
 
     print("bytes  : \(received.bytes)")     // 40
     print("message: \(received.message)")   // This is earth calling...earth calling...

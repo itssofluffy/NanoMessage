@@ -145,7 +145,7 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
 /// - Returns: the number of bytes received and the received message
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: C7.Data) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
         return try receivePayloadFromSocket(self._nanoSocket.socketFd, blockingMode)
     }
 
@@ -161,8 +161,8 @@ extension ProtocolSocket where Self: Receiver {
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
 /// - Returns: the number of bytes received and the received message
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> (bytes: Int, message: String) {
-        let received: (bytes: Int, message: C7.Data) = try self.receiveMessage(blockingMode: blockingMode) // chain down the receiveMessage signature stock.
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveString {
+        let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode) // chain down the receiveMessage signature stock.
 
         return (received.bytes, try String(data: received.message))
     }
@@ -184,7 +184,7 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
 ///            guaranteed behaviour and no error will be thrown. 
-    public func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: C7.Data) {
+    public func receiveMessage(timeout: TimeInterval) throws -> ReceiveData {
         guard (timeout >= 0) else {
             throw NanoMessageError.InvalidReceiveTimeout(timeout: timeout)
         }
@@ -220,8 +220,8 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
 ///            guaranteed behaviour and no error will be thrown. 
-    public func receiveMessage(timeout: TimeInterval) throws -> (bytes: Int, message: String) {
-        let received: (bytes: Int, message: C7.Data) = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
+    public func receiveMessage(timeout: TimeInterval) throws -> ReceiveString {
+        let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
         return (received.bytes, try String(data: received.message))
     }

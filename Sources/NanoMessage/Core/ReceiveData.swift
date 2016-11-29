@@ -1,5 +1,5 @@
 /*
-    pull.swift
+    ReceiveData.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -20,26 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-import NanoMessage
-import ISFLibrary
+import C7
 
-do {
-    guard let url = URL(string: "tcp://*:5555") else {
-        fatalError("url is not valid")
-    }
-
-    let node0 = try PullSocket()
-    let _: EndPoint = try node0.bindToURL(url, name: "my local end-point")
-
-    let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
-
-    print("bytes  : \(received.bytes)")     // 40
-    print("message: \(received.message)")   // This is earth calling...earth calling...
-} catch let error as NanoMessageError {
-    print(error, to: &errorStream)
-} catch {
-    print("an unexpected error '\(error)' has occured in the library libNanoMessage.", to: &errorStream)
-}
-
-exit(EXIT_SUCCESS)
+public typealias ReceiveData = (bytes: Int, message: C7.Data)

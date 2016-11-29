@@ -59,14 +59,14 @@ class PairProtocolFamilyTests: XCTestCase {
             var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
 
-            var node1Received: (bytes: Int, message: String) = try node1.receiveMessage()
+            var node1Received: ReceiveString = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
 
             bytesSent = try node1.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
 
-            var node0Received: (bytes: Int, message: String) = try node0.receiveMessage()
+            var node0Received: ReceiveString = try node0.receiveMessage()
             XCTAssertEqual(node0Received.bytes, node0Received.message.utf8.count, "node0.bytes != message.utf8.count")
             XCTAssertEqual(node0Received.message, payload, "node0.message != payload")
 
