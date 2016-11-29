@@ -34,14 +34,6 @@ extension Timeout: Equatable {
     public static func ==(lhs: Timeout, rhs: TimeInterval) -> Bool {
         return (lhs.rawValue == rhs)
     }
-
-    public static func !=(lhs: TimeInterval, rhs: Timeout) -> Bool {
-        return (lhs != rhs.rawValue)
-    }
-
-    public static func !=(lhs: Timeout, rhs: TimeInterval) -> Bool {
-        return (lhs.rawValue != rhs)
-    }
 }
 
 extension Timeout: CustomStringConvertible {

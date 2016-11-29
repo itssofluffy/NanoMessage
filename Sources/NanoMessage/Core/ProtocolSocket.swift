@@ -41,7 +41,7 @@ extension ProtocolSocket where Self: Sender {
 ///                   If the message cannot be sent straight away, the function will throw
 ///                   `NanoMessageError.MessageNotSent`
 ///
-/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+/// - Throws:  `NanoMessageError.SendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
@@ -59,7 +59,7 @@ extension ProtocolSocket where Self: Sender {
 ///                   If the message cannot be sent straight away, the function will throw
 ///                   `NanoMessageError.MessageNotSent`
 ///
-/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+/// - Throws:  `NanoMessageError.SendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
@@ -69,30 +69,20 @@ extension ProtocolSocket where Self: Sender {
         return try self.sendMessage(C7.Data(message), blockingMode: blockingMode)   // chain down the sendMessage signature stack
     }
 
-/// Send a message.
+/// Send a message setting the send timeout and attempt to restore to back to it's original value.
 ///
 /// - Parameters:
-///   - message: The message to send.
-///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
-///              If the message cannot be sent straight away, the function will throw `NanoMessageError.MessageNotSent`
+///   - message:      The message to send.
+///   - timeout:      The timeout interval to set.
 ///
-/// - Throws:  `NanoMessageError.InvalidSendTimeout`
-///            `NanoMessageError.GetSocketOption`
+/// - Throws:  `NanoMessageError.GetSocketOption`
 ///            `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.SendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: the number of bytes sent.
-///
-/// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
-///            guaranteed and no error will be thrown. 
-    @discardableResult
-    public func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int {
-        guard (timeout >= 0) else {
-            throw NanoMessageError.InvalidSendTimeout(timeout: timeout)
-        }
-
+    private func _sendMessageWithTimeout(_ message: C7.Data, timeout: TimeInterval) throws -> Int {
         let originalTimeout = try self.setSendTimeout(seconds: timeout)
 
         defer {
@@ -118,7 +108,34 @@ extension ProtocolSocket where Self: Sender {
 /// - Throws:  `NanoMessageError.InvalidSendTimeout`
 ///            `NanoMessageError.GetSocketOption`
 ///            `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.SendMessage` there was a problem sending the message.
+///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+///            `NanoMessageError.SendTimedOut` the send timedout.
+///
+/// - Returns: the number of bytes sent.
+///
+/// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
+///            guaranteed and no error will be thrown. 
+    @discardableResult
+    public func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int {
+        guard (timeout >= 0) else {
+            throw NanoMessageError.InvalidSendTimeout(timeout: timeout)
+        }
+
+        return try self._sendMessageWithTimeout(message, timeout: timeout)
+    }
+
+/// Send a message.
+///
+/// - Parameters:
+///   - message: The message to send.
+///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
+///              If the message cannot be sent straight away, the function will throw `NanoMessageError.MessageNotSent`
+///
+/// - Throws:  `NanoMessageError.InvalidSendTimeout`
+///            `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
+///            `NanoMessageError.SendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
@@ -139,25 +156,13 @@ extension ProtocolSocket where Self: Sender {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///            `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.sendMessage` there was a problem sending the message.
+///            `NanoMessageError.SendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///
 /// - Returns: The number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: C7.Data, timeout: Timeout) throws -> Int {
-        let originalTimeout = try self.setSendTimeout(seconds: timeout)
-
-        defer {
-            if (originalTimeout != timeout) {
-                do {
-                    try self.setSendTimeout(seconds: originalTimeout)
-                } catch {
-                    print(error, to: &errorStream)
-                }
-            }
-        }
-
-        return try self.sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
+        return try self._sendMessageWithTimeout(message, timeout: TimeInterval(seconds: timeout.rawValue))
     }
 
 /// Send a message.
@@ -166,7 +171,7 @@ extension ProtocolSocket where Self: Sender {
 ///   - message: The message to send.
 ///   - timeout: .Never
 ///
-/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+/// - Throws:  `NanoMessageError.SendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///
 /// - Returns: The number of bytes sent.
@@ -186,7 +191,7 @@ extension ProtocolSocket where Self: Receiver {
 ///                   if in non-blocking mode and there is no message to receive the function
 ///                   will throw `NanoMessageError.MessageNotReceived`.
 ///
-/// - Throws:  `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+/// - Throws:  `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
@@ -202,7 +207,7 @@ extension ProtocolSocket where Self: Receiver {
 ///                   if in non-blocking mode and there is no message to receive the function
 ///                   will throw `NanoMessageError.MessageNotReceived`.
 ///
-/// - Throws:  `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+/// - Throws:  `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
@@ -213,28 +218,19 @@ extension ProtocolSocket where Self: Receiver {
         return (received.bytes, try String(data: received.message))
     }
 
-/// Receive a message.
+/// Receive a message setting the receive timeout and attempt to restore to back to it's original value.
 ///
 /// - Parameters:
-///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
-///              If there is no message to receive the function will throw `NanoMessageError.MessageNotReceived`.
+///   - timeout: The timeout interval to set.
 ///
-/// - Throws:  `NanoMessageError.InvalidReceiveTimeout`
-///            `NanoMessageError.GetSocketOption`
-///            `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
-///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
-///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+/// - Throws:    `NanoMessageError.GetSocketOption`
+///              `NanoMessageError.SetSocketOption`
+///              `NanoMessageError.ReceiveMessage` there was a problem sending the message.
+///              `NanoMessageError.MessageNotAvailable` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+///              `NanoMessageError.ReceiveTimedOut` the send timedout.
 ///
 /// - Returns: the number of bytes received and the received message
-///
-/// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
-///            guaranteed behaviour and no error will be thrown. 
-    public func receiveMessage(timeout: TimeInterval) throws -> ReceiveData {
-        guard (timeout >= 0) else {
-            throw NanoMessageError.InvalidReceiveTimeout(timeout: timeout)
-        }
-
+    private func _receiveMessageWith(timeout: TimeInterval) throws -> ReceiveData {
         let originalTimeout = try self.setReceiveTimeout(seconds: timeout)
 
         defer {
@@ -256,7 +252,32 @@ extension ProtocolSocket where Self: Receiver {
 ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
 ///              If there is no message to receive the function will throw `NanoMessageError.MessageNotReceived`.
 ///
-/// - Throws:  `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+/// - Throws:  `NanoMessageError.InvalidReceiveTimeout`
+///            `NanoMessageError.GetSocketOption`
+///            `NanoMessageError.SetSocketOption`
+///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
+///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
+///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+///
+/// - Returns: the number of bytes received and the received message
+///
+/// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
+///            guaranteed behaviour and no error will be thrown. 
+    public func receiveMessage(timeout: TimeInterval) throws -> ReceiveData {
+        guard (timeout >= 0) else {
+            throw NanoMessageError.InvalidReceiveTimeout(timeout: timeout)
+        }
+
+        return try self._receiveMessageWith(timeout: timeout)
+    }
+
+/// Receive a message.
+///
+/// - Parameters:
+///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
+///              If there is no message to receive the function will throw `NanoMessageError.MessageNotReceived`.
+///
+/// - Throws:  `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.GetSocketOption`
 ///            `NanoMessageError.SetSocketOption`
 ///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
@@ -279,7 +300,7 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///            `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
@@ -288,19 +309,7 @@ extension ProtocolSocket where Self: Receiver {
 /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
 ///            guaranteed behaviour and no error will be thrown. 
     public func receiveMessage(timeout: Timeout) throws -> ReceiveData {
-        let originalTimeout = try self.setReceiveTimeout(seconds: timeout)
-
-        defer {
-            if (originalTimeout != timeout) {
-                do {
-                    try self.setReceiveTimeout(seconds: originalTimeout)
-                } catch {
-                    print(error, to: &errorStream)
-                }
-            }
-        }
-
-        return try self.receiveMessage(blockingMode: .Blocking)    // chain down the receiveMessage signature stock.
+        return try self._receiveMessageWith(timeout: TimeInterval(seconds: timeout.rawValue))
     }
 
 /// Receive a message.
@@ -310,7 +319,7 @@ extension ProtocolSocket where Self: Receiver {
 ///
 /// - Throws:  `NanoMessageError.GetSocketOption`
 ///            `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
