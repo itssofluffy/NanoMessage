@@ -215,7 +215,7 @@ extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode) // chain down the receiveMessage signature stock.
 
-        return (received.bytes, try String(data: received.message))
+        return ReceiveString(received.bytes, try String(data: received.message))
     }
 
 /// Receive a message setting the receive timeout and attempt to restore to back to it's original value.
@@ -290,7 +290,7 @@ extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(timeout: TimeInterval) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
-        return (received.bytes, try String(data: received.message))
+        return ReceiveString(received.bytes, try String(data: received.message))
     }
 
 /// Receive a message.
@@ -330,7 +330,7 @@ extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(timeout: Timeout) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
-        return (received.bytes, try String(data: received.message))
+        return ReceiveString(received.bytes, try String(data: received.message))
     }
 }
 

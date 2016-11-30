@@ -373,7 +373,7 @@ extension NanoSocket {
         let messageIsWaiting = ((pfd.revents & pollinMask) != 0)                // using the event masks determine our return values
         let sendIsBlocked = ((pfd.revents & polloutMask) != 0)                  //
 
-        return (messageIsWaiting, sendIsBlocked)
+        return PollResult(messageIsWaiting, sendIsBlocked)
     }
 
 /// Starts a device to bind the socket to another and forward messages between two sockets

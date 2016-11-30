@@ -100,5 +100,5 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
         throw NanoMessageError.ReceiveMessage(code: errno)
     }
 
-    return (bytesReceived, Data(buffer[0 ..< min(bytesReceived, bufferSize)]))
+    return ReceiveData(bytesReceived, Data(buffer[0 ..< min(bytesReceived, bufferSize)]))
 }
