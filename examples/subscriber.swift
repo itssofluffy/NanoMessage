@@ -45,7 +45,7 @@ do {
         print("message          : \(received.message)")
         print("bytes            : \(received.bytes)")
 
-        let socket: PollResult = try node0.pollSocket(seconds: TimeInterval(seconds: 0.1))
+        let socket = try node0.pollSocket(seconds: TimeInterval(seconds: 0.1))
 
         if (!socket.messageIsWaiting) {
             break

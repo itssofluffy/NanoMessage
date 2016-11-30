@@ -663,9 +663,9 @@ extension NanoSocket {
 /// - Returns: Is Nagle's algorithm enabled before being set.
     @discardableResult
     public func setTCPNoDelay(disableNagles: Bool, transportMechanism: TransportMechanism = .TCP) throws -> Bool {
-        let valueToSet: CInt = (disableNagles) ? NN_TCP_NODELAY : 0
+        let originalValue = try self.getTCPNoDelay(transportMechanism: transportMechanism)
 
-        let originalValue = try self.getTCPNoDelay()
+        let valueToSet: CInt = (disableNagles) ? NN_TCP_NODELAY : 0
 
         try setSocketOption(self.socketFd, .TCPNoDelay, valueToSet, transportMechanism)
 
