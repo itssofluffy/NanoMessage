@@ -24,6 +24,7 @@ import Foundation
 import CNanoMessage
 import ISFLibrary
 import C7
+import Dispatch
 
 /// A NanoMessage base socket.
 public class NanoSocket {
@@ -397,14 +398,53 @@ extension NanoSocket {
         }
     }
 
+/// Starts a device asynchronously to bind the socket to another and forward messages between two sockets
+///
+/// - Parameters:
+///   - nanoSocket:     The socket to bind too.
+///   - queue:          The dispatch queue to use
+///   - closureHandle:  The closure to use when the 'bind' terminates.
+    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
+        queue.async {
+            var nanoMessageError: Error? = nil
+
+            do {
+                try self.bindToSocket(nanoSocket)
+            } catch {
+                nanoMessageError = error
+            }
+
+            closureHandler(nanoMessageError)
+        }
+    }
+
 /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
 ///
-/// - Throws: `NanoMessageError.BindToSocket` if a problem has been encountered.
+/// - Throws: `NanoMessageError.LoopBack` if a problem has been encountered.
     public func loopBack() throws {
         let returnCode = nn_device(self.socketFd, -1)
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.LoopBack(code: nn_errno())
+        }
+    }
+
+/// Starts a 'loopback' on the socket asynchronously, it loops and sends any messages received from the socket back to itself.
+///
+/// - Parameters:
+///   - queue:          The dispatch queue to use
+///   - closureHandle:  The closure to use when the 'loopback' terminates.
+    public func loopBack(queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
+        queue.async {
+            var nanoMessageError: Error? = nil
+
+            do {
+                try self.loopBack()
+            } catch {
+                nanoMessageError = error
+            }
+
+            closureHandler(nanoMessageError)
         }
     }
 }

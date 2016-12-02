@@ -46,6 +46,7 @@ public let allTests = [
     testCase(SurveyProtocolFamilyTests.allTests),
     testCase(BusProtocolFamilyTests.allTests),
     testCase(PollSocketTests.allTests),
-    testCase(SocketStatisticTests.allTests)
+    testCase(SocketStatisticTests.allTests),
+    testCase(LoopBackTests.allTests)
 ]
 #endif
