@@ -59,6 +59,7 @@ public enum NanoMessageError: Error {
     case SetSocketOption(code: CInt, option: SocketOption)
     case GetSocketStatistic(code: CInt, option: SocketStatistic)
     case PollSocket(code: CInt)
+    case SocketIsADevice
     case SendMessage(code: CInt)
     case MessageNotSent
     case SendTimedOut(timeout: TimeInterval)
@@ -112,6 +113,8 @@ extension NanoMessageError: CustomStringConvertible {
                 return "getSocketStatistic('\(option)') failed: " + errorString(code)
             case .PollSocket(let code):
                 return "pollSocket() failed: " + errorString(code)
+            case .SocketIsADevice:
+                return "Socket Is A Device"
             case .SendMessage(let code):
                 return "sendMessage() failed: " + errorString(code)
             case .MessageNotSent:

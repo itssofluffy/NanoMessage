@@ -62,7 +62,8 @@ extension PublisherSocket {
 ///                   If the message cannot be sent straight away, the function will throw
 ///                   `NanoMessageError.MessageNotSent`
 ///
-/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+/// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.sendMessage` there was a problem sending the message.
 ///            `NanoMessageError.TopicLength` if the topic length too large.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.TimedOut` the send timedout.
@@ -88,7 +89,7 @@ extension PublisherSocket {
             messagePayload = message
         }
 
-        let bytesSent = try sendPayloadToSocket(self.socketFd, messagePayload, blockingMode)
+        let bytesSent = try sendPayloadToSocket(self, messagePayload, blockingMode)
 
         if (!self.sendTopic.isEmpty) {                            // check that we have a send topic.
             // remember which topics we've sent and how many.

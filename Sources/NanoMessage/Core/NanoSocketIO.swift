@@ -32,13 +32,18 @@ import CNanoMessage
 ///                   If the message cannot be sent straight away, the function will throw
 ///                   `NanoMessageError.MessageNotSent`
 ///
-/// - Throws:  `NanoMessageError.sendMessage` there was a problem sending the message.
+/// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.sendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: The number of bytes sent.
-internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
-    let bytesSent = nn_send(socketFd, payload.bytes, payload.count, blockingMode.rawValue)
+internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
+    guard (!nanoSocket.socketIsADevice) else {
+        throw NanoMessageError.SocketIsADevice
+    }
+
+    let bytesSent = nn_send(nanoSocket.socketFd, payload.bytes, payload.count, blockingMode.rawValue)
 
     guard (bytesSent >= 0) else {
         let errno = nn_errno()
@@ -46,7 +51,7 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotSent
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.SendTimedOut(timeout: try! getSocketOption(socketFd, .SendTimeout))
+            throw NanoMessageError.SendTimedOut(timeout: try! getSocketOption(nanoSocket.socketFd, .SendTimeout))
         }
 
         throw NanoMessageError.SendMessage(code: errno)
@@ -63,12 +68,13 @@ internal func sendPayloadToSocket(_ socketFd: CInt, _ payload: Data, _ blockingM
 ///                   if in non-blocking mode and there is no message to receive the function
 ///                   will throw `NanoMessageError.MessageNotReceived`.
 ///
-/// - Throws:  `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+/// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
 /// - Returns: The number of bytes received and the received message
-internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: BlockingMode) throws -> ReceiveData {
+internal func receivePayloadFromSocket(_ nanoSocket: NanoSocket, _ blockingMode: BlockingMode) throws -> ReceiveData {
 // The underlying nanomsg library zero copy message size NN_MSG = ((size_t)-1) cannot be reproduced using the clang compiler see:
 // https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
     func _maxBufferSize(_ socketFd: CInt) -> Int {
@@ -83,10 +89,14 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
         return maxBufferSize
     }
 
-    let bufferSize = _maxBufferSize(socketFd)
+    guard (!nanoSocket.socketIsADevice) else {
+        throw NanoMessageError.SocketIsADevice
+    }
+
+    let bufferSize = _maxBufferSize(nanoSocket.socketFd)
     var buffer = Data.buffer(with: bufferSize)
 
-    let bytesReceived = Int(nn_recv(socketFd, &buffer.bytes, bufferSize, blockingMode.rawValue))
+    let bytesReceived = Int(nn_recv(nanoSocket.socketFd, &buffer.bytes, bufferSize, blockingMode.rawValue))
 
     guard (bytesReceived >= 0) else {
         let errno = nn_errno()
@@ -94,7 +104,7 @@ internal func receivePayloadFromSocket(_ socketFd: CInt, _ blockingMode: Blockin
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotAvailable
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.ReceiveTimedOut(timeout: try! getSocketOption(socketFd, .ReceiveTimeout))
+            throw NanoMessageError.ReceiveTimedOut(timeout: try! getSocketOption(nanoSocket.socketFd, .ReceiveTimeout))
         }
 
         throw NanoMessageError.ReceiveMessage(code: errno)

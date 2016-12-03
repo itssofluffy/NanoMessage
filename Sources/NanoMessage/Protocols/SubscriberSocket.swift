@@ -61,7 +61,8 @@ extension SubscriberSocket {
 ///                   if in non-blocking mode and there is no message to receive the function
 ///                   will throw `NanoMessageError.MessageNotReceived`.
 ///
-/// - Throws:  `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+/// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotReceived` in non-blocking mode there was no message to receive.
 ///            `NanoMessageError.TimedOut` the receive timedout.
 ///
@@ -91,7 +92,7 @@ extension SubscriberSocket {
 
         self.receivedTopic = Data()
 
-        var received = try receivePayloadFromSocket(self.socketFd, blockingMode)
+        var received = try receivePayloadFromSocket(self, blockingMode)
 
         if (received.bytes > 0) {                                               // we have a message to process...
             if (!self.subscribedToAllTopics || self.ignoreTopicSeperator) {     // determine how to extract the topic.

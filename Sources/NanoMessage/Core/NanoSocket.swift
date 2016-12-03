@@ -64,6 +64,8 @@ public class NanoSocket {
 /// - Warning: Please not that if true this will block until the class has been de-referenced.
     public var blockTillCloseSuccess = false
 
+    public fileprivate(set) var socketIsADevice = false
+
 /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
 ///
 /// - Parameters:
@@ -384,6 +386,14 @@ extension NanoSocket {
 ///
 /// - Throws: `NanoMessageError.BindToSocket` if a problem has been encountered.
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
+        self.socketIsADevice = true
+        nanoSocket.socketIsADevice = true
+
+        defer {
+            self.socketIsADevice = false
+            nanoSocket.socketIsADevice = false
+        }
+
         let returnCode = nn_device(self.socketFd, nanoSocket.socketFd)
 
         guard (returnCode >= 0) else {
@@ -422,6 +432,12 @@ extension NanoSocket {
 ///
 /// - Throws: `NanoMessageError.LoopBack` if a problem has been encountered.
     public func loopBack() throws {
+        self.socketIsADevice = true
+
+        defer {
+            self.socketIsADevice = false
+        }
+
         let returnCode = nn_device(self.socketFd, -1)
 
         guard (returnCode >= 0) else {
