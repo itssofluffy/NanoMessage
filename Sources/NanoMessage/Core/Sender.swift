@@ -24,7 +24,7 @@ import Foundation
 import C7
 
 /// Sender socket protocol.
-public protocol Sender {
+public protocol Sender: ASyncSender {
     // I-O functions.
     @discardableResult
     func sendMessage(_ message: C7.Data, blockingMode: BlockingMode) throws -> Int

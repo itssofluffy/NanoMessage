@@ -24,7 +24,7 @@ import Foundation
 import C7
 
 /// Receiver socket protocol.
-public protocol Receiver {
+public protocol Receiver: ASyncReceiver {
     // I-O functions.
     func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveData
     func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveString

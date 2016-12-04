@@ -66,6 +66,8 @@ public class NanoSocket {
 
     public fileprivate(set) var socketIsADevice = false
 
+    public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInteractive)
+
 /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
 ///
 /// - Parameters:
@@ -416,15 +418,15 @@ extension NanoSocket {
 ///   - closureHandle:  The closure to use when the 'bind' terminates.
     public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
         queue.async {
-            var nanoMessageError: Error? = nil
+            var errorMessage: Error? = nil
 
             do {
                 try self.bindToSocket(nanoSocket)
             } catch {
-                nanoMessageError = error
+                errorMessage = error
             }
 
-            closureHandler(nanoMessageError)
+            closureHandler(errorMessage)
         }
     }
 
@@ -452,15 +454,15 @@ extension NanoSocket {
 ///   - closureHandle:  The closure to use when the 'loopback' terminates.
     public func loopBack(queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
         queue.async {
-            var nanoMessageError: Error? = nil
+            var errorMessage: Error? = nil
 
             do {
                 try self.loopBack()
             } catch {
-                nanoMessageError = error
+                errorMessage = error
             }
 
-            closureHandler(nanoMessageError)
+            closureHandler(errorMessage)
         }
     }
 }
