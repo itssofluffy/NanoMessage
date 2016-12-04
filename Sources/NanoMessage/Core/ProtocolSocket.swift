@@ -194,7 +194,7 @@ extension ProtocolSocket where Self: Sender {
 }
 
 extension ProtocolSocket where Self: Sender {
-    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             var bytesSent: Int?
             var errorMessage: Error?
@@ -209,7 +209,7 @@ extension ProtocolSocket where Self: Sender {
         }
     }
 
-    public func sendMessage(_ message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
     }
 
@@ -411,7 +411,7 @@ extension ProtocolSocket where Self: Receiver {
 }
 
 extension ProtocolSocket where Self: Receiver {
-    public func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             var received: ReceiveData?
             var errorMessage: Error?
@@ -426,7 +426,7 @@ extension ProtocolSocket where Self: Receiver {
         }
     }
 
-    public func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         self.receiveMessage(blockingMode: blockingMode, closureHandler)
     }
 
