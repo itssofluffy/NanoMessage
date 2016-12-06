@@ -26,7 +26,7 @@ import CNanoMessage
 /// The low-level send a message function.
 ///
 /// - Parameters:
-///   - socketFd:     The nano socket file descriptor.
+///   - nanoSocket:   The nano socket to use.
 ///   - message:      The message to send.
 ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
 ///                   If the message cannot be sent straight away, the function will throw
@@ -63,7 +63,7 @@ internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ b
 /// The low-level receive a message function.
 ///
 /// - Parameters:
-///   - socketFd:     The nano socket file descriptor.
+///   - nanoSocket:   The nano socket to use.
 ///   - blockingMode: Specifies if the socket should operate in blocking or non-blocking mode.
 ///                   if in non-blocking mode and there is no message to receive the function
 ///                   will throw `NanoMessageError.MessageNotReceived`.
