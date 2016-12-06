@@ -66,7 +66,7 @@ public class NanoSocket {
 
     public fileprivate(set) var socketIsADevice = false
 
-    public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInteractive)
+    public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInitiated)
 
 /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
 ///

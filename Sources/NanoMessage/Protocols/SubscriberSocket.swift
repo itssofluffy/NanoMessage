@@ -126,11 +126,11 @@ extension SubscriberSocket {
             }
 
             // remember which topics we've received and how many.
-            if var topicCount = receivedTopics[self.receivedTopic] {
+            if var topicCount = self.receivedTopics[self.receivedTopic] {
                 topicCount += 1
-                receivedTopics[self.receivedTopic] = topicCount
+                self.receivedTopics[self.receivedTopic] = topicCount
             } else {
-                receivedTopics[self.receivedTopic] = 1
+                self.receivedTopics[self.receivedTopic] = 1
             }
         }
 

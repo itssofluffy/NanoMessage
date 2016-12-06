@@ -93,11 +93,11 @@ extension PublisherSocket {
 
         if (!self.sendTopic.isEmpty) {                            // check that we have a send topic.
             // remember which topics we've sent and how many.
-            if var topicCount = sentTopics[self.sendTopic] {
+            if var topicCount = self.sentTopics[self.sendTopic] {
                 topicCount += 1
-                sentTopics[self.sendTopic] = topicCount
+                self.sentTopics[self.sendTopic] = topicCount
             } else {
-                sentTopics[self.sendTopic] = 1
+                self.sentTopics[self.sendTopic] = 1
             }
 
             if (self.resetTopicAfterSend) {                       // are we resetting the topic?
