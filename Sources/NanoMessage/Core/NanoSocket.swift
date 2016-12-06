@@ -331,7 +331,7 @@ extension NanoSocket {
 /// Remove an endpoint from the socket.
 ///
 /// - Parameters:
-///   - endPoint: An endpoint.
+///   - endPoint: An endpoint id.
 ///
 /// - Throws: `NanoMessageError.RemoveEndPoint` if the endpoint failed to be removed,
 ///           `NanoMessageError.Interrupted` if the endpoint removal was interrupted.
@@ -341,6 +341,24 @@ extension NanoSocket {
     public func removeEndPoint(_ endPointId: Int) throws -> Bool {
         if let endPoint = self.endPoints.first(where: { $0.id == endPointId }) {
             return try self.removeEndPoint(endPoint)            // access the first occurance as end-point.id is/should be unique!?
+        }
+
+        return false
+    }
+
+/// Remove an endpoint from the socket.
+///
+/// - Parameters:
+///   - endPoint: An endpoint url.
+///
+/// - Throws: `NanoMessageError.RemoveEndPoint` if the endpoint failed to be removed,
+///           `NanoMessageError.Interrupted` if the endpoint removal was interrupted.
+///
+/// - Returns: If the endpoint was removed, false indicates that the endpoint was not attached to the socket.
+    @discardableResult
+    public func removeEndPoint(_ endPointURL: URL) throws -> Bool {
+        if let endPoint = self.endPoints.first(where: { $0.url.absoluteString == endPointURL.absoluteString }) {
+            return try self.removeEndPoint(endPoint)            // access the first occurance as end-point.url is/should be unique!?
         }
 
         return false
