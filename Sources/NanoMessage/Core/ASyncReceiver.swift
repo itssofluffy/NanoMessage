@@ -27,9 +27,6 @@ import C7
 public protocol ASyncReceiver {
     // ASync I-O functions.
     func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
-    func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
     func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
-    func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
     func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
-    func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
 }

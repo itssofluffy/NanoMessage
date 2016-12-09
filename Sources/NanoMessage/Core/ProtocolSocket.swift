@@ -193,19 +193,25 @@ extension ProtocolSocket where Self: Sender {
     }
 }
 
-extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: Sender & ASyncSender {
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
-            var bytesSent: Int?
-            var errorMessage: Error?
-
             do {
-                bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
-            } catch {
-                errorMessage = error
-            }
+                try self._nanoSocket.mutex.lock {
+                    var bytesSent: Int?
+                    var errorMessage: Error?
 
-            closureHandler(bytesSent, errorMessage)
+                    do {
+                        bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(bytesSent, errorMessage)
+                }
+            } catch {
+                print(error, to: &errorStream)
+            }
         }
     }
 
@@ -215,16 +221,22 @@ extension ProtocolSocket where Self: Sender {
 
     public func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
-            var bytesSent: Int?
-            var errorMessage: Error?
-
             do {
-                bytesSent = try self.sendMessage(message, timeout: timeout)
-            } catch {
-                errorMessage = error
-            }
+                try self._nanoSocket.mutex.lock {
+                    var bytesSent: Int?
+                    var errorMessage: Error?
 
-            closureHandler(bytesSent, errorMessage)
+                    do {
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(bytesSent, errorMessage)
+                }
+            } catch {
+                print(error, to: &errorStream)
+            }
         }
     }
 
@@ -234,16 +246,22 @@ extension ProtocolSocket where Self: Sender {
 
     public func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
-            var bytesSent: Int?
-            var errorMessage: Error?
-
             do {
-                bytesSent = try self.sendMessage(message, timeout: timeout)
-            } catch {
-                errorMessage = error
-            }
+                try self._nanoSocket.mutex.lock {
+                    var bytesSent: Int?
+                    var errorMessage: Error?
 
-            closureHandler(bytesSent, errorMessage)
+                    do {
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(bytesSent, errorMessage)
+                }
+            } catch {
+                print(error, to: &errorStream)
+            }
         }
     }
 
@@ -410,62 +428,68 @@ extension ProtocolSocket where Self: Receiver {
     }
 }
 
-extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
-            var received: ReceiveData?
-            var errorMessage: Error?
-
             do {
-                received = try self.receiveMessage(blockingMode: blockingMode)
+                try self._nanoSocket.mutex.lock {
+                    var received: ReceiveData?
+                    var errorMessage: Error?
+
+                    do {
+                        received = try self.receiveMessage(blockingMode: blockingMode)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(received, errorMessage)
+                }
             } catch {
-                errorMessage = error
+                print(error, to: &errorStream)
             }
-
-            closureHandler(received, errorMessage)
         }
-    }
-
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self.receiveMessage(blockingMode: blockingMode, closureHandler)
     }
 
     public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
-            var received: ReceiveData?
-            var errorMessage: Error?
-
             do {
-                received = try self.receiveMessage(timeout: timeout)
+                try self._nanoSocket.mutex.lock {
+                   var received: ReceiveData?
+                   var errorMessage: Error?
+
+                   do {
+                       received = try self.receiveMessage(timeout: timeout)
+                   } catch {
+                       errorMessage = error
+                   }
+
+                   closureHandler(received, errorMessage)
+                }
             } catch {
-                errorMessage = error
+                print(error, to: &errorStream)
             }
-
-            closureHandler(received, errorMessage)
         }
-    }
-
-    public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self.receiveMessage(timeout: timeout, closureHandler)
     }
 
     public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
-            var received: ReceiveData?
-            var errorMessage: Error?
-
             do {
-                received = try self.receiveMessage(timeout: timeout)
+                try self._nanoSocket.mutex.lock {
+                    var received: ReceiveData?
+                    var errorMessage: Error?
+
+                    do {
+                        received = try self.receiveMessage(timeout: timeout)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(received, errorMessage)
+                }
             } catch {
-                errorMessage = error
+                print(error, to: &errorStream)
             }
-
-            closureHandler(received, errorMessage)
         }
-    }
-
-    public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self.receiveMessage(timeout: timeout, closureHandler)
     }
 }
 

@@ -30,8 +30,7 @@ do
            -L ../.build/debug \
            -L "$CNanoMessagePath" \
            -lNanoMessage \
-           "$fname" \
-	   -v
+           "$fname"
 done
 
 exit 0

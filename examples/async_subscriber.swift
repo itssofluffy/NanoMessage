@@ -39,11 +39,15 @@ do {
     try node0.subscribeTo(topic: "interesting")
 
     while (true) {
-        let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
-
-        print("topic            : \(node0.receivedTopic)")
-        print("message          : \(received.message)")
-        print("bytes            : \(received.bytes)")
+        node0.receiveMessage(timeout: TimeInterval(seconds: 10), { received, error in
+            if let error = error {
+                print(error)
+            } else {
+                print("topic            : \(node0.receivedTopic)")
+                print("message          : \(received!.message)")
+                print("bytes            : \(received!.bytes)")
+            }
+        })
 
         let socket = try node0.pollSocket(seconds: TimeInterval(seconds: 0.25))
 

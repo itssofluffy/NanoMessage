@@ -21,7 +21,7 @@
 */
 
 /// Respondent socket.
-public final class RespondentSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
+public final class RespondentSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
     public var _nanoSocket: NanoSocket {
         return self
     }

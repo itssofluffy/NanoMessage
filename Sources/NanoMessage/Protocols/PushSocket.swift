@@ -21,7 +21,7 @@
 */
 
 /// Push socket.
-public final class PushSocket: NanoSocket, ProtocolSocket, Sender {
+public final class PushSocket: NanoSocket, ProtocolSocket, Sender, ASyncSender {
     public var _nanoSocket: NanoSocket {
         return self
     }

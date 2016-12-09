@@ -25,6 +25,7 @@ import CNanoMessage
 import ISFLibrary
 import C7
 import Dispatch
+import Mutex
 
 /// A NanoMessage base socket.
 public class NanoSocket {
@@ -67,6 +68,7 @@ public class NanoSocket {
     public fileprivate(set) var socketIsADevice = false
 
     public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInitiated)
+    public var mutex: Mutex
 
 /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
 ///
@@ -76,6 +78,8 @@ public class NanoSocket {
 ///
 /// - Throws: `NanoMessageError.NanoSocket` if the nanomsg socket has failed to be created
     public init(socketDomain: SocketDomain, socketProtocol: SocketProtocol) throws {
+        try self.mutex = Mutex()
+
         self.socketFd = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
 
         guard (self.socketFd >= 0) else {

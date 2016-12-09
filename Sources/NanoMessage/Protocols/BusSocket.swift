@@ -21,7 +21,7 @@
 */
 
 /// Bus socket.
-public final class BusSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
+public final class BusSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
     public var _nanoSocket: NanoSocket {
         return self
     }

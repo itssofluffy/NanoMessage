@@ -21,7 +21,7 @@
 */
 
 /// Pair (one-to-one) socket
-public final class PairSocket: NanoSocket, ProtocolSocket, Receiver, Sender {
+public final class PairSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
     public var _nanoSocket: NanoSocket {
         return self
     }

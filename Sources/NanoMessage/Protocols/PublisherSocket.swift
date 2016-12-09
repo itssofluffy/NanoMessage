@@ -20,7 +20,9 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
 import C7
+import ISFLibrary
 
 /// Publisher socket.
 public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, PublisherSubscriber {
@@ -32,9 +34,9 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
     public var topicSeperator: Byte = Byte("|")
 
 /// The topic to send.
-    public var sendTopic = Data()
+    public var sendTopic = C7.Data()
 /// A Dictionary of the topics sent with a count of the times sent.
-    public fileprivate(set) var sentTopics = Dictionary<Data, UInt64>()
+    public fileprivate(set) var sentTopics = Dictionary<C7.Data, UInt64>()
 
 /// Prepend the topic to the start of the message when sending.
     public var prependTopic = true
@@ -70,8 +72,8 @@ extension PublisherSocket {
 ///
 /// - Returns: The number of bytes sent.
     @discardableResult
-    public func sendMessage(_ message: Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        var messagePayload: Data
+    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
+        var messagePayload: C7.Data
 
         if (self.prependTopic) {                                  // we are prepending the topic to the start of the message.
             if (self.sendTopic.isEmpty) {                         // check that we have a topic to send.
@@ -106,5 +108,112 @@ extension PublisherSocket {
         }
 
         return bytesSent
+    }
+}
+
+extension PublisherSocket {
+    public func sendMessage(topic: C7.Data, message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.ioQueue.async {
+            do {
+                try self.mutex.lock {
+                    var bytesSent: Int?
+                    var errorMessage: Error?
+
+                    self.sendTopic = topic
+
+                    do {
+                        bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(bytesSent, errorMessage)
+                }
+            } catch {
+                print(error, to: &errorStream)
+            }
+        }
+    }
+
+    public func sendMessage(topic: C7.Data, message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: topic, message: C7.Data(message), blockingMode: blockingMode, closureHandler)
+    }
+
+    public func sendMessage(topic: String, message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: C7.Data(topic), message: message, blockingMode: blockingMode, closureHandler)
+    }
+
+    public func sendMessage(topic: String, message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: C7.Data(topic), message: C7.Data(message), blockingMode: blockingMode, closureHandler)
+    }
+
+    public func sendMessage(topic: C7.Data, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.ioQueue.async {
+            do {
+                try self.mutex.lock {
+                    var bytesSent: Int?
+                    var errorMessage: Error?
+
+                    self.sendTopic = topic
+
+                    do {
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(bytesSent, errorMessage)
+                }
+            } catch {
+                print(error, to: &errorStream)
+            }
+        }
+    }
+
+    public func sendMessage(topic: C7.Data, message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, closureHandler)
+    }
+
+    public func sendMessage(topic: String, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, closureHandler)
+    }
+
+    public func sendMessage(topic: String, message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
+    }
+
+    public func sendMessage(topic: C7.Data, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.ioQueue.async {
+            do {
+                try self.mutex.lock {
+                    var bytesSent: Int?
+                    var errorMessage: Error?
+
+                    self.sendTopic = topic
+
+                    do {
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
+                    } catch {
+                        errorMessage = error
+                    }
+
+                    closureHandler(bytesSent, errorMessage)
+                }
+            } catch {
+                print(error, to: &errorStream)
+            }
+        }
+    }
+
+    public func sendMessage(topic: C7.Data, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, closureHandler)
+    }
+
+    public func sendMessage(topic: String, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, closureHandler)
+    }
+
+    public func sendMessage(topic: String, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+        self.sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
     }
 }

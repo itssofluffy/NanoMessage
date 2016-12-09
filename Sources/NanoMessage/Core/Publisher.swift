@@ -22,7 +22,7 @@
 
 import C7
 
-protocol Publisher: Sender  {
+protocol Publisher: Sender, ASyncPublisher {
     var sendTopic: Data { get set }
     var sentTopics: Dictionary<Data, UInt64> { get }  // implement private set
     var prependTopic: Bool { get set }
