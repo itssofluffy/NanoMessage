@@ -376,10 +376,15 @@ extension NanoSocket {
     ///   - timeout milliseconds: The maximum number of milliseconds to poll the socket for an event to occur,
     ///                           default is 1000 milliseconds (1 second).
     ///
-    /// - Throws: `NanoMessageError.PollSocket` if polling the socket fails.
+    /// - Throws: `NanoMessageError.SocketIsADevice`
+    ///           `NanoMessageError.PollSocket` if polling the socket fails.
     ///
     /// - Returns: Message waiting and send queue blocked as a tuple of bools.
     public func pollSocket(seconds: TimeInterval = 1) throws -> PollResult {
+        guard (!self.socketIsADevice) else {                                    // guard against polling a device socket.
+            throw NanoMessageError.SocketIsADevice
+        }
+
         let pollinMask = CShort(NN_POLLIN)                                      // define nn_poll event masks as short's so we only
         let polloutMask = CShort(NN_POLLOUT)                                    // cast once in the function
 
@@ -410,8 +415,17 @@ extension NanoSocket {
     /// - Parameters:
     ///   - nanoSocket: The socket to bind too.
     ///
-    /// - Throws: `NanoMessageError.BindToSocket` if a problem has been encountered.
+    /// - Throws: `NanoMessageError.SocketIsADevice`
+    ///           `NanoMessageError.BindToSocket` if a problem has been encountered.
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
+        guard (!self.socketIsADevice) else {                                    // guard against socket already being a device socket.
+            throw NanoMessageError.SocketIsADevice
+        }
+
+        guard (!nanoSocket.socketIsADevice) else {                              // guard against socket already being a device socket.
+            throw NanoMessageError.SocketIsADevice
+        }
+
         self.socketIsADevice = true
         nanoSocket.socketIsADevice = true
 
@@ -456,8 +470,13 @@ extension NanoSocket {
 
     /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
     ///
-    /// - Throws: `NanoMessageError.LoopBack` if a problem has been encountered.
+    /// - Throws: `NanoMessageError.SocketIsADevice`
+    ///           `NanoMessageError.LoopBack` if a problem has been encountered.
     public func loopBack() throws {
+        guard (!self.socketIsADevice) else {                                    // guard against socket already being a device socket.
+            throw NanoMessageError.SocketIsADevice
+        }
+
         self.socketIsADevice = true
 
         defer {
