@@ -38,26 +38,26 @@ public final class RequestSocket: NanoSocket, ProtocolSocket, Receiver, Sender, 
 }
 
 extension RequestSocket {
-/// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
-///
-/// Default value is 60000 milliseconds (60 seconds).
-///
-/// - Throws:  `NanoMessageError.GetSocketOption`
-///
-/// - Returns: The sockets resend interval.
+    /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
+    ///
+    /// Default value is 60000 milliseconds (60 seconds).
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: The sockets resend interval.
     public func getResendInterval() throws -> TimeInterval {
         return try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol)
     }
 
-/// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
-///
-/// - Parameters:
-///   - seconds: The sockets resend interval.
-///
-/// - Throws:  `NanoMessageError.GetSocketOption`
-///            `NanoMessageError.SetSocketOption`
-///
-/// - Returns: The sockets resend interval before being set.
+    /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
+    ///
+    /// - Parameters:
+    ///   - seconds: The sockets resend interval.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///            `NanoMessageError.SetSocketOption`
+    ///
+    /// - Returns: The sockets resend interval before being set.
     @discardableResult
     public func setResendInterval(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getResendInterval()

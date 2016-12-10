@@ -25,7 +25,7 @@ import C7
 
 /// ASync Publisher socket protocol.
 public protocol ASyncPublisher {
-    // ASync I-O functions.
+    // ASync Output functions.
     func sendMessage(topic: C7.Data, message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(topic: C7.Data, message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(topic: String, message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)

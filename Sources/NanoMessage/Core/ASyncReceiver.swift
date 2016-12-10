@@ -25,7 +25,7 @@ import C7
 
 /// Async Receiver socket protocol.
 public protocol ASyncReceiver {
-    // ASync I-O functions.
+    // ASync Input functions.
     func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
     func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
     func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)

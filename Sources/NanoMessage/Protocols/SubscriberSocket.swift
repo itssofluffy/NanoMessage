@@ -28,20 +28,20 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
         return self
     }
 
-/// The seperator used between topic and message.
+    /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
-/// Ignore topic seperator, true means that all topics must be of an equal length.
-/// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
+    /// Ignore topic seperator, true means that all topics must be of an equal length.
+    /// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
     public fileprivate(set) var ignoreTopicSeperator = false
-/// The topic last received.
+    /// The topic last received.
     public fileprivate(set) var receivedTopic = Data()
-/// A dictionary of topics and their count that have been received
+    /// A dictionary of topics and their count that have been received
     public fileprivate(set) var receivedTopics = Dictionary<Data, UInt64>()
-/// Remove the topic from the received data.
+    /// Remove the topic from the received data.
     public var removeTopicFromMessage = true
-/// A set of all the subscribed topics.
+    /// A set of all the subscribed topics.
     public fileprivate(set) var subscribedTopics = Set<Data>()
-/// Is the socket subscribed to all topics
+    /// Is the socket subscribed to all topics
     public fileprivate(set) var subscribedToAllTopics = false
 
     public init(socketDomain: SocketDomain) throws {
@@ -54,21 +54,21 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
 }
 
 extension SubscriberSocket {
-/// Receive a message.
-///
-/// - Parameters:
-///   - blockingMode: Specifies if the socket should operate in blocking or non-blocking mode.
-///                   if in non-blocking mode and there is no message to receive the function
-///                   will throw `NanoMessageError.MessageNotReceived`.
-///
-/// - Throws:  `NanoMessageError.SocketIsADevice`
-///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
-///            `NanoMessageError.MessageNotReceived` in non-blocking mode there was no message to receive.
-///            `NanoMessageError.TimedOut` the receive timedout.
-///
-/// - Returns: the number of bytes received and the received message
+    /// Receive a message.
+    ///
+    /// - Parameters:
+    ///   - blockingMode: Specifies if the socket should operate in blocking or non-blocking mode.
+    ///                   if in non-blocking mode and there is no message to receive the function
+    ///                   will throw `NanoMessageError.MessageNotReceived`.
+    ///
+    /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
+    ///            `NanoMessageError.MessageNotReceived` in non-blocking mode there was no message to receive.
+    ///            `NanoMessageError.TimedOut` the receive timedout.
+    ///
+    /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
-/// Does the message/payload contain the specified topic
+        /// Does the message/payload contain the specified topic
         func _messageHasTopic(_ topic: Data, _ message: Data) -> Bool {
             if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
                 if (Data(message[0 ..< topic.count]) != topic) {
@@ -81,7 +81,7 @@ extension SubscriberSocket {
             return false
         }
 
-/// Get the topic from the message/payload if it exists using the topic seperator.
+        /// Get the topic from the message/payload if it exists using the topic seperator.
         func _getTopicFromMessage(_ message: Data) -> Data {
             if let index = message.index(of: self.topicSeperator) {
                 return Data(message[0 ..< index])
@@ -139,29 +139,29 @@ extension SubscriberSocket {
 }
 
 extension SubscriberSocket {
-/// Is the specified topic already subscribed too.
-///
-/// - Parameters:
-///   - topic: The topic to check.
-///
-/// - Returns: If the topic has been subscribed too.
+    /// Is the specified topic already subscribed too.
+    ///
+    /// - Parameters:
+    ///   - topic: The topic to check.
+    ///
+    /// - Returns: If the topic has been subscribed too.
     public func isTopicSubscribed(_ topic: Data) -> Bool {
         return self.subscribedTopics.contains(topic)
     }
 
-/// Is the specified topic already subscribed too.
-///
-/// - Parameters:
-///   - topic: The topic to check.
-///
-/// - Returns: If the topic has been subscribed too.
+    /// Is the specified topic already subscribed too.
+    ///
+    /// - Parameters:
+    ///   - topic: The topic to check.
+    ///
+    /// - Returns: If the topic has been subscribed too.
     public func isTopicSubscribed(_ topic: String) -> Bool {
         return self.isTopicSubscribed(Data(topic))
     }
 
-/// Check all topics for equal lengths.
-///
-/// - Returns: Tuple of all topics of equal length and then standard topic length/count.
+    /// Check all topics for equal lengths.
+    ///
+    /// - Returns: Tuple of all topics of equal length and then standard topic length/count.
     private func _validateTopicLengths() -> (equalLengths: Bool, count: Int) {
         var equalLengths = true
         var topicLengths = -1
@@ -179,12 +179,12 @@ extension SubscriberSocket {
         return (equalLengths, topicLengths)
     }
 
-/// Flip the ignore topic seperator, when true all topic lengths must be of equal length.
-///
-/// - Throws:  `NanoMessageError.SetSocketOption`
-///            `NanoMessageError.InvalidTopic`
-///
-/// - Returns: Has the function been successful.
+    /// Flip the ignore topic seperator, when true all topic lengths must be of equal length.
+    ///
+    /// - Throws:  `NanoMessageError.SetSocketOption`
+    ///            `NanoMessageError.InvalidTopic`
+    ///
+    /// - Returns: Has the function been successful.
     public func flipIgnoreTopicSeperator() throws -> Bool {
         if (!self.subscribedToAllTopics) {
             if (!self.ignoreTopicSeperator) {
@@ -203,19 +203,19 @@ extension SubscriberSocket {
         return false
     }
 
-/// Subscibe to a topic.
-///
-/// - Parameters:
-///   - topic: The topic to subscribe to.
-///
-/// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
-///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
-///            `NanoMessageError.TopicLength` if the topic size is too large.
-///
-/// - Returns: If we managed to subscribed to the topic.
+    /// Subscibe to a topic.
+    ///
+    /// - Parameters:
+    ///   - topic: The topic to subscribe to.
+    ///
+    /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
+    ///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
+    ///            `NanoMessageError.TopicLength` if the topic size is too large.
+    ///
+    /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: Data) throws -> Bool {
-/// Check topic length against (any) existing topics is see if it is of equal length.
+        /// Check topic length against (any) existing topics is see if it is of equal length.
         func _validTopicLengths(_ topic: Data) -> Bool {
             let topics = self._validateTopicLengths()
 
@@ -255,29 +255,29 @@ extension SubscriberSocket {
         return false
     }
 
-/// Subscibe to a topic.
-///
-/// - Parameters:
-///   - topic: The topic to subscribe to.
-///
-/// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
-///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
-///            `NanoMessageError.TopicLength` if the topic size is too large.
-///
-/// - Returns: If we managed to subscribed to the topic.
+    /// Subscibe to a topic.
+    ///
+    /// - Parameters:
+    ///   - topic: The topic to subscribe to.
+    ///
+    /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
+    ///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
+    ///            `NanoMessageError.TopicLength` if the topic size is too large.
+    ///
+    /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: String) throws -> Bool {
         return try self.subscribeTo(topic: Data(topic))
     }
 
-/// Unsubscibe from a topic.
-///
-/// - Parameters:
-///   - topic: The topic to unsubscribe from.
-///
-/// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
-///
-/// - Returns: If we managed to unsubscribed from the topic.
+    /// Unsubscibe from a topic.
+    ///
+    /// - Parameters:
+    ///   - topic: The topic to unsubscribe from.
+    ///
+    /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
+    ///
+    /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
     public func unsubscribeFrom(topic: Data) throws -> Bool {
         if (!topic.isEmpty) {
@@ -299,26 +299,26 @@ extension SubscriberSocket {
         return false
     }
 
-/// Unsubscibe from a topic.
-///
-/// - Parameters:
-///   - topic: The topic to unsubscribe from.
-///
-/// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
-///
-/// - Returns: If we managed to unsubscribed from the topic.
+    /// Unsubscibe from a topic.
+    ///
+    /// - Parameters:
+    ///   - topic: The topic to unsubscribe from.
+    ///
+    /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
+    ///
+    /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
     public func unsubscribeFrom(topic: String) throws -> Bool {
         return try self.unsubscribeFrom(topic: Data(topic))
     }
 
-/// Subscribe to all topics.
-///
-/// - Throws: `NanoMessageError.SetSocketOption` if an issue has been encountered.
-///
-/// - Returns: If we have managed to subscribe to all topics.
-///
-/// - Note:    You cannot subscribe to all topics if `ignoreTopicSeperator` is true.
+    /// Subscribe to all topics.
+    ///
+    /// - Throws: `NanoMessageError.SetSocketOption` if an issue has been encountered.
+    ///
+    /// - Returns: If we have managed to subscribe to all topics.
+    ///
+    /// - Note:    You cannot subscribe to all topics if `ignoreTopicSeperator` is true.
     public func subscribeToAllTopics() throws -> Bool {
         if (!self.ignoreTopicSeperator) {
             if (!self.subscribedToAllTopics) {
@@ -337,9 +337,9 @@ extension SubscriberSocket {
         return false
     }
 
-/// Unsubscribe from all topics.
-///
-/// - Throws: `NanoMessageError.SetSocketOption` if an issue has been encountered.
+    /// Unsubscribe from all topics.
+    ///
+    /// - Throws: `NanoMessageError.SetSocketOption` if an issue has been encountered.
     public func unsubscribeFromAllTopics() throws {
         for topic in self.subscribedTopics {
             try self.unsubscribeFrom(topic: topic)

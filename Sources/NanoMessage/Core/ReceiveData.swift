@@ -22,4 +22,4 @@
 
 import C7
 
-public typealias ReceiveData = (bytes: Int, message: C7.Data)
+public typealias ReceiveData = (bytes: Int, message: Data)

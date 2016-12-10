@@ -25,7 +25,7 @@ import C7
 
 /// Sender socket protocol.
 public protocol Sender {
-    // I-O functions.
+    // Output functions.
     @discardableResult
     func sendMessage(_ message: C7.Data, blockingMode: BlockingMode) throws -> Int
     @discardableResult

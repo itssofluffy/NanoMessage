@@ -25,7 +25,7 @@ import C7
 
 /// ASync Sender socket protocol.
 public protocol ASyncSender {
-    // ASync I-O functions.
+    // ASync Output functions.
     func sendMessage(_ message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(_ message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)

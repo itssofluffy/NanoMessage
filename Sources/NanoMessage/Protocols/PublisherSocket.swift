@@ -30,20 +30,20 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
         return self
     }
 
-/// The seperator used between topic and message.
+    /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
 
-/// The topic to send.
+    /// The topic to send.
     public var sendTopic = C7.Data()
-/// A Dictionary of the topics sent with a count of the times sent.
+    /// A Dictionary of the topics sent with a count of the times sent.
     public fileprivate(set) var sentTopics = Dictionary<C7.Data, UInt64>()
 
-/// Prepend the topic to the start of the message when sending.
+    /// Prepend the topic to the start of the message when sending.
     public var prependTopic = true
-/// When prepending the topic to the message do we ignore the topic seperator,
-/// if true then the Subscriber socket should do the same and have subscribed to topics of equal length.
+    /// When prepending the topic to the message do we ignore the topic seperator,
+    /// if true then the Subscriber socket should do the same and have subscribed to topics of equal length.
     public var ignoreTopicSeperator = false
-/// Reset the send topic to empty after a sendMessage() has been performed.
+    /// Reset the send topic to empty after a sendMessage() has been performed.
     public var resetTopicAfterSend = false
 
     public init(socketDomain: SocketDomain) throws {
@@ -56,21 +56,21 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
 }
 
 extension PublisherSocket {
-/// Send a message.
-///
-/// - Parameters:
-///   - message:      The message to send.
-///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-///                   If the message cannot be sent straight away, the function will throw
-///                   `NanoMessageError.MessageNotSent`
-///
-/// - Throws:  `NanoMessageError.SocketIsADevice`
-///            `NanoMessageError.sendMessage` there was a problem sending the message.
-///            `NanoMessageError.TopicLength` if the topic length too large.
-///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
-///            `NanoMessageError.TimedOut` the send timedout.
-///
-/// - Returns: The number of bytes sent.
+    /// Send a message.
+    ///
+    /// - Parameters:
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the function will throw
+    ///                   `NanoMessageError.MessageNotSent`
+    ///
+    /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.sendMessage` there was a problem sending the message.
+    ///            `NanoMessageError.TopicLength` if the topic length too large.
+    ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+    ///            `NanoMessageError.TimedOut` the send timedout.
+    ///
+    /// - Returns: The number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
         var messagePayload: C7.Data
@@ -103,7 +103,7 @@ extension PublisherSocket {
             }
 
             if (self.resetTopicAfterSend) {                       // are we resetting the topic?
-                self.sendTopic = Data()
+                self.sendTopic = C7.Data()
             }
         }
 
