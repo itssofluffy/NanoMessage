@@ -31,17 +31,15 @@ public struct EndPoint {
     public var transport: TransportMechanism {    // end-points transport mechanism
         return TransportMechanism(url: self.url)
     }
-    public let receivePriority: Priority?         // receive priority of the end-point.
-    public let sendPriority: Priority?            // send priority to the end-point.
+    public let priorities: SocketPriorities       // end-point socket priorities.
     public let ipv4Only: Bool                     // if true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
     public var name: String                       // user defined name of the end-point
 
-    public init(id: Int, url: URL, type: ConnectionType, receivePriority: Priority?, sendPriority: Priority?, ipv4Only: Bool, name: String = "") {
+    public init(id: Int, url: URL, type: ConnectionType, priorities: SocketPriorities, ipv4Only: Bool, name: String = "") {
         self.id = id
         self.url = url
         self.type = type
-        self.receivePriority = receivePriority
-        self.sendPriority = sendPriority
+        self.priorities = priorities
         self.ipv4Only = ipv4Only
         self.name = (name.isEmpty) ? String(self.id) : name
     }
@@ -67,14 +65,7 @@ extension EndPoint: Equatable {
 
 extension EndPoint: CustomStringConvertible {
     public var description: String {
-        var description = "id: \(self.id), url: \(self.url.absoluteString), type: \(self.type), transport: \(self.transport)"
-        if let priority = self.receivePriority {
-            description += ", receive priority: (\(priority))"
-        }
-        if let priority = self.sendPriority {
-            description += ", send priority: (\(priority))"
-        }
-        description += ", ipv4only: \(self.ipv4Only)"
+        var description = "id: \(self.id), url: \(self.url.absoluteString), type: \(self.type), transport: \(self.transport), priorities: (\(self.priorities)), ipv4only: \(self.ipv4Only)"
         if (!self.name.isEmpty) {
             description += ", name: \(self.name)"
         }

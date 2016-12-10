@@ -152,7 +152,7 @@ extension NanoSocket {
     ///
     /// - Returns: Tuple of receive and send send priorities, if either is nil then
     ///            socket is either not a receiver or sender.
-    private func _socketPriorities() throws -> (receivePriority: Priority?, sendPriority: Priority?) {
+    private func _socketPriorities() throws -> SocketPriorities {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
@@ -163,7 +163,7 @@ extension NanoSocket {
             sendPriority = try getSocketOption(self.socketFd, .SendPriority)          // obtain the send priority for the end-point.
         }
 
-        return (receivePriority, sendPriority)
+        return SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority)
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -184,7 +184,7 @@ extension NanoSocket {
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
-        let socket = try self._socketPriorities()
+        let priorities = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
         url.absoluteString.withCString {
@@ -195,13 +195,12 @@ extension NanoSocket {
             throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
         }
 
-        let endPoint = EndPoint(id:              Int(endPointId),
-                                url:             url,
-                                type:            .Bind,
-                                receivePriority: socket.receivePriority,
-                                sendPriority:    socket.sendPriority,
-                                ipv4Only:        ipv4Only,
-                                name:            name)
+        let endPoint = EndPoint(id:         Int(endPointId),
+                                url:        url,
+                                type:       .Bind,
+                                priorities: priorities,
+                                ipv4Only:   ipv4Only,
+                                name:       name)
 
         self.endPoints.insert(endPoint)
 
@@ -247,7 +246,7 @@ extension NanoSocket {
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
         var endPointId: CInt = -1
 
-        let socket = try self._socketPriorities()
+        let priorities = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
         url.absoluteString.withCString {
@@ -258,13 +257,12 @@ extension NanoSocket {
             throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
         }
 
-        let endPoint = EndPoint(id:              Int(endPointId),
-                                url:             url,
-                                type:            .Connect,
-                                receivePriority: socket.receivePriority,
-                                sendPriority:    socket.sendPriority,
-                                ipv4Only:        ipv4Only,
-                                name:            name)
+        let endPoint = EndPoint(id:         Int(endPointId),
+                                url:        url,
+                                type:       .Connect,
+                                priorities: priorities,
+                                ipv4Only:   ipv4Only,
+                                name:       name)
 
         self.endPoints.insert(endPoint)
 
