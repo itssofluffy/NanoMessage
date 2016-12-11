@@ -64,10 +64,8 @@ public class NanoSocket {
     ///
     /// - Warning: Please not that if true this will block until the class has been de-referenced.
     public var blockTillCloseSuccess = false
-
     /// Is the socket attached to a device.
     public fileprivate(set) var socketIsADevice = false
-
     /// The dispatch queue that async send/receive messages are run on.
     public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInitiated)
     /// async mutex lock.
@@ -418,11 +416,7 @@ extension NanoSocket {
     /// - Throws: `NanoMessageError.SocketIsADevice`
     ///           `NanoMessageError.BindToSocket` if a problem has been encountered.
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
-        guard (!self.socketIsADevice) else {                                    // guard against socket already being a device socket.
-            throw NanoMessageError.SocketIsADevice
-        }
-
-        guard (!nanoSocket.socketIsADevice) else {                              // guard against socket already being a device socket.
+        guard (!self.socketIsADevice && !nanoSocket.socketIsADevice) else {     // guard against socket already being a device socket.
             throw NanoMessageError.SocketIsADevice
         }
 
@@ -454,9 +448,9 @@ extension NanoSocket {
     ///   - nanoSocket:     The socket to bind too.
     ///   - queue:          The dispatch queue to use
     ///   - closureHandle:  The closure to use when the 'bind' terminates.
-    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
+    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (NanoSocket, Error?) -> Void) {
         queue.async {
-            var errorMessage: Error? = nil
+            var errorMessage: Error?
 
             do {
                 try self.bindToSocket(nanoSocket)
@@ -464,7 +458,7 @@ extension NanoSocket {
                 errorMessage = error
             }
 
-            closureHandler(errorMessage)
+            closureHandler(nanoSocket, errorMessage)
         }
     }
 
@@ -497,7 +491,7 @@ extension NanoSocket {
     ///   - closureHandle:  The closure to use when the 'loopback' terminates.
     public func loopBack(queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
         queue.async {
-            var errorMessage: Error? = nil
+            var errorMessage: Error?
 
             do {
                 try self.loopBack()

@@ -62,8 +62,8 @@ class BindToSocketTests: XCTestCase {
 
             let queue = DispatchQueue(label: "com.nanomessage.bindtosocket")
 
-            node0.bindToSocket(node1, queue: queue, {
-                if let error = $0 {
+            node0.bindToSocket(node1, queue: queue, { nanoSocket, error in
+                if let error = error {
                     print("async node0.bindToSocket() error: \(error)")
                 }
             })
