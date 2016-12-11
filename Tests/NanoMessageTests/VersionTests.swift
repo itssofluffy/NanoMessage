@@ -40,7 +40,7 @@ class VersionTests: XCTestCase {
 
          XCTAssertEqual(current, 0, "NanoMessage current not as expected")
          XCTAssertEqual(revision, 0, "NanoMessage revision not as expected")
-         XCTAssertGreaterThanOrEqual(age, 10, "NanoMessage age not as expected")
+         XCTAssertGreaterThanOrEqual(age, 11, "NanoMessage age not as expected")
 
          print("current: \(current), revision: \(revision), age: \(age)")
     }

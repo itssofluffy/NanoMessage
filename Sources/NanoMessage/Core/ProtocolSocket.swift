@@ -195,6 +195,14 @@ extension ProtocolSocket where Self: Sender {
 }
 
 extension ProtocolSocket where Self: Sender & ASyncSender {
+    /// Asynchronous send a message.
+    ///
+    /// - Parameters:
+    ///   - message:        The message to send.
+    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
+    ///                     If the message cannot be sent straight away, the closureHandler
+    ///                     will be passed `NanoMessageError.MessageNotSent`
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             do {
@@ -216,10 +224,25 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         }
     }
 
+    /// Asynchronous send a message.
+    ///
+    /// - Parameters:
+    ///   - message:        The message to send.
+    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
+    ///                     If the message cannot be sent straight away, the closureHandler
+    ///                     will be passed `NanoMessageError.MessageNotSent`
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
     }
 
+    /// Asynchronous send a message.
+    ///
+    /// - Parameters:
+    ///   - message:        The message to send.
+    ///   - timeout:        Specifies that the send should be performed in non-blocking mode for a timeinterval.
+    ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             do {
@@ -241,10 +264,23 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         }
     }
 
+    /// Asynchronous send a message.
+    ///
+    /// - Parameters:
+    ///   - message:        The message to send.
+    ///   - timeout:        Specifies that the send should be performed in non-blocking mode for a timeinterval.
+    ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(_ message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.sendMessage(C7.Data(message), timeout: timeout, closureHandler)
     }
 
+    /// Asynchronous send a message.
+    ///
+    /// - Parameters:
+    ///   - message:        The message to send.
+    ///   - timeout:        .Never
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             do {
@@ -266,6 +302,12 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         }
     }
 
+    /// Asynchronous send a message.
+    ///
+    /// - Parameters:
+    ///   - message:        The message to send.
+    ///   - timeout:        .Never
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(_ message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.sendMessage(C7.Data(message), timeout: timeout, closureHandler)
     }
@@ -430,6 +472,13 @@ extension ProtocolSocket where Self: Receiver {
 }
 
 extension ProtocolSocket where Self: Receiver & ASyncReceiver {
+    /// Asynchronous receive a message.
+    ///
+    /// - Parameters:
+    ///   - blockingMode:   Specifies if the socket should operate in blocking or non-blocking mode.
+    ///                     if in non-blocking mode and there is no message to receive the closureHandler
+    ///                     will be passed `NanoMessageError.MessageNotReceived`.
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             do {
@@ -451,6 +500,12 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         }
     }
 
+    /// Asynchronous receive a message.
+    ///
+    /// - Parameters:
+    ///   - timeout:        Specifies if the socket should operate in non-blocking mode for a timeout interval.
+    ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             do {
@@ -472,6 +527,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         }
     }
 
+    /// Asynchronous receive a message.
+    ///
+    /// - Parameters:
+    ///   - timeout:        .Never
+    ///   - closureHandler: The closure to use when the sendMessage completes.
     public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.ioQueue.async {
             do {

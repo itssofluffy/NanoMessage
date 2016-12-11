@@ -447,7 +447,7 @@ extension NanoSocket {
     /// - Parameters:
     ///   - nanoSocket:     The socket to bind too.
     ///   - queue:          The dispatch queue to use
-    ///   - closureHandle:  The closure to use when the 'bind' terminates.
+    ///   - closureHandler: The closure to use when the 'bind' terminates.
     public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (NanoSocket, Error?) -> Void) {
         queue.async {
             var errorMessage: Error?
@@ -488,7 +488,7 @@ extension NanoSocket {
     ///
     /// - Parameters:
     ///   - queue:          The dispatch queue to use
-    ///   - closureHandle:  The closure to use when the 'loopback' terminates.
+    ///   - closureHandler: The closure to use when the 'loopback' terminates.
     public func loopBack(queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
         queue.async {
             var errorMessage: Error?
