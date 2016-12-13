@@ -23,6 +23,8 @@
 import C7
 import CNanoMessage
 
+private let NN_MSG: size_t = -1
+
 /// The low-level send a message function.
 ///
 /// - Parameters:
@@ -75,28 +77,13 @@ internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ b
 ///
 /// - Returns: The number of bytes received and the received message
 internal func receivePayloadFromSocket(_ nanoSocket: NanoSocket, _ blockingMode: BlockingMode) throws -> ReceiveData {
-    // The underlying nanomsg library zero copy message size NN_MSG = ((size_t)-1) cannot be reproduced using the clang compiler see:
-    // https://github.com/apple/swift/blob/master/docs/StdlibRationales.rst#size_t-is-unsigned-but-it-is-imported-as-int
-    func _maxBufferSize(_ socketFd: CInt) -> Int {
-        var maxBufferSize = 1048576                      // 1024 * 1024 bytes = 1 MiB
-
-        if let bufferSize: Int = try? getSocketOption(socketFd, .ReceiveMaximumMessageSize) {
-            if (bufferSize > 0) {                        // cater for unlimited message size.
-                maxBufferSize = bufferSize
-            }
-        }
-
-        return maxBufferSize
-    }
-
     guard (!nanoSocket.socketIsADevice) else {
         throw NanoMessageError.SocketIsADevice
     }
 
-    let bufferSize = _maxBufferSize(nanoSocket.socketFd)
-    var buffer = Data.buffer(with: bufferSize)
+    var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)
 
-    let bytesReceived = Int(nn_recv(nanoSocket.socketFd, &buffer.bytes, bufferSize, blockingMode.rawValue))
+    let bytesReceived = Int(nn_recv(nanoSocket.socketFd, &buffer, NN_MSG, blockingMode.rawValue))
 
     guard (bytesReceived >= 0) else {
         let errno = nn_errno()
@@ -110,5 +97,13 @@ internal func receivePayloadFromSocket(_ nanoSocket: NanoSocket, _ blockingMode:
         throw NanoMessageError.ReceiveMessage(code: errno)
     }
 
-    return ReceiveData(bytesReceived, Data(buffer[0 ..< min(bytesReceived, bufferSize)]))
+    let payload: [Byte] = Array(UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
+
+    let returnCode = nn_freemsg(buffer)
+
+    guard (returnCode >= 0) else {
+        throw NanoMessageError.ReceiveMessage(code: nn_errno())
+    }
+
+    return ReceiveData(bytesReceived, Data(payload))
 }
