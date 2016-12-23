@@ -68,6 +68,8 @@ public class NanoSocket {
     public fileprivate(set) var socketIsADevice = false
     /// The dispatch queue that async send/receive messages are run on.
     public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInitiated)
+    /// The async dispatch queue's group.
+    public var ioGroup = DispatchGroup()
     /// async mutex lock.
     public var mutex: Mutex
 
@@ -448,7 +450,7 @@ extension NanoSocket {
     ///   - nanoSocket:     The socket to bind too.
     ///   - queue:          The dispatch queue to use
     ///   - closureHandler: The closure to use when the 'bind' terminates.
-    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (NanoSocket, Error?) -> Void) {
+    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
         queue.async {
             var errorMessage: Error?
 
@@ -458,7 +460,7 @@ extension NanoSocket {
                 errorMessage = error
             }
 
-            closureHandler(nanoSocket, errorMessage)
+            closureHandler(errorMessage)
         }
     }
 

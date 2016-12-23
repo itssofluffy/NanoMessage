@@ -119,12 +119,6 @@ class SocketOptionTests: XCTestCase {
             WSMessageType = try node0.getWebSocketMessageType()
             XCTAssertEqual(WSMessageType, WebSocketMessageType.TextFrames, "set->getWebSocketMessageType: \(WSMessageType)")
 
-            do {
-                try node0.setMaximumMessageSize(bytes: -1)
-                XCTAssert(true, "setMaximumMessageSize(-1)")
-            } catch NanoMessageError.FeatureNotSupported {
-            }
-
             let node1 = try RequestSocket()
 
             var resendInterval = try node1.getResendInterval()

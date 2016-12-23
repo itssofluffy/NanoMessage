@@ -21,7 +21,6 @@
 */
 
 import Foundation
-import C7
 
 /// Receiver socket protocol.
 public protocol Receiver: ASyncReceiver {

@@ -45,7 +45,7 @@ internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ b
         throw NanoMessageError.SocketIsADevice
     }
 
-    let bytesSent = nn_send(nanoSocket.socketFd, payload.bytes, payload.count, blockingMode.rawValue)
+    let bytesSent = Int(nn_send(nanoSocket.socketFd, payload.bytes, payload.count, blockingMode.rawValue))
 
     guard (bytesSent >= 0) else {
         let errno = nn_errno()
@@ -59,7 +59,7 @@ internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ b
         throw NanoMessageError.SendMessage(code: errno)
     }
 
-    return Int(bytesSent)
+    return bytesSent
 }
 
 /// The low-level receive a message function.
@@ -104,6 +104,8 @@ internal func receivePayloadFromSocket(_ nanoSocket: NanoSocket, _ blockingMode:
     guard (returnCode >= 0) else {
         throw NanoMessageError.ReceiveMessage(code: nn_errno())
     }
+
+    buffer.deinitialize(count: bytesReceived)   // not sure if this needed because of the deallocation using nn_freemsg() but does seem to hurt.
 
     return ReceiveData(bytesReceived, Data(payload))
 }
