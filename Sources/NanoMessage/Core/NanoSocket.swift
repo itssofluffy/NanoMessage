@@ -110,7 +110,7 @@ public class NanoSocket {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(self._closeDelay.asMicroseconds)         // zzzz...
+                        usleep(self._closeDelay.microseconds)           // zzzz...
 
                         loopCount += 1
                     } else {
@@ -315,7 +315,7 @@ extension NanoSocket {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(self._closeDelay.asMicroseconds)                 // zzzz...
+                        usleep(self._closeDelay.microseconds)                   // zzzz...
 
                         loopCount += 1
                     } else {
@@ -380,7 +380,7 @@ extension NanoSocket {
     ///           `NanoMessageError.PollSocket` if polling the socket fails.
     ///
     /// - Returns: Message waiting and send queue blocked as a tuple of bools.
-    public func pollSocket(seconds: TimeInterval = 1) throws -> PollResult {
+    public func pollSocket(timeout: TimeInterval = 1) throws -> PollResult {
         guard (!self.socketIsADevice) else {                                    // guard against polling a device socket.
             throw NanoMessageError.SocketIsADevice
         }
@@ -398,7 +398,7 @@ extension NanoSocket {
 
         var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
 
-        let returnCode = nn_poll(&pfd, 1, CInt(seconds.asMilliseconds))         // poll the nano socket
+        let returnCode = nn_poll(&pfd, 1, CInt(timeout.milliseconds))           // poll the nano socket
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.PollSocket(code: nn_errno())

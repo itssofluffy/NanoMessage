@@ -488,7 +488,7 @@ internal func setSocketOption(_ socketFd: CInt, _ option: SocketOption, _ optval
     if (optval < 0) {
         try setSocketOption(socketFd, option, CInt(TimeInterval(seconds: .Never)), level)
     } else {
-        try setSocketOption(socketFd, option, optval.asMilliseconds, level)
+        try setSocketOption(socketFd, option, optval.milliseconds, level)
     }
 }
 

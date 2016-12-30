@@ -25,7 +25,7 @@ import XCTest
 
 let payload = "This above all...to thine own self be true."
 
-public var pauseTime = TimeInterval(seconds: 0.20).asMicroseconds
+public var pauseTime = TimeInterval(seconds: 0.20).microseconds
 public var pauseCount: UInt32 = 0
 
 func pauseForBind() {

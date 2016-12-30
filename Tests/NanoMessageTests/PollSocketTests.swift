@@ -54,14 +54,14 @@ class PollSocketTests: XCTestCase {
 
             pauseForBind()
 
-            var node1Poll: PollResult = try node1.pollSocket(seconds: 0.5)
+            var node1Poll: PollResult = try node1.pollSocket(timeout: 0.5)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
             let bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
 
-            node1Poll = try node1.pollSocket(seconds: 0.5)
+            node1Poll = try node1.pollSocket(timeout: 0.5)
             XCTAssertEqual(node1Poll.messageIsWaiting, true, "node1Poll.messageIsWaiting != true")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
@@ -69,7 +69,7 @@ class PollSocketTests: XCTestCase {
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "bytes != message.utf8.count")
             XCTAssertEqual(node1Received.message, payload, "message != payload")
 
-            node1Poll = try node1.pollSocket(seconds: 0.25)
+            node1Poll = try node1.pollSocket(timeout: 0.25)
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 

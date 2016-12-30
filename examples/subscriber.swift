@@ -34,7 +34,7 @@ do {
 
     print(endPoint)
 
-    usleep(TimeInterval(seconds: 0.25).asMicroseconds)
+    usleep(TimeInterval(seconds: 0.25).microseconds)
 
     try node0.subscribeTo(topic: "interesting")
 
@@ -45,7 +45,7 @@ do {
         print("message          : \(received.message)")
         print("bytes            : \(received.bytes)")
 
-        let socket = try node0.pollSocket(seconds: TimeInterval(seconds: 0.25))
+        let socket = try node0.pollSocket(timeout: TimeInterval(seconds: 0.25))
 
         if (!socket.messageIsWaiting) {
             break
