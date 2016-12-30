@@ -47,8 +47,9 @@ class LoopBackTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.bindToURL('\(bindURL)') < 0")
 
             let queue = DispatchQueue(label: "com.nanomessage.loopback")
+            let group = DispatchGroup()
 
-            node0.loopBack(queue: queue, {
+            let workItem = node0.loopBack(queue: queue, group: group, {
                 if let error = $0 {
                     print("async node0.loopBack() error: \(error)")
                 }
@@ -72,6 +73,12 @@ class LoopBackTests: XCTestCase {
             var node2Received: ReceiveString = try node2.receiveMessage()
             XCTAssertEqual(node2Received.bytes, node2Received.message.utf8.count, "node2.bytes != message.utf8.count")
             XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
+
+            workItem.cancel()
+
+            workItem.notify(queue: queue) {
+                print("node0.bindToSocket(): \(workItem.isCancelled)")
+            }
 
             completed = true
         } catch let error as NanoMessageError {

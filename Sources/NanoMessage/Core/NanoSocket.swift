@@ -34,22 +34,22 @@ public class NanoSocket {
     /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
-    private var _closureAttempts: Int = 100
+    private var _closeAttempts: Int = 100
     /// The number of attempts to close down a socket or endpoint, this is clamped to between 1 and 1000.
     ///
     /// - Note:  The `getLinger()` function is called to determine the number of milliseconds to
-    ///          wait for a socket/endpoint to clear and close, this is divided by `closureAttempts`
+    ///          wait for a socket/endpoint to clear and close, this is divided by `closeAttempts`
     ///          to determine the minimum pause between each attempt.
-    public var closureAttempts: Int {
+    public var closeAttempts: Int {
         get {
-            return self._closureAttempts
+            return self._closeAttempts
         }
         set (attempts) {
-            self._closureAttempts = clamp(value: attempts, lower: 1, upper: 1000)
+            self._closeAttempts = clamp(value: attempts, lower: 1, upper: 1000)
         }
     }
-    /// The socket/end-point closure time in timeinterval.
-    fileprivate var _closureDelay: TimeInterval {
+    /// The socket/end-point close time in timeinterval.
+    fileprivate var _closeDelay: TimeInterval {
         var delay = TimeInterval(seconds: 1)
 
         if let linger = try? self.getLinger() {
@@ -58,7 +58,7 @@ public class NanoSocket {
             }
         }
 
-        return TimeInterval(seconds: delay / Double(self.closureAttempts))
+        return TimeInterval(seconds: delay / Double(self.closeAttempts))
     }
     /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
     ///
@@ -67,7 +67,7 @@ public class NanoSocket {
     /// Is the socket attached to a device.
     public fileprivate(set) var socketIsADevice = false
     /// The dispatch queue that async send/receive messages are run on.
-    public var ioQueue = DispatchQueue(label: "com.nanomessage.asyncqueue", qos: .userInitiated)
+    public var ioQueue = DispatchQueue(label: "com.nanomessage.aioqueue", qos: .userInitiated)
     /// The async dispatch queue's group.
     public var ioGroup = DispatchGroup()
     /// async mutex lock.
@@ -103,14 +103,14 @@ public class NanoSocket {
                         let errno = nn_errno()
 
                         if (errno == EINTR) {                           // if we were interrupted by a signal, reattempt is allowed by the native library
-                            if (loopCount >= self.closureAttempts) {    // we've reached our limit so say we were interrupted
+                            if (loopCount >= self.closeAttempts) {      // we've reached our limit so say we were interrupted
                                 throw NanoMessageError.Interrupted
                             }
                         } else {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(self._closureDelay.asMicroseconds)       // zzzz...
+                        usleep(self._closeDelay.asMicroseconds)         // zzzz...
 
                         loopCount += 1
                     } else {
@@ -311,11 +311,11 @@ extension NanoSocket {
                     let errno = nn_errno()
 
                     if (errno == EINTR) {                                       // if we were interrupted by a signal, reattempt is allowed by the native library
-                        if (loopCount >= self.closureAttempts) {
+                        if (loopCount >= self.closeAttempts) {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(self._closureDelay.asMicroseconds)               // zzzz...
+                        usleep(self._closeDelay.asMicroseconds)                 // zzzz...
 
                         loopCount += 1
                     } else {
@@ -449,9 +449,12 @@ extension NanoSocket {
     /// - Parameters:
     ///   - nanoSocket:     The socket to bind too.
     ///   - queue:          The dispatch queue to use
+    ///   - group:          The dispatch group to use.
     ///   - closureHandler: The closure to use when the 'bind' terminates.
-    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
-        queue.async {
+    ///
+    //// - Returns:          The despatched work item.
+    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, group: DispatchGroup, _ closureHandler: @escaping (Error?) -> Void) -> DispatchWorkItem {
+        let workItem = DispatchWorkItem {
             var errorMessage: Error?
 
             do {
@@ -462,6 +465,10 @@ extension NanoSocket {
 
             closureHandler(errorMessage)
         }
+
+        queue.async(group: group, execute: workItem)
+
+        return workItem
     }
 
     /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
@@ -490,9 +497,12 @@ extension NanoSocket {
     ///
     /// - Parameters:
     ///   - queue:          The dispatch queue to use
+    ///   - group:          The dispatch group to use.
     ///   - closureHandler: The closure to use when the 'loopback' terminates.
-    public func loopBack(queue: DispatchQueue, _ closureHandler: @escaping (Error?) -> Void) {
-        queue.async {
+    ///
+    /// - Returns:          The despatched work item.
+    public func loopBack(queue: DispatchQueue, group: DispatchGroup, _ closureHandler: @escaping (Error?) -> Void) -> DispatchWorkItem {
+        let workItem = DispatchWorkItem {
             var errorMessage: Error?
 
             do {
@@ -503,6 +513,10 @@ extension NanoSocket {
 
             closureHandler(errorMessage)
         }
+
+        queue.async(group: group, execute: workItem)
+
+        return workItem
     }
 }
 
