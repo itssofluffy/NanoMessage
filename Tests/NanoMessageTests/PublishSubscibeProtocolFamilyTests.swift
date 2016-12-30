@@ -49,7 +49,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0EndPointId: Int = try node0.connectToURL(connectURL)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
 
-            node0.sendTopic = "shakespeare"
+            node0.setSendTopic("shakespeare")
             XCTAssertEqual(node0.prependTopic, true, "node0.prependTopic")
 
             let node1EndPointId: Int = try node1.bindToURL(bindURL)
@@ -102,7 +102,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let planets = [ "mercury", "venus", "mars", "earth", "mars", "jupiter", "saturn", "uranus", "neptune" ]
 
-            node0.sendTopic = "planet"
+            node0.setSendTopic("planet")
 
             for planet in planets {
                 let bytesSent = try node0.sendMessage(planet)
@@ -113,7 +113,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let dwarfPlanets = [ "Eris", "Pluto", "Makemake", "Or", "Haumea", "Quaoar", "Senda", "Orcus", "2002 MS", "Ceres", "Salacia" ]
 
-            node0.sendTopic = "dwarfPlanet"
+            node0.setSendTopic("dwarfPlanet")
 
             for dwarfPlanet in dwarfPlanets {
                 let bytesSent = try node0.sendMessage(dwarfPlanet)
@@ -134,7 +134,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.unsubscribeFromAllTopics()
             try node1.subscribeTo(topic: "dwarfPlanet")
 
-            node0.sendTopic = "planet"
+            node0.setSendTopic("planet")
 
             for planet in planets {
                 let bytesSent = try node0.sendMessage(planet)
@@ -148,7 +148,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")
             }
 
-            node0.sendTopic = "dwarfPlanet"
+            node0.setSendTopic("dwarfPlanet")
 
             for dwarfPlanet in dwarfPlanets {
                 let bytesSent = try node0.sendMessage(dwarfPlanet)
@@ -182,7 +182,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let _ = try node1.flipIgnoreTopicSeperator()
             XCTAssertEqual(node1.ignoreTopicSeperator, true, "node1.ignoreTopicSeperator")
 
-            node0.sendTopic = "AAA"
+            node0.setSendTopic("AAA")
 
             let _ = try node0.sendMessage(payload)
 

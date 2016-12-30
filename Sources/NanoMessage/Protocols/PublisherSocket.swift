@@ -33,7 +33,7 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
     /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
     /// The topic to send.
-    public var sendTopic = C7.Data()
+    public fileprivate(set) var sendTopic = C7.Data()
     /// A Dictionary of the topics sent with a count of the times sent.
     public fileprivate(set) var sentTopics = Dictionary<C7.Data, UInt64>()
     /// Prepend the topic to the start of the message when sending.
@@ -101,7 +101,7 @@ extension PublisherSocket {
             }
 
             if (self.resetTopicAfterSend) {                       // are we resetting the topic?
-                self.sendTopic = C7.Data()
+                self.setSendTopic(C7.Data())
             }
         }
 
@@ -126,7 +126,7 @@ extension PublisherSocket {
                     var bytesSent: Int?
                     var errorMessage: Error?
 
-                    self.sendTopic = topic
+                    self.setSendTopic(topic)
 
                     do {
                         bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
@@ -243,7 +243,7 @@ extension PublisherSocket {
                     var bytesSent: Int?
                     var errorMessage: Error?
 
-                    self.sendTopic = topic
+                    self.setSendTopic(topic)
 
                     do {
                         bytesSent = try self.sendMessage(message, timeout: timeout)
@@ -306,7 +306,7 @@ extension PublisherSocket {
                     var bytesSent: Int?
                     var errorMessage: Error?
 
-                    self.sendTopic = topic
+                    self.setSendTopic(topic)
 
                     do {
                         bytesSent = try self.sendMessage(message, timeout: timeout)
@@ -353,5 +353,23 @@ extension PublisherSocket {
     ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(topic: String, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
+    }
+}
+
+extension PublisherSocket {
+    /// set the topic to send.
+    ///
+    /// - Parameters:
+    ///   - topic:  The topic to send.
+    public func setSendTopic(_ topic: C7.Data) {
+        self.sendTopic = topic
+    }
+
+    /// set the topic to send.
+    ///
+    /// - Parameters:
+    ///   - topic:  The topic to send.
+    public func setSendTopic(_ topic: String) {
+        self.setSendTopic(C7.Data(topic))
     }
 }

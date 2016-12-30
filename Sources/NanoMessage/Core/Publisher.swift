@@ -23,8 +23,8 @@
 import C7
 
 protocol Publisher: Sender, ASyncPublisher {
-    var sendTopic: Data { get set }
-    var sentTopics: Dictionary<Data, UInt64> { get }  // implement private set
+    var sendTopic: Data { get }                       // implement private set.
+    var sentTopics: Dictionary<Data, UInt64> { get }  // implement private set.
     var prependTopic: Bool { get set }
     var ignoreTopicSeperator: Bool { get set }
     var resetTopicAfterSend: Bool { get set }

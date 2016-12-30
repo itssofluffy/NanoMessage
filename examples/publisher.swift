@@ -60,7 +60,7 @@ do {
     messages.insert(DataSet(topic: "interesting", message: "this is message #4"))
 
     for dataSet in messages.sorted(by: { $0.message < $1.message }) {
-        node0.sendTopic = C7.Data(dataSet.topic)
+        node0.setSendTopic(dataSet.topic)
 
         print("sending topic: \(node0.sendTopic), message: \(dataSet.message)")
 
