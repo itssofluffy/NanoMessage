@@ -67,9 +67,9 @@ public class NanoSocket {
     /// Is the socket attached to a device.
     public fileprivate(set) var socketIsADevice = false
     /// The dispatch queue that async send/receive messages are run on.
-    public var ioQueue = DispatchQueue(label: "com.nanomessage.aioqueue", qos: .userInitiated)
+    public var aioQueue = DispatchQueue(label: "com.nanomessage.aioqueue", qos: .userInitiated)
     /// The async dispatch queue's group.
-    public var ioGroup = DispatchGroup()
+    public var aioGroup = DispatchGroup()
     /// async mutex lock.
     public var mutex: Mutex
 

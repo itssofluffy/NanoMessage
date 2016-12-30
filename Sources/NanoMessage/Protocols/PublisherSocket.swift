@@ -120,7 +120,7 @@ extension PublisherSocket {
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(topic: C7.Data, message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.ioQueue.async(group: self.ioGroup) {
+        self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
                     var bytesSent: Int?
@@ -237,7 +237,7 @@ extension PublisherSocket {
     ///   - timeout:        The timeout interval to set.
     ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(topic: C7.Data, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.ioQueue.async(group: self.ioGroup) {
+        self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
                     var bytesSent: Int?
@@ -300,7 +300,7 @@ extension PublisherSocket {
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the sendMessage completes.
     public func sendMessage(topic: C7.Data, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.ioQueue.async(group: self.ioGroup) {
+        self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
                     var bytesSent: Int?

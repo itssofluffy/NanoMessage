@@ -1,5 +1,5 @@
 /*
-    XCTestManifests.swift
+    NanoMsgTests.swift
 
     Copyright (c) 2016 Stephen Whittle  All rights reserved.
 
@@ -20,37 +20,26 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
 import XCTest
 
-let payload = "This above all...to thine own self be true."
+@testable import NanoMessage
 
-public var pauseTime = TimeInterval(seconds: 0.20).microseconds
-public var pauseCount: UInt32 = 0
+class TerminateTests: XCTestCase {
+    func testTerminate() {
+        var completed = false
 
-func pauseForBind() {
-    usleep(pauseTime)
-    pauseCount += 1
-}
+        terminate()     // this will cause the closureHandlers in BindToSocketTests and LoopBackTests to be executed
+                        // as it seems we can't cancel the work items in the test classes even though after being#
+                        // cancelled isCancelled = true
+
+        completed = true
+
+        XCTAssert(completed, "test not completed")
+    }
 
 #if !os(OSX)
-public let allTests = [
-    testCase(NanoMsgTests.allTests),
-    testCase(VersionTests.allTests),
-    testCase(SocketOptionTests.allTests),
-    testCase(EndPointTests.allTests),
-    testCase(PipelineProtocolFamilyTests.allTests),
-    testCase(PairProtocolFamilyTests.allTests),
-    testCase(RequestReplyProtocolFamilyTests.allTests),
-    testCase(PublishSubscribeProtocolFamilyTests.allTests),
-    testCase(SurveyProtocolFamilyTests.allTests),
-    testCase(BusProtocolFamilyTests.allTests),
-    testCase(PollSocketTests.allTests),
-    testCase(SocketStatisticTests.allTests),
-    testCase(MessageSizeTests.allTests),
-    testCase(MessageSpeedTests.allTests),
-    testCase(BindToSocketTests.allTests),
-    testCase(LoopBackTests.allTests),
-    testCase(TerminateTests.allTests)
-]
+    static let allTests = [
+        ("testTerminate", testTerminate)
+    ]
 #endif
+}

@@ -45,10 +45,10 @@ class NanoMsgTests: XCTestCase {
     }
 
     func testNanoMsgError() {
-      for (code, errorCode) in nanomsgError.sorted(by: { $0.0 < $1.0 }) {
-          print("code: \(code), errorCode: \(errorCode), nanoMessageError: \(nanoMessageError(code))")
-      }
-  }
+        for (code, errorCode) in nanomsgError.sorted(by: { $0.0 < $1.0 }) {
+            print("code: \(code), errorCode: \(errorCode), nanoMessageError: \(nanoMessageError(code))")
+        }
+    }
 
     func testNanoMsgSymbolProperty() {
         // test symbolProperty computed property and debugDescription of SymbolProperty struct.

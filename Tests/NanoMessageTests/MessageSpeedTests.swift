@@ -66,7 +66,7 @@ class MessageSpeedTests: XCTestCase {
                 })
             }
 
-            node1.ioGroup.wait()
+            node1.aioGroup.wait()
 
             let messagesSent = try node0.getMessagesSent()
             let messagesReceived = try node1.getMessagesReceived()

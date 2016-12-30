@@ -65,7 +65,7 @@ class BindToSocketTests: XCTestCase {
 
             let workItem = node0.bindToSocket(node1, queue: queue, group: group, {
                 if let error = $0 {
-                    print("async node0.bindToSocket() error: \(error)")
+                    print(error)
                 }
             })
 
@@ -97,7 +97,7 @@ class BindToSocketTests: XCTestCase {
             XCTAssertEqual(node2Received.bytes, node2Received.message.utf8.count, "node2.bytes != message.utf8.count")
             XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
 
-            workItem.cancel()
+            workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
 
             workItem.notify(queue: queue) {
                 print("node0.bindToSocket(): \(workItem.isCancelled)")
