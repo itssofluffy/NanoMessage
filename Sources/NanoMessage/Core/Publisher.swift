@@ -28,4 +28,7 @@ protocol Publisher: Sender, ASyncPublisher {
     var prependTopic: Bool { get set }
     var ignoreTopicSeperator: Bool { get set }
     var resetTopicAfterSend: Bool { get set }
+
+    func setSendTopic(_ topic: Data) throws
+    func setSendTopic(_ topic: String) throws
 }

@@ -32,7 +32,7 @@ public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
 
 /// NanoMessage library version.
 public var nanoMessageVersion: (current: Int, revision: Int, age: Int) {
-    return (current: 0, revision: 0, age: 11)
+    return (current: 0, revision: 0, age: 12)
 }
 
 /// Notify all sockets about process termination.

@@ -54,6 +54,21 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
 }
 
 extension PublisherSocket {
+    /// validate the passed topic.
+    ///
+    /// - Parameters:
+    ///   - topic:  The topic to validate.
+    ///
+    /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined.
+    ///             `NanoMessageError.TopicLength` if the topic length too large.
+    fileprivate func _validateTopic(_ topic: C7.Data) throws {
+        if (topic.isEmpty) {
+            throw NanoMessageError.NoTopic
+        } else if (topic.count > NanoMessage.maximumTopicLength) {
+            throw NanoMessageError.TopicLength
+        }
+    }
+
     /// Send a message.
     ///
     /// - Parameters:
@@ -63,7 +78,8 @@ extension PublisherSocket {
     ///                   `NanoMessageError.MessageNotSent`
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
-    ///            `NanoMessageError.sendMessage` there was a problem sending the message.
+    ///            `NanoMessageError.SendMessage` there was a problem sending the message.
+    ///            `NanoMessageError.NoTopic` if there was no topic defined to send.
     ///            `NanoMessageError.TopicLength` if the topic length too large.
     ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
     ///            `NanoMessageError.TimedOut` the send timedout.
@@ -74,11 +90,7 @@ extension PublisherSocket {
         var messagePayload: C7.Data
 
         if (self.prependTopic) {                                  // we are prepending the topic to the start of the message.
-            if (self.sendTopic.isEmpty) {                         // check that we have a topic to send.
-                throw NanoMessageError.NoTopic
-            } else if (self.sendTopic.count > NanoMessage.maximumTopicLength) {
-                throw NanoMessageError.TopicLength
-            }
+            try self._validateTopic(self.sendTopic)               // check that we have a valid topic to send.
 
             if (self.ignoreTopicSeperator) {                      // check if we are ignoring the topic seperator.
                 messagePayload = self.sendTopic + message
@@ -101,7 +113,7 @@ extension PublisherSocket {
             }
 
             if (self.resetTopicAfterSend) {                       // are we resetting the topic?
-                self.setSendTopic(C7.Data())
+                self.sendTopic = C7.Data()                        // reset the topic, don't use setSendTopic() as this checks for isEmpty!
             }
         }
 
@@ -126,9 +138,9 @@ extension PublisherSocket {
                     var bytesSent: Int?
                     var errorMessage: Error?
 
-                    self.setSendTopic(topic)
-
                     do {
+                        try self.setSendTopic(topic)
+
                         bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
                     } catch {
                         errorMessage = error
@@ -243,9 +255,9 @@ extension PublisherSocket {
                     var bytesSent: Int?
                     var errorMessage: Error?
 
-                    self.setSendTopic(topic)
-
                     do {
+                        try self.setSendTopic(topic)
+
                         bytesSent = try self.sendMessage(message, timeout: timeout)
                     } catch {
                         errorMessage = error
@@ -306,9 +318,9 @@ extension PublisherSocket {
                     var bytesSent: Int?
                     var errorMessage: Error?
 
-                    self.setSendTopic(topic)
-
                     do {
+                        try self.setSendTopic(topic)
+
                         bytesSent = try self.sendMessage(message, timeout: timeout)
                     } catch {
                         errorMessage = error
@@ -361,7 +373,12 @@ extension PublisherSocket {
     ///
     /// - Parameters:
     ///   - topic:  The topic to send.
-    public func setSendTopic(_ topic: C7.Data) {
+    ///
+    /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined to send.
+    ///             `NanoMessageError.TopicLength` if the topic length too large.
+    public func setSendTopic(_ topic: C7.Data) throws {
+        try self._validateTopic(topic)               // check that we have a valid topic.
+
         self.sendTopic = topic
     }
 
@@ -369,7 +386,10 @@ extension PublisherSocket {
     ///
     /// - Parameters:
     ///   - topic:  The topic to send.
-    public func setSendTopic(_ topic: String) {
-        self.setSendTopic(C7.Data(topic))
+    ///
+    /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined to send.
+    ///             `NanoMessageError.TopicLength` if the topic length too large.
+    public func setSendTopic(_ topic: String) throws {
+        try self.setSendTopic(C7.Data(topic))
     }
 }
