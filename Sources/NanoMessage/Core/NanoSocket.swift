@@ -373,8 +373,8 @@ extension NanoSocket {
     /// Check a socket and reports whether it’s possible to send a message to the socket and/or receive a message from the socket.
     ///
     /// - Parameters:
-    ///   - timeout milliseconds: The maximum number of milliseconds to poll the socket for an event to occur,
-    ///                           default is 1000 milliseconds (1 second).
+    ///   - timeout : The maximum number of milliseconds to poll the socket for an event to occur,
+    ///               default is 1000 milliseconds (1 second).
     ///
     /// - Throws: `NanoMessageError.SocketIsADevice`
     ///           `NanoMessageError.PollSocket` if polling the socket fails.
@@ -452,18 +452,14 @@ extension NanoSocket {
     ///   - group:          The dispatch group to use.
     ///   - closureHandler: The closure to use when the 'bind' terminates.
     ///
-    //// - Returns:          The despatched work item.
+    /// - Returns:          The despatched work item.
     public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, group: DispatchGroup, _ closureHandler: @escaping (Error?) -> Void) -> DispatchWorkItem {
         let workItem = DispatchWorkItem {
-            var errorMessage: Error?
-
             do {
                 try self.bindToSocket(nanoSocket)
             } catch {
-                errorMessage = error
+                closureHandler(error)
             }
-
-            closureHandler(errorMessage)
         }
 
         queue.async(group: group, execute: workItem)
@@ -503,15 +499,11 @@ extension NanoSocket {
     /// - Returns:          The despatched work item.
     public func loopBack(queue: DispatchQueue, group: DispatchGroup, _ closureHandler: @escaping (Error?) -> Void) -> DispatchWorkItem {
         let workItem = DispatchWorkItem {
-            var errorMessage: Error?
-
             do {
                 try self.loopBack()
             } catch {
-                errorMessage = error
+                closureHandler(error)
             }
-
-            closureHandler(errorMessage)
         }
 
         queue.async(group: group, execute: workItem)

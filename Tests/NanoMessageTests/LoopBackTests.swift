@@ -67,17 +67,24 @@ class LoopBackTests: XCTestCase {
             let node2EndPointId: Int = try node2.connectToURL(connectURL)
             XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.connectToURL('\(connectURL)') < 0")
 
-            let bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
+            let node1bytesSent = try node1.sendMessage(payload)
+            XCTAssertEqual(node1bytesSent, payload.utf8.count, "node1bytesSent != payload.utf8.count")
 
             var node2Received: ReceiveString = try node2.receiveMessage()
             XCTAssertEqual(node2Received.bytes, node2Received.message.utf8.count, "node2.bytes != message.utf8.count")
             XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
 
+            let messagesSent = try node1.getMessagesSent()
+            let messagesReceived = try node2.getMessagesReceived()
+            let bytesSent = try node1.getBytesSent()
+            let bytesReceived = try node2.getBytesReceived()
+
+            print("Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
+
             workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
 
             workItem.notify(queue: queue) {
-                print("node0.bindToSocket(): \(workItem.isCancelled)")
+                print("node0.loopBack(): \(workItem.isCancelled)")
             }
 
             completed = true

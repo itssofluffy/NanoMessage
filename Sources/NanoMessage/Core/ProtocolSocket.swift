@@ -207,19 +207,16 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    var bytesSent: Int?
-                    var errorMessage: Error?
-
                     do {
-                        bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
 
-                    closureHandler(bytesSent, errorMessage)
+                        closureHandler(bytesSent, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -269,19 +266,16 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    var bytesSent: Int?
-                    var errorMessage: Error?
-
                     do {
-                        bytesSent = try self.sendMessage(message, timeout: timeout)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, errorMessage)
+                        closureHandler(bytesSent, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -307,19 +301,16 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    var bytesSent: Int?
-                    var errorMessage: Error?
-
                     do {
-                        bytesSent = try self.sendMessage(message, timeout: timeout)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, errorMessage)
+                        closureHandler(bytesSent, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -505,19 +496,16 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    var received: ReceiveData?
-                    var errorMessage: Error?
-
                     do {
-                        received = try self.receiveMessage(blockingMode: blockingMode)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode)
 
-                    closureHandler(received, errorMessage)
+                        closureHandler(received, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -542,19 +530,16 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                   var received: ReceiveData?
-                   var errorMessage: Error?
-
                    do {
-                       received = try self.receiveMessage(timeout: timeout)
-                   } catch {
-                       errorMessage = error
-                   }
+                       let received: ReceiveData = try self.receiveMessage(timeout: timeout)
 
-                   closureHandler(received, errorMessage)
+                       closureHandler(received, nil)
+                   } catch {
+                       closureHandler(nil, error)
+                   }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -568,19 +553,16 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    var received: ReceiveData?
-                    var errorMessage: Error?
-
                     do {
-                        received = try self.receiveMessage(timeout: timeout)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let received: ReceiveData = try self.receiveMessage(timeout: timeout)
 
-                    closureHandler(received, errorMessage)
+                        closureHandler(received, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }

@@ -83,19 +83,26 @@ class BindToSocketTests: XCTestCase {
             let node3EndPointId: Int = try node3.connectToURL(connectURL2)
             XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.connectToURL('\(connectURL2)') < 0")
 
-            var bytesSent = try node2.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node2.bytesSent != payload.utf8.count")
+            let node2bytesSent = try node2.sendMessage(payload)
+            XCTAssertEqual(node2bytesSent, payload.utf8.count, "node2bytesSent != payload.utf8.count")
 
-            var node3Received: ReceiveString = try node3.receiveMessage()
+            let node3Received: ReceiveString = try node3.receiveMessage()
             XCTAssertEqual(node3Received.bytes, node3Received.message.utf8.count, "node3.bytes != message.utf8.count")
             XCTAssertEqual(node3Received.message, payload, "node3.message != payload")
 
-            bytesSent = try node3.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node3.bytesSent != payload.utf8.count")
+            let node3bytesSent = try node3.sendMessage(payload)
+            XCTAssertEqual(node3bytesSent, payload.utf8.count, "node3bytesSent != payload.utf8.count")
 
-            var node2Received: ReceiveString = try node2.receiveMessage()
+            let node2Received: ReceiveString = try node2.receiveMessage()
             XCTAssertEqual(node2Received.bytes, node2Received.message.utf8.count, "node2.bytes != message.utf8.count")
             XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
+
+            let messagesSent = try node2.getMessagesSent()
+            let messagesReceived = try node3.getMessagesReceived()
+            let bytesSent = try node2.getBytesSent()
+            let bytesReceived = try node3.getBytesReceived()
+
+            print("Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
 
             workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
 

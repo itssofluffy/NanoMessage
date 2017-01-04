@@ -135,21 +135,18 @@ extension PublisherSocket {
         self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
-                    var bytesSent: Int?
-                    var errorMessage: Error?
-
                     do {
                         try self.setSendTopic(topic)
 
-                        bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
 
-                    closureHandler(bytesSent, errorMessage)
+                        closureHandler(bytesSent, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -252,21 +249,18 @@ extension PublisherSocket {
         self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
-                    var bytesSent: Int?
-                    var errorMessage: Error?
-
                     do {
                         try self.setSendTopic(topic)
 
-                        bytesSent = try self.sendMessage(message, timeout: timeout)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, errorMessage)
+                        closureHandler(bytesSent, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
@@ -315,21 +309,18 @@ extension PublisherSocket {
         self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
-                    var bytesSent: Int?
-                    var errorMessage: Error?
-
                     do {
                         try self.setSendTopic(topic)
 
-                        bytesSent = try self.sendMessage(message, timeout: timeout)
-                    } catch {
-                        errorMessage = error
-                    }
+                        let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, errorMessage)
+                        closureHandler(bytesSent, nil)
+                    } catch {
+                        closureHandler(nil, error)
+                    }
                 }
             } catch {
-                print(error, to: &errorStream)
+                closureHandler(nil, error)
             }
         }
     }
