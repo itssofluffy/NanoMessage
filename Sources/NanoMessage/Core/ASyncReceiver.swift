@@ -28,6 +28,10 @@ public protocol ASyncReceiver {
     // ASync Input functions.
     func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
     func receiveMessage(_ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
+    func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
+    func receiveMessage(_ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
     func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
+    func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
     func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void)
+    func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void)
 }

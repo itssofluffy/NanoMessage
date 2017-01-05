@@ -59,8 +59,8 @@ class MessageSpeedTests: XCTestCase {
 
             for _ in 1 ... 100000 {
                 let _ = try node0.sendMessage(messagePayload)
-                node1.receiveMessage({
-                    if let error = $1 {
+                node1.receiveMessage({ (receive: ReceiveData?, error: Error?) -> Void in
+                    if let error = error {
                         print(error)
                     }
                 })
