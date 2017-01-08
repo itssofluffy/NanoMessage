@@ -27,7 +27,12 @@ import C7
 @testable import NanoMessage
 
 class MessageSpeedTests: XCTestCase {
-    private func testMessageSpeed(connectAddress: String, bindAddress: String = "") {
+    enum ReceiveType {
+        case Serial
+        case Asynchronously
+    }
+
+    func testMessageSpeed(receiveType: ReceiveType, connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return
@@ -59,11 +64,17 @@ class MessageSpeedTests: XCTestCase {
 
             for _ in 1 ... 100000 {
                 let _ = try node0.sendMessage(messagePayload)
-                node1.receiveMessage({ (receive: ReceiveData?, error: Error?) -> Void in
-                    if let error = error {
-                        print(error)
-                    }
-                })
+
+                switch (receiveType) {
+                    case .Serial:
+                        let _: ReceiveData = try node1.receiveMessage()
+                    case .Asynchronously:
+                        node1.receiveMessage({ (receive: ReceiveData?, error: Error?) -> Void in
+                            if let error = error {
+                                print(error)
+                            }
+                        })
+                }
             }
 
             node1.aioGroup.wait()
@@ -93,32 +104,56 @@ class MessageSpeedTests: XCTestCase {
         XCTAssert(completed, "test not completed")
     }
 
-    func testTCPMessageSpeed() {
+    func testTCPMessageSpeedSerial() {
         print("TCP tests...")
-        testMessageSpeed(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
-    func testInProcessMessageSpeed() {
+    func testTCPMessageSpeedAsynchronously() {
+        print("TCP tests...")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+    }
+
+    func testInProcessMessageSpeedSerial() {
         print("In-Process tests...")
-        testMessageSpeed(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
-    func testInterProcessMessageSpeed() {
+    func testInProcessMessageSpeedAsynchronously() {
+        print("In-Process tests...")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "inproc:///tmp/pipeline.inproc")
+    }
+
+    func testInterProcessMessageSpeedSerial() {
         print("Inter Process tests...")
-        testMessageSpeed(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
-    func testWebSocketMessageSpeed() {
+    func testInterProcessMessageSpeedAsynchronously() {
+        print("Inter Process tests...")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ipc:///tmp/pipeline.ipc")
+    }
+
+    func testWebSocketMessageSpeedSerial() {
         print("Web Socket tests...")
-        testMessageSpeed(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+    }
+
+    func testWebSocketMessageSpeedAsynchronously() {
+        print("Web Socket tests...")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 
 #if !os(OSX)
     static let allTests = [
-        ("testTCPMessageSpeed", testTCPMessageSpeed),
-        ("testInProcessMessageSpeed", testInProcessMessageSpeed),
-        ("testInterProcessMessageSpeed", testInterProcessMessageSpeed),
-        ("testWebSocketMessageSpeed", testWebSocketMessageSpeed)
+        ("testTCPMessageSpeedSerial", testTCPMessageSpeedSerial),
+        ("testTCPMessageSpeedAsynchronously", testTCPMessageSpeedAsynchronously),
+        ("testInProcessMessageSpeedSerial", testInProcessMessageSpeedSerial),
+        ("testInProcessMessageSpeedAsynchronously", testInProcessMessageSpeedAsynchronously),
+        ("testInterProcessMessageSpeedSerial", testInterProcessMessageSpeedSerial),
+        ("testInterProcessMessageSpeedAsynchronously", testInterProcessMessageSpeedAsynchronously),
+        ("testWebSocketMessageSpeedSerial", testWebSocketMessageSpeedSerial),
+        ("testWebSocketMessageSpeedAsynchronously", testWebSocketMessageSpeedAsynchronously)
     ]
 #endif
 }
