@@ -26,6 +26,8 @@ import C7
 
 @testable import NanoMessage
 
+var asyncError = false
+
 class MessageSpeedTests: XCTestCase {
     enum ReceiveType {
         case Serial
@@ -63,21 +65,36 @@ class MessageSpeedTests: XCTestCase {
             let messagePayload = C7.Data([Byte](repeating: 0xff, count: messageSize))
 
             for _ in 1 ... 100000 {
-                let _ = try node0.sendMessage(messagePayload)
-
                 switch (receiveType) {
                     case .Serial:
+                        let _ = try node0.sendMessage(messagePayload)
                         let _: ReceiveData = try node1.receiveMessage()
                     case .Asynchronously:
+                        if (asyncError) {
+                            break
+                        }
+
+                        node0.sendMessage(messagePayload, { (bytesSent: Int?, error: Error?) -> Void in
+                            if let error = error {
+                                print(error)
+                                asyncError = true
+                            }
+                        })
                         node1.receiveMessage { (receive: ReceiveData?, error: Error?) -> Void in
                             if let error = error {
                                 print(error)
+                                asyncError = true
                             }
                         }
                 }
             }
 
-            node1.aioGroup.wait()
+            if (receiveType == .Asynchronously) {
+                node0.aioGroup.wait()
+                node1.aioGroup.wait()
+            }
+
+            XCTAssert(!asyncError, "async IO Error")
 
             let messagesSent = try node0.getMessagesSent()
             let messagesReceived = try node1.getMessagesReceived()
