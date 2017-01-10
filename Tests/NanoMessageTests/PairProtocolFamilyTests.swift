@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class PairProtocolFamilyTests: XCTestCase {
-    private func testPair(connectAddress: String, bindAddress: String = "") {
+    func testPair(connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return

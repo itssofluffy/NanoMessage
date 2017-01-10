@@ -27,7 +27,7 @@ import Dispatch
 @testable import NanoMessage
 
 class BindToSocketTests: XCTestCase {
-    private func testBindToSocket(connectAddress: String, bindAddress: String = "") {
+    func testBindToSocket(connectAddress: String, bindAddress: String = "") {
         guard let connectURL1 = URL(string: connectAddress + "5") else {
             XCTAssert(false, "connectURL is invalid")
             return

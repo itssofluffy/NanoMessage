@@ -27,7 +27,7 @@ import Dispatch
 @testable import NanoMessage
 
 class LoopBackTests: XCTestCase {
-    private func testLoopBack(connectAddress: String, bindAddress: String = "") {
+    func testLoopBack(connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return

@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class SocketOptionTests: XCTestCase {
-    private func testSocketOptions() {
+    func testSocketOptions() {
         var completed = false
 
         do {

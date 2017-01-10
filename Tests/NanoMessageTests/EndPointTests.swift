@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class EndPointTests: XCTestCase {
-    private func testEndPoints(connectAddress: String, bindAddress: String = "") {
+    func testEndPoints(connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return

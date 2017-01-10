@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class PollSocketTests: XCTestCase {
-    private func testPollSocket(connectAddress: String, bindAddress: String = "") {
+    func testPollSocket(connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return

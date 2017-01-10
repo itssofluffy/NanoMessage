@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class PipelineProtocolFamilyTests: XCTestCase {
-    private func testPipeline(connectAddress: String, bindAddress: String = "") {
+    func testPipeline(connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return

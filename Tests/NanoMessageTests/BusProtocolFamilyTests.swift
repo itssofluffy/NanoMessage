@@ -26,7 +26,7 @@ import Foundation
 @testable import NanoMessage
 
 class BusProtocolFamilyTests: XCTestCase {
-    private func testBus(address1: String, address2: String) {
+    func testBus(address1: String, address2: String) {
         guard let address1URL = URL(string: address1) else {
             XCTAssert(false, "address1URL is invalid")
             return

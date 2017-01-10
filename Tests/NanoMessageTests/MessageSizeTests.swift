@@ -27,7 +27,7 @@ import C7
 @testable import NanoMessage
 
 class MessageSizeTests: XCTestCase {
-    private func testMessageSize(connectAddress: String, bindAddress: String = "") {
+    func testMessageSize(connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
             return
@@ -58,7 +58,7 @@ class MessageSizeTests: XCTestCase {
             let maximumMessageSize = try node1.getMaximumMessageSize()
 
             while (messageSize <= maximumMessageSize) {
-                let messagePayload = Data([Byte](repeating: 0xff, count: messageSize))
+                let messagePayload = C7.Data([Byte](repeating: 0xff, count: messageSize))
 
                 let _ = try node0.sendMessage(messagePayload)
                 let _: ReceiveData = try node1.receiveMessage()

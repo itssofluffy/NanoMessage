@@ -60,7 +60,7 @@ class MessageSpeedTests: XCTestCase {
             pauseForBind()
 
             let messageSize = 128
-            let messagePayload = Data([Byte](repeating: 0xff, count: messageSize))
+            let messagePayload = C7.Data([Byte](repeating: 0xff, count: messageSize))
 
             for _ in 1 ... 100000 {
                 let _ = try node0.sendMessage(messagePayload)
@@ -69,11 +69,11 @@ class MessageSpeedTests: XCTestCase {
                     case .Serial:
                         let _: ReceiveData = try node1.receiveMessage()
                     case .Asynchronously:
-                        node1.receiveMessage({ (receive: ReceiveData?, error: Error?) -> Void in
+                        node1.receiveMessage { (receive: ReceiveData?, error: Error?) -> Void in
                             if let error = error {
                                 print(error)
                             }
-                        })
+                        }
                 }
             }
 
