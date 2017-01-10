@@ -133,21 +133,24 @@ extension PublisherSocket {
     ///   - closureHandler: The closure to use when the async functionality completes.
     public func sendMessage(topic: C7.Data, message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.aioQueue.async(group: self.aioGroup) {
+            var bytesSent: Int?
+            var thrownError: Error?
+
             do {
                 try self.mutex.lock {
                     do {
                         try self.setSendTopic(topic)
 
-                        let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
-
-                        closureHandler(bytesSent, nil)
+                        bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(bytesSent, thrownError)
         }
     }
 
@@ -247,21 +250,24 @@ extension PublisherSocket {
     ///   - closureHandler: The closure to use when the async functionality completes.
     public func sendMessage(topic: C7.Data, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.aioQueue.async(group: self.aioGroup) {
+            var bytesSent: Int?
+            var thrownError: Error?
+
             do {
                 try self.mutex.lock {
                     do {
                         try self.setSendTopic(topic)
 
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
-
-                        closureHandler(bytesSent, nil)
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(bytesSent, thrownError)
         }
     }
 
@@ -307,21 +313,25 @@ extension PublisherSocket {
     ///   - closureHandler: The closure to use when the async functionality completes.
     public func sendMessage(topic: C7.Data, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.aioQueue.async(group: self.aioGroup) {
+            var bytesSent: Int?
+            var thrownError: Error?
+
             do {
                 try self.mutex.lock {
                     do {
                         try self.setSendTopic(topic)
 
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
-
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
                         closureHandler(bytesSent, nil)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(bytesSent, thrownError)
         }
     }
 

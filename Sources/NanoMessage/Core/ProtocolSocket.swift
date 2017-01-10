@@ -205,19 +205,22 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var bytesSent: Int?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
-
-                        closureHandler(bytesSent, nil)
+                        bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(bytesSent, thrownError)
         }
     }
 
@@ -264,19 +267,22 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var bytesSent: Int?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
-
-                        closureHandler(bytesSent, nil)
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(bytesSent, thrownError)
         }
     }
 
@@ -299,19 +305,22 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var bytesSent: Int?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
-
-                        closureHandler(bytesSent, nil)
+                        bytesSent = try self.sendMessage(message, timeout: timeout)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(bytesSent, thrownError)
         }
     }
 
@@ -494,19 +503,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var received: ReceiveData?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode)
-
-                        closureHandler(received, nil)
+                        received = try self.receiveMessage(blockingMode: blockingMode)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(received, thrownError)
         }
     }
 
@@ -529,19 +541,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var received: ReceiveString?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let received: ReceiveString = try self.receiveMessage(blockingMode: blockingMode)
-
-                        closureHandler(received, nil)
+                        received = try self.receiveMessage(blockingMode: blockingMode)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(received, thrownError)
         }
     }
 
@@ -563,19 +578,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var received: ReceiveData?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                    do {
-                       let received: ReceiveData = try self.receiveMessage(timeout: timeout)
-
-                       closureHandler(received, nil)
+                       received = try self.receiveMessage(timeout: timeout)
                    } catch {
-                       closureHandler(nil, error)
+                       thrownError = error
                    }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(received, thrownError)
         }
     }
 
@@ -587,19 +605,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var received: ReceiveString?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                    do {
-                       let received: ReceiveString = try self.receiveMessage(timeout: timeout)
-
-                       closureHandler(received, nil)
+                       received = try self.receiveMessage(timeout: timeout)
                    } catch {
-                       closureHandler(nil, error)
+                       thrownError = error
                    }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(received, thrownError)
         }
     }
 
@@ -610,19 +631,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var received: ReceiveData?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let received: ReceiveData = try self.receiveMessage(timeout: timeout)
-
-                        closureHandler(received, nil)
+                        received = try self.receiveMessage(timeout: timeout)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(received, thrownError)
         }
     }
 
@@ -633,19 +657,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+            var received: ReceiveString?
+            var thrownError: Error?
+
             do {
                 try self._nanoSocket.mutex.lock {
                     do {
-                        let received: ReceiveString = try self.receiveMessage(timeout: timeout)
-
-                        closureHandler(received, nil)
+                        received = try self.receiveMessage(timeout: timeout)
                     } catch {
-                        closureHandler(nil, error)
+                        thrownError = error
                     }
                 }
             } catch {
-                closureHandler(nil, error)
+                thrownError = error
             }
+
+            closureHandler(received, thrownError)
         }
     }
 }
