@@ -26,7 +26,7 @@ import ISFLibrary
 
 let urlToUse: String
 
-switch (CommandLine.argc) {
+switch (CommandLine.arguments.count) {
     case 1:
         urlToUse = "tcp://localhost:5555"
     case 2:
