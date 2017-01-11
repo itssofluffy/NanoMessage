@@ -24,11 +24,22 @@ import Foundation
 import NanoMessage
 import ISFLibrary
 
-do {
-    guard let url = URL(string: "tcp://localhost:5555") else {
-        fatalError("url is not valid")
-    }
+let urlToUse: String
 
+switch (CommandLine.argc) {
+    case 1:
+        urlToUse = "tcp://localhost:5555"
+    case 2:
+        urlToUse = CommandLine.arguments[1]
+    default:
+        fatalError("invalid number of parameters")
+}
+
+guard let url = URL(string: urlToUse) else {
+    fatalError("url is not valid")
+}
+
+do {
     let node0 = try PushSocket()
     let _: Int = try node0.connectToURL(url)
 

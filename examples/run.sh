@@ -22,4 +22,4 @@
 
 export LD_LIBRARY_PATH="$(dirname "$(pwd)")/.build/debug"
 
-./$1
+./$@

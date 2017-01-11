@@ -28,7 +28,7 @@ import Mutex
 @testable import NanoMessage
 
 class MessageSpeedTests: XCTestCase {
-    var asyncMutex: Mutex = try! Mutex()
+    var asyncErrorMutex: Mutex = try! Mutex()
     var asyncError: Error?
     var asyncMessagesSent: UInt64 = 0
     var asyncMessagesReceived: UInt64 = 0
@@ -84,7 +84,7 @@ class MessageSpeedTests: XCTestCase {
                     case .Asynchronously:
                         node0.sendMessage(messagePayload, { (bytesSent: Int?, error: Error?) -> Void in
                             if let error = error {
-                                try! self.asyncMutex.tryLock {
+                                try! self.asyncErrorMutex.tryLock {
                                     if (self.asyncError == nil) {
                                         self.asyncError = error
                                     }
@@ -96,7 +96,7 @@ class MessageSpeedTests: XCTestCase {
                         })
                         node1.receiveMessage { (receive: ReceiveData?, error: Error?) -> Void in
                             if let error = error {
-                                try! self.asyncMutex.tryLock {
+                                try! self.asyncErrorMutex.tryLock {
                                     if (self.asyncError == nil) {
                                         self.asyncError = error
                                     }
