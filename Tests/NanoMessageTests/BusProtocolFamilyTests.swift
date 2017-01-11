@@ -92,12 +92,10 @@ class BusProtocolFamilyTests: XCTestCase {
     }
 
     func testInProcessBus() {
-        print("In-Process tests...")
         testBus(address1: "inproc:///tmp/pipeline_1.inproc", address2: "inproc:///tmp/pipeline_2.inproc")
     }
 
     func testInterProcessBus() {
-        print("Inter Process tests...")
         testBus(address1: "ipc:///tmp/pipeline_1.ipc", address2: "ipc:///tmp/pipeline_2.ipc")
     }
 

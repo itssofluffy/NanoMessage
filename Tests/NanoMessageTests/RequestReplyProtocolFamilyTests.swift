@@ -81,22 +81,18 @@ class RequestReplyProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPRequestReply() {
-        print("TCP tests...")
         testRequestReply(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessRequestReply() {
-        print("In-Process tests...")
         testRequestReply(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessRequestReply() {
-        print("Inter Process tests...")
         testRequestReply(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketRequestReply() {
-        print("Web Socket tests...")
         testRequestReply(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

@@ -94,7 +94,6 @@ class EndPointTests: XCTestCase {
     }
 
     func testEndPoint() {
-        print("EndPoint tests...")
         testEndPoints(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 

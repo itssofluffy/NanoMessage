@@ -23,12 +23,18 @@
 import XCTest
 import Foundation
 import C7
+import Mutex
 
 @testable import NanoMessage
 
-var asyncError = false
-
 class MessageSpeedTests: XCTestCase {
+    var asyncMutex: Mutex = try! Mutex()
+    var asyncError: Error?
+    var asyncMessagesSent: UInt64 = 0
+    var asyncMessagesReceived: UInt64 = 0
+    var asyncBytesSent: UInt64 = 0
+    var asyncBytesReceived: UInt64 = 0
+
     enum ReceiveType {
         case Serial
         case Asynchronously
@@ -47,6 +53,12 @@ class MessageSpeedTests: XCTestCase {
 
         var completed = false
 
+        self.asyncError = nil
+        self.asyncMessagesSent = 0
+        self.asyncMessagesReceived = 0
+        self.asyncBytesSent = 0
+        self.asyncBytesReceived = 0
+
         do {
             let node0 = try PushSocket()
             let node1 = try PullSocket()
@@ -64,28 +76,40 @@ class MessageSpeedTests: XCTestCase {
             let messageSize = 128
             let messagePayload = C7.Data([Byte](repeating: 0xff, count: messageSize))
 
-            for _ in 1 ... 100000 {
+            for _ in 1 ... 100_000 {
                 switch (receiveType) {
                     case .Serial:
                         let _ = try node0.sendMessage(messagePayload)
                         let _: ReceiveData = try node1.receiveMessage()
                     case .Asynchronously:
-                        if (asyncError) {
-                            break
-                        }
-
                         node0.sendMessage(messagePayload, { (bytesSent: Int?, error: Error?) -> Void in
                             if let error = error {
-                                print(error)
-                                asyncError = true
+                                try! self.asyncMutex.tryLock {
+                                    if (self.asyncError == nil) {
+                                        self.asyncError = error
+                                    }
+                                }
+                            } else {
+                                self.asyncMessagesSent += 1
+                                self.asyncBytesSent += UInt64(bytesSent!)
                             }
                         })
                         node1.receiveMessage { (receive: ReceiveData?, error: Error?) -> Void in
                             if let error = error {
-                                print(error)
-                                asyncError = true
+                                try! self.asyncMutex.tryLock {
+                                    if (self.asyncError == nil) {
+                                        self.asyncError = error
+                                    }
+                                }
+                            } else {
+                                self.asyncMessagesReceived += 1
+                                self.asyncBytesReceived += UInt64(receive!.bytes)
                             }
                         }
+                }
+
+                if let error = self.asyncError {
+                    throw error
                 }
             }
 
@@ -94,8 +118,6 @@ class MessageSpeedTests: XCTestCase {
                 node1.aioGroup.wait()
             }
 
-            XCTAssert(!asyncError, "async IO Error")
-
             let messagesSent = try node0.getMessagesSent()
             let messagesReceived = try node1.getMessagesReceived()
             let bytesSent = try node0.getBytesSent()
@@ -103,6 +125,13 @@ class MessageSpeedTests: XCTestCase {
 
             XCTAssertEqual(messagesSent, messagesReceived, "messagesSent != messagesReceived")
             XCTAssertEqual(bytesSent, bytesReceived, "bytesSent != bytesReceived")
+
+            if (receiveType == .Asynchronously) {
+                XCTAssertEqual(messagesSent, self.asyncMessagesSent, "messagesSent != asyncMessagesSent")
+                XCTAssertEqual(bytesSent, self.asyncBytesSent, "bytesSent != asyncBytesSent")
+                XCTAssertEqual(messagesReceived, self.asyncMessagesReceived, "messagesReceived != asyncMessagesReceived")
+                XCTAssertEqual(bytesReceived, self.asyncBytesReceived, "bytesReceived != asyncBytesReceived")
+            }
 
             print("Message Size: \(messageSize) Bytes, Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
 
@@ -122,42 +151,34 @@ class MessageSpeedTests: XCTestCase {
     }
 
     func testTCPMessageSpeedSerial() {
-        print("TCP tests...")
         testMessageSpeed(receiveType: .Serial, connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testTCPMessageSpeedAsynchronously() {
-        print("TCP tests...")
         testMessageSpeed(receiveType: .Asynchronously, connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessMessageSpeedSerial() {
-        print("In-Process tests...")
         testMessageSpeed(receiveType: .Serial, connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInProcessMessageSpeedAsynchronously() {
-        print("In-Process tests...")
         testMessageSpeed(receiveType: .Asynchronously, connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessMessageSpeedSerial() {
-        print("Inter Process tests...")
         testMessageSpeed(receiveType: .Serial, connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testInterProcessMessageSpeedAsynchronously() {
-        print("Inter Process tests...")
         testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketMessageSpeedSerial() {
-        print("Web Socket tests...")
         testMessageSpeed(receiveType: .Serial, connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 
     func testWebSocketMessageSpeedAsynchronously() {
-        print("Web Socket tests...")
         testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

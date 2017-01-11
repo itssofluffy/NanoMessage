@@ -72,22 +72,18 @@ class PipelineProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPPipeline() {
-        print("TCP tests...")
         testPipeline(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessPipeline() {
-        print("In-Process tests...")
         testPipeline(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessPipeline() {
-        print("Inter Process tests...")
         testPipeline(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketPipeline() {
-        print("Web Socket tests...")
         testPipeline(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

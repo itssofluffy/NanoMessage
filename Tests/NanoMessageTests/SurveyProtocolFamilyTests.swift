@@ -90,22 +90,18 @@ class SurveyProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPSurvey() {
-        print("TCP tests...")
         testSurvey(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessSurvey() {
-        print("In-Process tests...")
         testSurvey(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessSurvey() {
-        print("Inter Process tests...")
         testSurvey(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketSurvey() {
-        print("Web Socket tests...")
         testSurvey(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

@@ -148,7 +148,6 @@ class SocketOptionTests: XCTestCase {
     }
 
     func testSocketOption() {
-        print("SocketOptions tests...")
         testSocketOptions()
     }
 

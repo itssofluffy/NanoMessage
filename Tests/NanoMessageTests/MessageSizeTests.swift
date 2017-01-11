@@ -92,22 +92,18 @@ class MessageSizeTests: XCTestCase {
     }
 
     func testTCPMessageSize() {
-        print("TCP tests...")
         testMessageSize(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessMessageSize() {
-        print("In-Process tests...")
         testMessageSize(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessMessageSize() {
-        print("Inter Process tests...")
         testMessageSize(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketMessageSize() {
-        print("Web Socket tests...")
         testMessageSize(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

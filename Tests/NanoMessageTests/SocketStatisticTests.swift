@@ -173,22 +173,18 @@ class SocketStatisticTests: XCTestCase {
     }
 
     func testTCPSocketStatistic() {
-        print("TCP tests...")
         testSocketStatistics(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessSocketStatistic() {
-        print("In-Process tests...")
         testSocketStatistics(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessSocketStatistic() {
-        print("Inter Process tests...")
         testSocketStatistics(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketStatistic() {
-        print("Web Socket tests...")
         testSocketStatistics(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

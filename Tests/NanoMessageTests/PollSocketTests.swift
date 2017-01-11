@@ -84,22 +84,18 @@ class PollSocketTests: XCTestCase {
     }
 
     func testTCPPollSocket() {
-        print("TCP tests...")
         testPollSocket(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessPollSocket() {
-        print("In-Process tests...")
         testPollSocket(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessPollSocket() {
-        print("Inter Process tests...")
         testPollSocket(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketPollSocket() {
-        print("Web Socket tests...")
         testPollSocket(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

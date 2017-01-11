@@ -81,22 +81,18 @@ class PairProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPPair() {
-        print("TCP tests...")
         testPair(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessPair() {
-        print("In-Process tests...")
         testPair(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessPair() {
-        print("Inter Process tests...")
         testPair(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketPair() {
-        print("Web Socket tests...")
         testPair(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 

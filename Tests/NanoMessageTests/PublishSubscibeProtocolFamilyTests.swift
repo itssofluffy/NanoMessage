@@ -203,22 +203,18 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPPublishSubscribe() {
-        print("TCP tests...")
         testPublishSubscribeTests(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
     }
 
     func testInProcessPublishSubscribe() {
-        print("In-Process tests...")
         testPublishSubscribeTests(connectAddress: "inproc:///tmp/pipeline.inproc")
     }
 
     func testInterProcessPublishSubscribe() {
-        print("Inter Process tests...")
         testPublishSubscribeTests(connectAddress: "ipc:///tmp/pipeline.ipc")
     }
 
     func testWebSocketPublishSubscribe() {
-        print("Web Socket tests...")
         testPublishSubscribeTests(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
     }
 
