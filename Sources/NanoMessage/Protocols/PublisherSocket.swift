@@ -135,15 +135,11 @@ extension PublisherSocket {
         self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
-                    do {
-                        try self.setSendTopic(topic)
+                    try self.setSendTopic(topic)
 
-                        let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
+                    let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
 
-                        closureHandler(bytesSent, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(bytesSent, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -249,15 +245,11 @@ extension PublisherSocket {
         self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
-                    do {
-                        try self.setSendTopic(topic)
+                    try self.setSendTopic(topic)
 
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
+                    let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                        closureHandler(bytesSent, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(bytesSent, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -309,15 +301,11 @@ extension PublisherSocket {
         self.aioQueue.async(group: self.aioGroup) {
             do {
                 try self.mutex.lock {
-                    do {
-                        try self.setSendTopic(topic)
+                    try self.setSendTopic(topic)
 
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
+                    let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                        closureHandler(bytesSent, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(bytesSent, nil)
                 }
             } catch {
                 closureHandler(nil, error)

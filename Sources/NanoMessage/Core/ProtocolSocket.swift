@@ -207,13 +207,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
+                    let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
 
-                        closureHandler(bytesSent, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(bytesSent, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -266,13 +262,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
+                    let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                        closureHandler(bytesSent, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(bytesSent, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -301,13 +293,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let bytesSent = try self.sendMessage(message, timeout: timeout)
+                    let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                        closureHandler(bytesSent, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(bytesSent, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -496,13 +484,9 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode)
+                    let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode)
 
-                        closureHandler(received, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(received, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -531,13 +515,9 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let received: ReceiveString = try self.receiveMessage(blockingMode: blockingMode)
+                    let received: ReceiveString = try self.receiveMessage(blockingMode: blockingMode)
 
-                        closureHandler(received, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(received, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -565,13 +545,9 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let received: ReceiveData = try self.receiveMessage(timeout: timeout)
+                    let received: ReceiveData = try self.receiveMessage(timeout: timeout)
 
-                        closureHandler(received, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(received, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -589,13 +565,9 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let received: ReceiveString = try self.receiveMessage(timeout: timeout)
+                    let received: ReceiveString = try self.receiveMessage(timeout: timeout)
 
-                        closureHandler(received, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(received, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -612,13 +584,9 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let received: ReceiveData = try self.receiveMessage(timeout: timeout)
+                    let received: ReceiveData = try self.receiveMessage(timeout: timeout)
 
-                        closureHandler(received, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(received, nil)
                 }
             } catch {
                 closureHandler(nil, error)
@@ -635,13 +603,9 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
-                    do {
-                        let received: ReceiveString = try self.receiveMessage(timeout: timeout)
+                    let received: ReceiveString = try self.receiveMessage(timeout: timeout)
 
-                        closureHandler(received, nil)
-                    } catch {
-                        closureHandler(nil, error)
-                    }
+                    closureHandler(received, nil)
                 }
             } catch {
                 closureHandler(nil, error)
