@@ -1,7 +1,7 @@
 /*
-    push.swift
+    push_mass.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,27 +23,54 @@
 import Foundation
 import NanoMessage
 import ISFLibrary
+import C7
 
-let urlToUse: String
+var urlToUse = "tcp://localhost:5555"
+var sendCount = 1
+var messageSize = 128
 
 switch (CommandLine.arguments.count) {
     case 1:
-        urlToUse = "tcp://localhost:5555"
+        break
     case 2:
         urlToUse = CommandLine.arguments[1]
+    case 3:
+        sendCount = Int(CommandLine.arguments[2])!
+    case 4:
+        urlToUse = CommandLine.arguments[1]
+        sendCount = Int(CommandLine.arguments[2])!
+        messageSize = Int(CommandLine.arguments[3])!
     default:
-        fatalError("invalid number of parameters")
+        fatalError("usage: push [url] [send_count] [message_size]")
 }
 
 guard let url = URL(string: urlToUse) else {
     fatalError("url is not valid")
 }
 
+if (sendCount < 1) {
+    sendCount = 1
+}
+
+if (messageSize < 1) {
+    messageSize = 1
+}
+
 do {
     let node0 = try PushSocket()
-    let _: Int = try node0.connectToURL(url)
+    let endPoint: EndPoint = try node0.connectToURL(url)
 
-    try node0.sendMessage("This is earth calling...earth calling...", timeout: TimeInterval(seconds: 10))
+    let messagePayload = C7.Data([UInt8](repeating: 0xff, count: messageSize))
+
+    for _ in 1 ... sendCount {
+        try node0.sendMessage(messagePayload, timeout: TimeInterval(seconds: 10))
+    }
+
+    let messagesSent = try node0.getMessagesSent()
+    let bytesSent = try node0.getBytesSent()
+
+    print("messages: \(messagesSent)")
+    print("bytes   : \(bytesSent)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

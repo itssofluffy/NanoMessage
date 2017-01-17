@@ -118,6 +118,10 @@ class MessageSpeedTests: XCTestCase {
                 node1.aioGroup.wait()
             }
 
+            if let error = self.asyncError {
+                throw error
+            }
+
             let messagesSent = try node0.getMessagesSent()
             let messagesReceived = try node1.getMessagesReceived()
             let bytesSent = try node0.getBytesSent()

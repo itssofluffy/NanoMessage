@@ -24,15 +24,15 @@ import Foundation
 import NanoMessage
 import ISFLibrary
 
-let urlToUse: String
+var urlToUse = "tcp://*:5555"
 
 switch (CommandLine.arguments.count) {
     case 1:
-        urlToUse = "tcp://*:5555"
+        break
     case 2:
         urlToUse = CommandLine.arguments[1]
     default:
-        fatalError("invalid number of parameters")
+        fatalError("usage: pull [url]")
 }
 
 guard let url = URL(string: urlToUse) else {
@@ -43,10 +43,27 @@ do {
     let node0 = try PullSocket()
     let _: EndPoint = try node0.bindToURL(url, name: "my local end-point")
 
-    let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+    while (true) {
+        do {
+            let _: ReceiveData = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+        } catch NanoMessageError.ReceiveTimedOut {
+            break
+        } catch {
+            throw error
+        }
 
-    print("bytes  : \(received.bytes)")     // 40
-    print("message: \(received.message)")   // This is earth calling...earth calling...
+        let socket = try node0.pollSocket(timeout: TimeInterval(seconds: 0.25))
+
+        if (!socket.messageIsWaiting) {
+            break
+        }
+    }
+
+    let messagesReceived = try node0.getMessagesReceived()
+    let bytesReceived = try node0.getBytesReceived()
+
+    print("messages: \(messagesReceived)")
+    print("bytes   : \(bytesReceived)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

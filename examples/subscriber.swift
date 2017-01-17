@@ -24,15 +24,15 @@ import Foundation
 import NanoMessage
 import ISFLibrary
 
-let urlToUse: String
+var urlToUse = "tcp://*:5555"
 
 switch (CommandLine.arguments.count) {
     case 1:
-        urlToUse = "tcp://*:5555"
+        break
     case 2:
         urlToUse = CommandLine.arguments[1]
     default:
-        fatalError("invalid number of parameters")
+        fatalError("usage: subscriber [url]")
 }
 
 guard let url = URL(string: urlToUse) else {
