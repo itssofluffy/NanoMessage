@@ -20,14 +20,22 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 #  IN THE SOFTWARE.
 
-CNanoMessagePath="$(dirname "$(find "../Packages" \
+base_dir="$(dirname "$(pwd)")"
+
+if [[ -d "$base_dir/.build/release" ]] ; then
+    export lib_path="$base_dir/.build/release"
+else
+    export lib_path="$base_dir/.build/debug"
+fi
+
+CNanoMessagePath="$(dirname "$(find "$base_dir/Packages" \
                                     -name "CNanoMessage.h")")"
 
 for fname in $(ls *.swift)
 do
-    swiftc -I ../.build/debug \
+    swiftc -I "$lib_path" \
            -I "$CNanoMessagePath" \
-           -L ../.build/debug \
+           -L "$lib_path" \
            -L "$CNanoMessagePath" \
            -lNanoMessage \
            "$fname"

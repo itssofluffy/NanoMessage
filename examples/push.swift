@@ -1,5 +1,5 @@
 /*
-    push_mass.swift
+    push.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -58,7 +58,11 @@ if (messageSize < 1) {
 
 do {
     let node0 = try PushSocket()
-    let endPoint: EndPoint = try node0.connectToURL(url)
+    let endPoint: EndPoint = try node0.connectToURL(url, name: "send end-point")
+
+    usleep(TimeInterval(milliseconds: 200).microseconds)
+
+    print(endPoint)
 
     let messagePayload = C7.Data([UInt8](repeating: 0xff, count: messageSize))
 

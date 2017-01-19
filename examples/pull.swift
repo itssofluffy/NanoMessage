@@ -41,7 +41,9 @@ guard let url = URL(string: urlToUse) else {
 
 do {
     let node0 = try PullSocket()
-    let _: EndPoint = try node0.bindToURL(url, name: "my local end-point")
+    let endPoint: EndPoint = try node0.bindToURL(url, name: "receive end-point")
+
+    print(endPoint)
 
     while (true) {
         do {
@@ -52,7 +54,7 @@ do {
             throw error
         }
 
-        let socket = try node0.pollSocket(timeout: TimeInterval(seconds: 0.25))
+        let socket = try node0.pollSocket(timeout: TimeInterval(milliseconds: 250))
 
         if (!socket.messageIsWaiting) {
             break

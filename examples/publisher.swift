@@ -60,15 +60,19 @@ guard let url = URL(string: urlToUse) else {
 }
 
 do {
-    let node0 = try PublisherSocket()
-    let endPoint: Int = try node0.connectToURL(url)
-
     var messages = Set<DataSet>()
 
     messages.insert(DataSet(topic: "interesting", message: "this is message #1"))
     messages.insert(DataSet(topic: "not-really",  message: "this is message #2"))
     messages.insert(DataSet(topic: "interesting", message: "this is message #3"))
     messages.insert(DataSet(topic: "interesting", message: "this is message #4"))
+
+    let node0 = try PublisherSocket()
+    let endPoint: EndPoint = try node0.connectToURL(url)
+
+    usleep(TimeInterval(seconds: 0.25).microseconds)
+
+    print(endPoint)
 
     for dataSet in messages.sorted(by: { $0.message < $1.message }) {
         try node0.setSendTopic(dataSet.topic)

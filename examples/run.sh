@@ -20,6 +20,12 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 #  IN THE SOFTWARE.
 
-export LD_LIBRARY_PATH="$(dirname "$(pwd)")/.build/debug"
+base_dir="$(dirname "$(pwd)")"
+
+if [[ -d "$base_dir/.build/release" ]] ; then
+    export LD_LIBRARY_PATH="$base_dir/.build/release"
+else
+    export LD_LIBRARY_PATH="$base_dir/.build/debug"
+fi
 
 ./$@

@@ -50,7 +50,7 @@ public class NanoSocket {
     }
     /// The socket/end-point close time in timeinterval.
     fileprivate var _closeDelay: TimeInterval {
-        var delay = TimeInterval(seconds: 1)
+        var delay = TimeInterval(milliseconds: 1000)
 
         if let linger = try? self.getLinger() {
             if (linger > 0) {                               // account for infinate linger timeout.
@@ -187,8 +187,8 @@ extension NanoSocket {
         let priorities = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
-        url.absoluteString.withCString {
-            endPointId = nn_bind(self.socketFd, $0)
+        url.absoluteString.withCString { address in
+            endPointId = nn_bind(self.socketFd, address)
         }
 
         guard (endPointId >= 0) else {
@@ -249,8 +249,8 @@ extension NanoSocket {
         let priorities = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
-        url.absoluteString.withCString {
-            endPointId = nn_connect(self.socketFd, $0)
+        url.absoluteString.withCString { address in
+            endPointId = nn_connect(self.socketFd, address)
         }
 
         guard (endPointId >= 0) else {
