@@ -380,7 +380,7 @@ extension NanoSocket {
     ///           `NanoMessageError.PollSocket` if polling the socket fails.
     ///
     /// - Returns: Message waiting and send queue blocked as a tuple of bools.
-    public func pollSocket(timeout: TimeInterval = 1) throws -> PollResult {
+    public func pollSocket(timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> PollResult {
         guard (!self.socketIsADevice) else {                                    // guard against polling a device socket.
             throw NanoMessageError.SocketIsADevice
         }
