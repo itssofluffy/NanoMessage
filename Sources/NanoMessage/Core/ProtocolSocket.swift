@@ -203,7 +203,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -225,30 +225,8 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
         self.sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    ///
-    /// - Note:             'sendMessage()' is called with blocking mode.
-    public func sendMessage(_ message: C7.Data, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.sendMessage(message, blockingMode: .Blocking, closureHandler)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    ///
-    /// - Note:             'sendMessage()' is called with blocking mode.
-    public func sendMessage(_ message: String, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.sendMessage(C7.Data(message), blockingMode: .Blocking, closureHandler)
     }
 
     /// Asynchronous send a message.
@@ -480,7 +458,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     if in non-blocking mode and there is no message to receive the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -497,21 +475,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    ///
-    /// - Note:             'receiveMessage()' will be called with blocking mode.
-    public func receiveMessage(_ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
-        self.receiveMessage(blockingMode: .Blocking, closureHandler)
-    }
-
-    /// Asynchronous receive a message.
-    ///
-    /// - Parameters:
     ///   - blockingMode:   Specifies if the socket should operate in blocking or non-blocking mode.
     ///                     if in non-blocking mode and there is no message to receive the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(blockingMode: BlockingMode, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -523,16 +491,6 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
                 closureHandler(nil, error)
             }
         }
-    }
-
-    /// Asynchronous receive a message.
-    ///
-    /// - Parameters:
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    ///
-    /// - Note:             'receiveMessage()' will be called with blocking mode.
-    public func receiveMessage(_ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self.receiveMessage(blockingMode: .Blocking, closureHandler)
     }
 
     /// Asynchronous receive a message.

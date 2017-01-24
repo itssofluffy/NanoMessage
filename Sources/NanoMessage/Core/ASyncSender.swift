@@ -28,8 +28,6 @@ public protocol ASyncSender {
     // ASync Output functions.
     func sendMessage(_ message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(_ message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: C7.Data, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: String, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(_ message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
     func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
