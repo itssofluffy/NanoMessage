@@ -22,10 +22,11 @@
 
 import Foundation
 import XCTest
+import ISFLibrary
 
 let payload = "This above all...to thine own self be true."
 
-public var pauseTime = TimeInterval(seconds: 0.20).microseconds
+public var pauseTime = TimeInterval(milliseconds: 200)
 public var pauseCount: UInt32 = 0
 
 func pauseForBind() {

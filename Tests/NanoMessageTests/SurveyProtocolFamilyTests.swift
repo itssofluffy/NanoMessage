@@ -22,6 +22,7 @@
 
 import XCTest
 import Foundation
+import ISFLibrary
 
 @testable import NanoMessage
 
@@ -63,7 +64,7 @@ class SurveyProtocolFamilyTests: XCTestCase {
             var bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
 
-            usleep(UInt32(TimeInterval(seconds: 0.75).microseconds)) // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
+            usleep(TimeInterval(seconds: 0.75)) // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
 
             var node1Received: ReceiveString = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")

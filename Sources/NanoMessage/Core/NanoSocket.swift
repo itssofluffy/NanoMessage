@@ -110,7 +110,7 @@ public class NanoSocket {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(self._closeDelay.microseconds)           // zzzz...
+                        usleep(self._closeDelay)                        // zzzz...
 
                         loopCount += 1
                     } else {
@@ -315,7 +315,7 @@ extension NanoSocket {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(self._closeDelay.microseconds)                   // zzzz...
+                        usleep(self._closeDelay)                                // zzzz...
 
                         loopCount += 1
                     } else {
