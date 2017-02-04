@@ -72,6 +72,9 @@ public class NanoSocket {
     public var aioGroup = DispatchGroup()
     /// async mutex lock.
     public var mutex: Mutex
+    // define nn_poll() event masks.
+    fileprivate let _pollinMask = CShort(NN_POLLIN)
+    fileprivate let _polloutMask = CShort(NN_POLLOUT)
 
     /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
     ///
@@ -385,15 +388,12 @@ extension NanoSocket {
             throw NanoMessageError.SocketIsADevice
         }
 
-        let pollinMask = CShort(NN_POLLIN)                                      // define nn_poll event masks as short's so we only
-        let polloutMask = CShort(NN_POLLOUT)                                    // cast once in the function
-
         var eventMask = CShort.allZeros                                         //
         if let _: Int = try? getSocketOption(self.socketFd, .ReceiveFd) {       // rely on the fact that getting the for example receive
-            eventMask = pollinMask                                              // file descriptor for a socket type that does not support
+            eventMask = _pollinMask                                             // file descriptor for a socket type that does not support
         }                                                                       // receiving will throw a nil return value to determine
         if let _: Int = try? getSocketOption(self.socketFd, .SendFd) {          // what our polling event mask will be.
-            eventMask = eventMask | polloutMask                                 //
+            eventMask = eventMask | _polloutMask                                //
         }                                                                       //
 
         var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
@@ -404,8 +404,8 @@ extension NanoSocket {
             throw NanoMessageError.PollSocket(code: nn_errno())
         }
 
-        let messageIsWaiting = ((pfd.revents & pollinMask) != 0)                // using the event masks determine our return values
-        let sendIsBlocked = ((pfd.revents & polloutMask) != 0)                  //
+        let messageIsWaiting = ((pfd.revents & _pollinMask) != 0)               // using the event masks determine our return values
+        let sendIsBlocked = ((pfd.revents & _polloutMask) != 0)                 //
 
         return PollResult(messageIsWaiting, sendIsBlocked)
     }

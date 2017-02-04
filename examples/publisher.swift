@@ -70,7 +70,7 @@ do {
     let node0 = try PublisherSocket()
     let endPoint: EndPoint = try node0.connectToURL(url)
 
-    usleep(TimeInterval(seconds: 0.25).microseconds)
+    usleep(TimeInterval(seconds: 0.25))
 
     print(endPoint)
 

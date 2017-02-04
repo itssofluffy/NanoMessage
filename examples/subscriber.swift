@@ -43,7 +43,7 @@ do {
     let node0 = try SubscriberSocket()
     let endPoint: EndPoint = try node0.bindToURL(url, name: "my local end-point")
 
-    usleep(TimeInterval(seconds: 0.25).microseconds)
+    usleep(TimeInterval(seconds: 0.25))
 
     print(endPoint)
 

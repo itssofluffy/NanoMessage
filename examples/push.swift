@@ -60,7 +60,7 @@ do {
     let node0 = try PushSocket()
     let endPoint: EndPoint = try node0.connectToURL(url, name: "send end-point")
 
-    usleep(TimeInterval(milliseconds: 200).microseconds)
+    usleep(TimeInterval(milliseconds: 200))
 
     print(endPoint)
 
