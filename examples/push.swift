@@ -35,6 +35,7 @@ switch (CommandLine.arguments.count) {
     case 2:
         urlToUse = CommandLine.arguments[1]
     case 3:
+        urlToUse = CommandLine.arguments[1]
         sendCount = Int(CommandLine.arguments[2])!
     case 4:
         urlToUse = CommandLine.arguments[1]
