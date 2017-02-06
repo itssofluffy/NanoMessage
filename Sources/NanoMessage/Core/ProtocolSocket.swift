@@ -30,7 +30,6 @@ public protocol ProtocolSocket {
     var _nanoSocket: NanoSocket { get }
 
     init(socketDomain: SocketDomain) throws
-    init() throws
 }
 
 extension ProtocolSocket where Self: Sender {

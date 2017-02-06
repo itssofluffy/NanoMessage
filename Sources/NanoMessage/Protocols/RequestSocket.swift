@@ -28,12 +28,8 @@ public final class RequestSocket: NanoSocket, ProtocolSocket, Receiver, Sender, 
         return self
     }
 
-    public init(socketDomain: SocketDomain) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .RequestProtocol)
-    }
-
-    public convenience init() throws {
-        try self.init(socketDomain: .StandardSocket)
     }
 }
 

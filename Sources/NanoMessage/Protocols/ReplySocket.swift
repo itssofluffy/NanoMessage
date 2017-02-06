@@ -26,11 +26,7 @@ public final class ReplySocket: NanoSocket, ProtocolSocket, Receiver, Sender, AS
         return self
     }
 
-    public init(socketDomain: SocketDomain) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .ReplyProtocol)
-    }
-
-    public convenience init() throws {
-        try self.init(socketDomain: .StandardSocket)
     }
 }

@@ -44,12 +44,8 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
     /// Reset the send topic to empty after a sendMessage() has been performed.
     public var resetTopicAfterSend = false
 
-    public init(socketDomain: SocketDomain) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .PublisherProtocol)
-    }
-
-    public convenience init() throws {
-        try self.init(socketDomain: .StandardSocket)
     }
 }
 

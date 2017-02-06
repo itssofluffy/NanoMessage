@@ -44,12 +44,8 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
     /// Is the socket subscribed to all topics
     public fileprivate(set) var subscribedToAllTopics = false
 
-    public init(socketDomain: SocketDomain) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .SubscriberProtocol)
-    }
-
-    public convenience init() throws {
-        try self.init(socketDomain: .StandardSocket)
     }
 }
 
