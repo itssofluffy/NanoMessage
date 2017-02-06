@@ -30,6 +30,10 @@ public protocol ProtocolSocket {
     var _nanoSocket: NanoSocket { get }
 
     init(socketDomain: SocketDomain) throws
+    init(socketDomain: SocketDomain, connectTo url: URL) throws
+    init(socketDomain: SocketDomain, connectTo urls: [URL]) throws
+    init(socketDomain: SocketDomain, bindTo url: URL) throws
+    init(socketDomain: SocketDomain, bindTo urls: [URL]) throws
 }
 
 extension ProtocolSocket where Self: Sender {

@@ -51,14 +51,8 @@ class BindToSocketTests: XCTestCase {
         var completed = false
 
         do {
-            let node0 = try ReplySocket(socketDomain: .RawSocket)
-            let node1 = try RequestSocket(socketDomain: .RawSocket)
-
-            let node0EndPointId: Int = try node0.bindToURL(bindURL1)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.bindToURL('\(bindURL1)') < 0")
-
-            let node1EndPointId: Int = try node1.bindToURL(bindURL2)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL2)') < 0")
+            let node0 = try ReplySocket(socketDomain: .RawSocket, bindTo: bindURL1)
+            let node1 = try RequestSocket(socketDomain: .RawSocket, bindTo: bindURL2)
 
             let queue = DispatchQueue(label: "com.nanomessage.bindtosocket")
             let group = DispatchGroup()

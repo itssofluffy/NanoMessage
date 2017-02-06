@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
+
 /// Reply socket.
 public final class ReplySocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
     public var _nanoSocket: NanoSocket {
@@ -28,5 +30,33 @@ public final class ReplySocket: NanoSocket, ProtocolSocket, Receiver, Sender, AS
 
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .ReplyProtocol)
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
+        try self.init(socketDomain: socketDomain)
+
+        let _: Int = try self.connectToURL(url)
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
+        try self.init(socketDomain: socketDomain)
+
+        for url in urls {
+            let _: Int = try self.connectToURL(url)
+        }
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
+        try self.init(socketDomain: socketDomain)
+
+        let _: Int = try self.bindToURL(url)
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
+        try self.init(socketDomain: socketDomain)
+
+        for url in urls {
+            let _: Int = try self.bindToURL(url)
+        }
     }
 }

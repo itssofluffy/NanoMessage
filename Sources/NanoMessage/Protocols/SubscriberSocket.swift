@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
 import C7
 
 /// Subscriber socket.
@@ -34,18 +35,46 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
     /// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
     public fileprivate(set) var ignoreTopicSeperator = false
     /// The topic last received.
-    public fileprivate(set) var receivedTopic = Data()
+    public fileprivate(set) var receivedTopic = C7.Data()
     /// A dictionary of topics and their count that have been received
-    public fileprivate(set) var receivedTopics = Dictionary<Data, UInt64>()
+    public fileprivate(set) var receivedTopics = Dictionary<C7.Data, UInt64>()
     /// Remove the topic from the received data.
     public var removeTopicFromMessage = true
     /// A set of all the subscribed topics.
-    public fileprivate(set) var subscribedTopics = Set<Data>()
+    public fileprivate(set) var subscribedTopics = Set<C7.Data>()
     /// Is the socket subscribed to all topics
     public fileprivate(set) var subscribedToAllTopics = false
 
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .SubscriberProtocol)
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
+        try self.init(socketDomain: socketDomain)
+
+        let _: Int = try self.connectToURL(url)
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
+        try self.init(socketDomain: socketDomain)
+
+        for url in urls {
+            let _: Int = try self.connectToURL(url)
+        }
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
+        try self.init(socketDomain: socketDomain)
+
+        let _: Int = try self.bindToURL(url)
+    }
+
+    public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
+        try self.init(socketDomain: socketDomain)
+
+        for url in urls {
+            let _: Int = try self.bindToURL(url)
+        }
     }
 }
 
@@ -65,9 +94,9 @@ extension SubscriberSocket {
     /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
         /// Does the message/payload contain the specified topic
-        func _messageHasTopic(_ topic: Data, _ message: Data) -> Bool {
+        func _messageHasTopic(_ topic: C7.Data, _ message: C7.Data) -> Bool {
             if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
-                if (Data(message[0 ..< topic.count]) != topic) {
+                if (C7.Data(message[0 ..< topic.count]) != topic) {
                     return false
                 } else if (self.ignoreTopicSeperator || message[topic.count] == self.topicSeperator) {
                     return true
@@ -78,15 +107,15 @@ extension SubscriberSocket {
         }
 
         /// Get the topic from the message/payload if it exists using the topic seperator.
-        func _getTopicFromMessage(_ message: Data) -> Data {
+        func _getTopicFromMessage(_ message: C7.Data) -> C7.Data {
             if let index = message.index(of: self.topicSeperator) {
-                return Data(message[0 ..< index])
+                return C7.Data(message[0 ..< index])
             }
 
             return message
         }
 
-        self.receivedTopic = Data()
+        self.receivedTopic = C7.Data()
 
         var received = try receivePayloadFromSocket(self, blockingMode)
 
@@ -141,7 +170,7 @@ extension SubscriberSocket {
     ///   - topic: The topic to check.
     ///
     /// - Returns: If the topic has been subscribed too.
-    public func isTopicSubscribed(_ topic: Data) -> Bool {
+    public func isTopicSubscribed(_ topic: C7.Data) -> Bool {
         return self.subscribedTopics.contains(topic)
     }
 
@@ -152,7 +181,7 @@ extension SubscriberSocket {
     ///
     /// - Returns: If the topic has been subscribed too.
     public func isTopicSubscribed(_ topic: String) -> Bool {
-        return self.isTopicSubscribed(Data(topic))
+        return self.isTopicSubscribed(C7.Data(topic))
     }
 
     /// Check all topics for equal lengths.
@@ -210,9 +239,9 @@ extension SubscriberSocket {
     ///
     /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
-    public func subscribeTo(topic: Data) throws -> Bool {
+    public func subscribeTo(topic: C7.Data) throws -> Bool {
         /// Check topic length against (any) existing topics is see if it is of equal length.
-        func _validTopicLengths(_ topic: Data) -> Bool {
+        func _validTopicLengths(_ topic: C7.Data) -> Bool {
             let topics = self._validateTopicLengths()
 
             if (!topics.equalLengths) {
@@ -263,7 +292,7 @@ extension SubscriberSocket {
     /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: String) throws -> Bool {
-        return try self.subscribeTo(topic: Data(topic))
+        return try self.subscribeTo(topic: C7.Data(topic))
     }
 
     /// Unsubscibe from a topic.
@@ -275,7 +304,7 @@ extension SubscriberSocket {
     ///
     /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
-    public func unsubscribeFrom(topic: Data) throws -> Bool {
+    public func unsubscribeFrom(topic: C7.Data) throws -> Bool {
         if (!topic.isEmpty) {
             let topicSubscribed = self.isTopicSubscribed(topic)
 
@@ -305,7 +334,7 @@ extension SubscriberSocket {
     /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
     public func unsubscribeFrom(topic: String) throws -> Bool {
-        return try self.unsubscribeFrom(topic: Data(topic))
+        return try self.unsubscribeFrom(topic: C7.Data(topic))
     }
 
     /// Subscribe to all topics.

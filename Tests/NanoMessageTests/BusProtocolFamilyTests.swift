@@ -40,17 +40,12 @@ class BusProtocolFamilyTests: XCTestCase {
         var completed = false
 
         do {
-            let node0 = try BusSocket()
+            let node0 = try BusSocket(bindTo: address1URL)
             let node1 = try BusSocket()
-            let node2 = try BusSocket()
-
-            let _: Int = try node0.bindToURL(address1URL)
+            let node2 = try BusSocket(connectTo: [address1URL, address2URL])
 
             let _: Int = try node1.connectToURL(address1URL)
             let _: Int = try node1.bindToURL(address2URL)
-
-            let _: Int = try node2.connectToURL(address1URL)
-            let _: Int = try node2.connectToURL(address2URL)
 
             pauseForBind()
 

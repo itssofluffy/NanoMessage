@@ -40,19 +40,13 @@ class PairProtocolFamilyTests: XCTestCase {
         var completed = false
 
         do {
-            let node0 = try PairSocket()
-            let node1 = try PairSocket()
+            let node0 = try PairSocket(connectTo: connectURL)
+            let node1 = try PairSocket(bindTo: bindURL)
 
             try node0.setSendTimeout(seconds: 1)
             try node0.setReceiveTimeout(seconds: 1)
             try node1.setSendTimeout(seconds: 1)
             try node1.setReceiveTimeout(seconds: 1)
-
-            let node0EndPointId: Int = try node0.connectToURL(connectURL)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
-
-            let node1EndPointId: Int = try node1.bindToURL(bindURL)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL)') < 0")
 
             pauseForBind()
 
