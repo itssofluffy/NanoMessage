@@ -34,7 +34,7 @@ public class NanoSocket {
     /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
-    private var _closeAttempts: Int = 100
+    private var _closeAttempts: Int = 20
     /// The number of attempts to close down a socket or endpoint, this is clamped to between 1 and 1000.
     ///
     /// - Note:  The `getLinger()` function is called to determine the number of milliseconds to
@@ -58,7 +58,7 @@ public class NanoSocket {
             }
         }
 
-        return TimeInterval(seconds: delay / Double(self.closeAttempts))
+        return TimeInterval(milliseconds: delay.milliseconds / self.closeAttempts)
     }
     /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
     ///
