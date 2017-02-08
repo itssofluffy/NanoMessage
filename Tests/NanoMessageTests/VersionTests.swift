@@ -26,23 +26,19 @@ import XCTest
 
 class VersionTests: XCTestCase {
     func testNanoMsgABIVersion() {
-        let (current, revision, age) = nanoMsgABIVersion
+         XCTAssertEqual(nanoMsgABIVersion.current, 5, "nanomsg ABI current not as expected")
+         XCTAssertEqual(nanoMsgABIVersion.revision, 0, "nanomsg ABI revision not as expected")
+         XCTAssertEqual(nanoMsgABIVersion.age, 0, "nanomsg ABI age not as expected")
 
-         XCTAssertEqual(current, 5, "nanomsg ABI current not as expected")
-         XCTAssertEqual(revision, 0, "nanomsg ABI revision not as expected")
-         XCTAssertEqual(age, 0, "nanomsg ABI age not as expected")
-
-         print("current: \(current), revision: \(revision), age: \(age)")
+         print("current: \(nanoMsgABIVersion.current), revision: \(nanoMsgABIVersion.revision), age: \(nanoMsgABIVersion.age)")
     }
 
     func testNanoMessageVersion() {
-        let (current, revision, age) = nanoMessageVersion
+         XCTAssertEqual(nanoMessageVersion.major, 0, "NanoMessage major not as expected")
+         XCTAssertEqual(nanoMessageVersion.minor, 1, "NanoMessage minor not as expected")
+         XCTAssertGreaterThanOrEqual(nanoMessageVersion.release, 0, "NanoMessage release not as expected")
 
-         XCTAssertEqual(current, 0, "NanoMessage current not as expected")
-         XCTAssertEqual(revision, 0, "NanoMessage revision not as expected")
-         XCTAssertGreaterThanOrEqual(age, 12, "NanoMessage age not as expected")
-
-         print("current: \(current), revision: \(revision), age: \(age)")
+         print("major: \(nanoMessageVersion.major), minor: \(nanoMessageVersion.minor), release: \(nanoMessageVersion.release)")
     }
 
 #if !os(OSX)

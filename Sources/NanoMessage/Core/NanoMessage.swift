@@ -27,12 +27,12 @@ public let maximumTopicLength = 128
 
 /// The underlying nanomsg libraries ABI version.
 public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
-    return (Int(NN_VERSION_CURRENT), Int(NN_VERSION_REVISION), Int(NN_VERSION_AGE))
+    return (current: Int(NN_VERSION_CURRENT), revision: Int(NN_VERSION_REVISION), age: Int(NN_VERSION_AGE))
 }
 
 /// NanoMessage library version.
-public var nanoMessageVersion: (current: Int, revision: Int, age: Int) {
-    return (current: 0, revision: 0, age: 12)
+public var nanoMessageVersion: (major: Int, minor: Int, release: Int) {
+    return (major: 0, minor: 1, release: 0)
 }
 
 /// Notify all sockets about process termination.
@@ -47,7 +47,7 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
         var value: CInt = 0
 
         if let symbolName = nn_symbol(index, &value) {
-            return (String(cString: symbolName), value)
+            return (name: String(cString: symbolName), value: value)
         }
 
         return nil
