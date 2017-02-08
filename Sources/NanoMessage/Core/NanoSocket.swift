@@ -1,3 +1,4 @@
+
 /*
     NanoSocket.swift
 
@@ -27,10 +28,18 @@ import C7
 import Dispatch
 import Mutex
 
+// define nn_poll() event masks.
+private let _pollinMask = CShort(NN_POLLIN)
+private let _polloutMask = CShort(NN_POLLOUT)
+
 /// A NanoMessage base socket.
 public class NanoSocket {
     /// The raw nanomsg socket file descriptor.
-    public private(set) var socketFd: CInt = -1
+    public let socketFd: CInt
+    /// Is the socket capable of receiving.
+    public let receiverSocket: Bool
+    /// Is the socket capable of sending.
+    public let senderSocket: Bool
     /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
@@ -71,10 +80,7 @@ public class NanoSocket {
     /// The async dispatch queue's group.
     public var aioGroup = DispatchGroup()
     /// async mutex lock.
-    public var mutex: Mutex
-    // define nn_poll() event masks.
-    fileprivate let _pollinMask = CShort(NN_POLLIN)
-    fileprivate let _polloutMask = CShort(NN_POLLOUT)
+    internal var mutex: Mutex
 
     /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
     ///
@@ -91,6 +97,21 @@ public class NanoSocket {
 
         guard (self.socketFd >= 0) else {
             throw NanoMessageError.NanoSocket(code: nn_errno())
+        }
+
+        // rely on the fact that getting the receive/send file descriptor for a socket type from
+        // the underlying library that does not support receive/send will throw a nil to determine
+        // if the socket is capable of receiving or ending.
+        if let _: Int = try? getSocketOption(self.socketFd, .ReceiveFd) {
+            self.receiverSocket = true
+        } else {
+            self.receiverSocket = false
+        }
+
+        if let _: Int = try? getSocketOption(self.socketFd, .SendFd) {
+            self.senderSocket = true
+        } else {
+            self.senderSocket = false
         }
     }
 
@@ -159,10 +180,10 @@ extension NanoSocket {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
-        if let _: Int = try? getSocketOption(self.socketFd, .ReceiveFd) {             // if this is a receiver socket then...
+        if (self.receiverSocket) {                                                    // if this is a receiver socket then...
             receivePriority = try getSocketOption(self.socketFd, .ReceivePriority)    // obtain the receive priority for the end-point.
         }
-        if let _: Int = try? getSocketOption(self.socketFd, .SendFd) {                // if this is a sender socket then...
+        if (self.senderSocket) {                                                      // if this is a sender socket then...
             sendPriority = try getSocketOption(self.socketFd, .SendPriority)          // obtain the send priority for the end-point.
         }
 
@@ -389,12 +410,12 @@ extension NanoSocket {
         }
 
         var eventMask = CShort.allZeros                                         //
-        if let _: Int = try? getSocketOption(self.socketFd, .ReceiveFd) {       // rely on the fact that getting the for example receive
-            eventMask = _pollinMask                                             // file descriptor for a socket type that does not support
-        }                                                                       // receiving will throw a nil return value to determine
-        if let _: Int = try? getSocketOption(self.socketFd, .SendFd) {          // what our polling event mask will be.
-            eventMask = eventMask | _polloutMask                                //
-        }                                                                       //
+        if (self.receiverSocket) {                                              // if the socket can receive then set the event mask appropriately.
+            eventMask = _pollinMask
+        }
+        if (self.senderSocket) {                                                // if the socket can send then set the event mask appropriately.
+            eventMask = eventMask | _polloutMask
+        }
 
         var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
 
@@ -407,7 +428,7 @@ extension NanoSocket {
         let messageIsWaiting = ((pfd.revents & _pollinMask) != 0)               // using the event masks determine our return values
         let sendIsBlocked = ((pfd.revents & _polloutMask) != 0)                 //
 
-        return PollResult(messageIsWaiting, sendIsBlocked)
+        return PollResult(messageIsWaiting: messageIsWaiting, sendIsBlocked: sendIsBlocked)
     }
 
     /// Starts a device to bind the socket to another and forward messages between two sockets

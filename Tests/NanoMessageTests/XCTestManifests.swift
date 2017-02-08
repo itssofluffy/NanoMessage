@@ -38,6 +38,7 @@ func pauseForBind() {
 public let allTests = [
     testCase(NanoMsgTests.allTests),
     testCase(VersionTests.allTests),
+    testCase(SenderReceiverTests.allTests),
     testCase(SocketOptionTests.allTests),
     testCase(EndPointTests.allTests),
     testCase(PipelineProtocolFamilyTests.allTests),
