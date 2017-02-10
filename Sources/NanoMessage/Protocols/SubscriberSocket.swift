@@ -201,7 +201,7 @@ extension SubscriberSocket {
             }
         }
 
-        return (equalLengths, topicLengths)
+        return (equalLengths: equalLengths, count: topicLengths)
     }
 
     /// Flip the ignore topic seperator, when true all topic lengths must be of equal length.

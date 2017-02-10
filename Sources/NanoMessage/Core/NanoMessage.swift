@@ -21,9 +21,14 @@
 */
 
 import CNanoMessage
+import Foundation
 
 /// On publish/subscribe sockets the maximum size of a topic
 public let maximumTopicLength = 128
+
+// define nn_poll() event masks.
+private let _pollinMask = CShort(NN_POLLIN)
+private let _polloutMask = CShort(NN_POLLOUT)
 
 /// The underlying nanomsg libraries ABI version.
 public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
@@ -32,7 +37,7 @@ public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
 
 /// NanoMessage library version.
 public var nanoMessageVersion: (major: Int, minor: Int, release: Int) {
-    return (major: 0, minor: 1, release: 0)
+    return (major: 0, minor: 1, release: 1)
 }
 
 /// Notify all sockets about process termination.
@@ -96,4 +101,53 @@ public var symbolProperty: Set<SymbolProperty> {
     }
 
     return _symbolProperty
+}
+
+/// Check sockets and reports whether it’s possible to send a message to the socket and/or receive a message from the socket.
+///
+/// - Parameters:
+///   - sockets : An array of nano sockets to examine.
+///   - timeout : The maximum number of milliseconds to poll the socket for an event to occur,
+///               default is 1000 milliseconds (1 second).
+///
+/// - Throws: `NanoMessageError.SocketIsADevice`
+///           `NanoMessageError.PollSocket` if polling the socket fails.
+///
+/// - Returns: Message waiting and send queue blocked as a tuple of bools.
+public func poll(sockets: [NanoSocket], timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> [PollResult] {
+    var pollFds = [nn_pollfd]()
+    var pollResults = [PollResult]()
+
+    for socket in sockets {
+        guard (!socket.socketIsADevice) else {                                            // guard against polling a device socket.
+            throw NanoMessageError.SocketIsADevice(socket: socket)
+        }
+
+        var eventMask = CShort.allZeros                                                   //
+        if (socket.receiverSocket) {                                                      // if the socket can receive then set the event mask appropriately.
+            eventMask = _pollinMask
+        }
+        if (socket.senderSocket) {                                                        // if the socket can send then set the event mask appropriately.
+            eventMask = eventMask | _polloutMask
+        }
+
+        pollFds.append(nn_pollfd(fd: socket.socketFd, events: eventMask, revents: 0))
+    }
+
+    try pollFds.withUnsafeMutableBufferPointer { fds -> Void in                           // poll the list of nano sockets.
+        let returnCode = nn_poll(fds.baseAddress, CInt(sockets.count), CInt(timeout.milliseconds))
+
+        guard (returnCode >= 0) else {
+            throw NanoMessageError.PollSocket(code: nn_errno())
+        }
+    }
+
+    for loopCount in 0 ... sockets.count - 1 {
+        let messageIsWaiting = ((pollFds[loopCount].revents & _pollinMask) != 0)          // using the event masks determine our return values
+        let sendIsBlocked = ((pollFds[loopCount].revents & _polloutMask) != 0)            //
+
+        pollResults.append(PollResult(messageIsWaiting: messageIsWaiting, sendIsBlocked: sendIsBlocked))
+    }
+
+    return pollResults
 }

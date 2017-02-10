@@ -3,3 +3,7 @@
 /Packages
 /*.xcodeproj
 *.bak
+/examples/publisher
+/examples/pull
+/examples/push
+/examples/subscriber

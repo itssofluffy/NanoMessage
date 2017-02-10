@@ -42,7 +42,7 @@ private let NN_MSG: size_t = -1
 /// - Returns: The number of bytes sent.
 internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
     guard (!nanoSocket.socketIsADevice) else {
-        throw NanoMessageError.SocketIsADevice
+        throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }
 
     let bytesSent = Int(nn_send(nanoSocket.socketFd, payload.bytes, payload.count, blockingMode.rawValue))
@@ -78,7 +78,7 @@ internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ b
 /// - Returns: The number of bytes received and the received message
 internal func receivePayloadFromSocket(_ nanoSocket: NanoSocket, _ blockingMode: BlockingMode) throws -> ReceiveData {
     guard (!nanoSocket.socketIsADevice) else {
-        throw NanoMessageError.SocketIsADevice
+        throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }
 
     var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)

@@ -28,10 +28,6 @@ import C7
 import Dispatch
 import Mutex
 
-// define nn_poll() event masks.
-private let _pollinMask = CShort(NN_POLLIN)
-private let _polloutMask = CShort(NN_POLLOUT)
-
 /// A NanoMessage base socket.
 public class NanoSocket {
     /// The raw nanomsg socket file descriptor.
@@ -211,12 +207,12 @@ extension NanoSocket {
         let priorities = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
-        url.absoluteString.withCString { address in
+        try url.absoluteString.withCString { address in
             endPointId = nn_bind(self.socketFd, address)
-        }
 
-        guard (endPointId >= 0) else {
-            throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
+            guard (endPointId >= 0) else {
+                throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
+            }
         }
 
         let endPoint = EndPoint(id:         Int(endPointId),
@@ -273,12 +269,12 @@ extension NanoSocket {
         let priorities = try self._socketPriorities()
         let ipv4Only = try self.getIPv4Only()
 
-        url.absoluteString.withCString { address in
+        try url.absoluteString.withCString { address in
             endPointId = nn_connect(self.socketFd, address)
-        }
 
-        guard (endPointId >= 0) else {
-            throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
+            guard (endPointId >= 0) else {
+                throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
+            }
         }
 
         let endPoint = EndPoint(id:         Int(endPointId),
@@ -394,7 +390,7 @@ extension NanoSocket {
         return false
     }
 
-    /// Check a socket and reports whether it’s possible to send a message to the socket and/or receive a message from the socket.
+    /// Check socket and reports whether it’s possible to send a message to the socket and/or receive a message from the socket.
     ///
     /// - Parameters:
     ///   - timeout : The maximum number of milliseconds to poll the socket for an event to occur,
@@ -405,30 +401,9 @@ extension NanoSocket {
     ///
     /// - Returns: Message waiting and send queue blocked as a tuple of bools.
     public func pollSocket(timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> PollResult {
-        guard (!self.socketIsADevice) else {                                    // guard against polling a device socket.
-            throw NanoMessageError.SocketIsADevice
-        }
+        let pollResults = try poll(sockets: [self], timeout: timeout)
 
-        var eventMask = CShort.allZeros                                         //
-        if (self.receiverSocket) {                                              // if the socket can receive then set the event mask appropriately.
-            eventMask = _pollinMask
-        }
-        if (self.senderSocket) {                                                // if the socket can send then set the event mask appropriately.
-            eventMask = eventMask | _polloutMask
-        }
-
-        var pfd = nn_pollfd(fd: self.socketFd, events: eventMask, revents: 0)   // define the pollfd struct for this socket
-
-        let returnCode = nn_poll(&pfd, 1, CInt(timeout.milliseconds))           // poll the nano socket
-
-        guard (returnCode >= 0) else {
-            throw NanoMessageError.PollSocket(code: nn_errno())
-        }
-
-        let messageIsWaiting = ((pfd.revents & _pollinMask) != 0)               // using the event masks determine our return values
-        let sendIsBlocked = ((pfd.revents & _polloutMask) != 0)                 //
-
-        return PollResult(messageIsWaiting: messageIsWaiting, sendIsBlocked: sendIsBlocked)
+        return pollResults[0]
     }
 
     /// Starts a device to bind the socket to another and forward messages between two sockets
@@ -439,8 +414,12 @@ extension NanoSocket {
     /// - Throws: `NanoMessageError.SocketIsADevice`
     ///           `NanoMessageError.BindToSocket` if a problem has been encountered.
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
-        guard (!self.socketIsADevice && !nanoSocket.socketIsADevice) else {     // guard against socket already being a device socket.
-            throw NanoMessageError.SocketIsADevice
+        guard (!self.socketIsADevice) else {
+            throw NanoMessageError.SocketIsADevice(socket: self)
+        }
+
+        guard (!nanoSocket.socketIsADevice) else {
+            throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
         }
 
         self.socketIsADevice = true
@@ -494,7 +473,7 @@ extension NanoSocket {
     ///           `NanoMessageError.LoopBack` if a problem has been encountered.
     public func loopBack() throws {
         guard (!self.socketIsADevice) else {                                    // guard against socket already being a device socket.
-            throw NanoMessageError.SocketIsADevice
+            throw NanoMessageError.SocketIsADevice(socket: self)
         }
 
         self.socketIsADevice = true
