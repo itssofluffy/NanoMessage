@@ -22,6 +22,7 @@
 
 import XCTest
 import Foundation
+import ISFLibrary
 
 @testable import NanoMessage
 
@@ -60,6 +61,8 @@ class PollSocketTests: XCTestCase {
 
             let bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
+
+            usleep(TimeInterval(milliseconds: 50))          // pause to make sure the message is sent.
 
             let pollResults = try poll(sockets: [node0, node1], timeout: 0.5)
             XCTAssertEqual(pollResults[0].messageIsWaiting, false, "pollResults[0].messageIsWaiting != false")
