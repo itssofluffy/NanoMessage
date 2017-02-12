@@ -30,8 +30,10 @@ import Mutex
 
 /// A NanoMessage base socket.
 public class NanoSocket {
+    @available(*, unavailable, renamed: "fileDescriptor")
+    public let socketFd: CInt = -1
     /// The raw nanomsg socket file descriptor.
-    public let socketFd: CInt
+    public let fileDescriptor: CInt
     /// Is the socket capable of receiving.
     public let receiverSocket: Bool
     /// Is the socket capable of sending.
@@ -89,22 +91,22 @@ public class NanoSocket {
     public init(socketDomain: SocketDomain, socketProtocol: SocketProtocol) throws {
         try self.mutex = Mutex()
 
-        self.socketFd = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
+        self.fileDescriptor = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
 
-        guard (self.socketFd >= 0) else {
+        guard (self.fileDescriptor >= 0) else {
             throw NanoMessageError.NanoSocket(code: nn_errno())
         }
 
         // rely on the fact that getting the receive/send file descriptor for a socket type from
         // the underlying library that does not support receive/send will throw a nil to determine
         // if the socket is capable of receiving or ending.
-        if let _: Int = try? getSocketOption(self.socketFd, .ReceiveFd) {
+        if let _ = try? getSocketOption(self.fileDescriptor, .ReceiveFd) {
             self.receiverSocket = true
         } else {
             self.receiverSocket = false
         }
 
-        if let _: Int = try? getSocketOption(self.socketFd, .SendFd) {
+        if let _ = try? getSocketOption(self.fileDescriptor, .SendFd) {
             self.senderSocket = true
         } else {
             self.senderSocket = false
@@ -113,11 +115,11 @@ public class NanoSocket {
 
     deinit {
         func _closeSocket() throws {
-            if (self.socketFd >= 0) {                                   // if we have a valid nanomsg socket file descriptor then...
+            if (self.fileDescriptor >= 0) {                             // if we have a valid nanomsg socket file descriptor then...
                 var loopCount = 0
 
                 while (true) {
-                    let returnCode = nn_close(self.socketFd)            // try and close the nanomsg socket
+                    let returnCode = nn_close(self.fileDescriptor)      // try and close the nanomsg socket
 
                     if (returnCode < 0) {                               // if `nn_close()` failed then...
                         let errno = nn_errno()
@@ -176,11 +178,11 @@ extension NanoSocket {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
-        if (self.receiverSocket) {                                                    // if this is a receiver socket then...
-            receivePriority = try getSocketOption(self.socketFd, .ReceivePriority)    // obtain the receive priority for the end-point.
+        if (self.receiverSocket) {                                         // if this is a receiver socket then...
+            receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
         }
-        if (self.senderSocket) {                                                      // if this is a sender socket then...
-            sendPriority = try getSocketOption(self.socketFd, .SendPriority)          // obtain the send priority for the end-point.
+        if (self.senderSocket) {                                           // if this is a sender socket then...
+            sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
         }
 
         return SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority)
@@ -208,7 +210,7 @@ extension NanoSocket {
         let ipv4Only = try self.getIPv4Only()
 
         try url.absoluteString.withCString { address in
-            endPointId = nn_bind(self.socketFd, address)
+            endPointId = nn_bind(self.fileDescriptor, address)
 
             guard (endPointId >= 0) else {
                 throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
@@ -270,7 +272,7 @@ extension NanoSocket {
         let ipv4Only = try self.getIPv4Only()
 
         try url.absoluteString.withCString { address in
-            endPointId = nn_connect(self.socketFd, address)
+            endPointId = nn_connect(self.fileDescriptor, address)
 
             guard (endPointId >= 0) else {
                 throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
@@ -325,24 +327,24 @@ extension NanoSocket {
             var loopCount = 0
 
             while (true) {
-                let returnCode = nn_shutdown(self.socketFd, CInt(endPoint.id))  // attempt to close down the endpoint
+                let returnCode = nn_shutdown(self.fileDescriptor, CInt(endPoint.id))  // attempt to close down the endpoint
 
-                if (returnCode < 0) {                                           // if `nn_shutdown()` failed then...
+                if (returnCode < 0) {                                                 // if `nn_shutdown()` failed then...
                     let errno = nn_errno()
 
-                    if (errno == EINTR) {                                       // if we were interrupted by a signal, reattempt is allowed by the native library
+                    if (errno == EINTR) {                                             // if we were interrupted by a signal, reattempt is allowed by the native library
                         if (loopCount >= self.closeAttempts) {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(self._closeDelay)                                // zzzz...
+                        usleep(self._closeDelay)                                      // zzzz...
 
                         loopCount += 1
                     } else {
                         throw NanoMessageError.RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
                     }
                 } else {
-                    break                                                       // we've closed the endpoint succesfully
+                    break                                                             // we've closed the endpoint succesfully
                 }
             }
 
@@ -430,11 +432,11 @@ extension NanoSocket {
             nanoSocket.socketIsADevice = false
         }
 
-        let returnCode = nn_device(self.socketFd, nanoSocket.socketFd)
+        let returnCode = nn_device(self.fileDescriptor, nanoSocket.fileDescriptor)
 
         guard (returnCode >= 0) else {
             let errno = nn_errno()
-            var nanoSocketName = String(nanoSocket.socketFd)
+            var nanoSocketName = String(nanoSocket.fileDescriptor)
 
             if let socketName = try? nanoSocket.getSocketName() {
                 nanoSocketName = socketName
@@ -482,7 +484,7 @@ extension NanoSocket {
             self.socketIsADevice = false
         }
 
-        let returnCode = nn_device(self.socketFd, -1)
+        let returnCode = nn_device(self.fileDescriptor, -1)
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.LoopBack(code: nn_errno())
@@ -519,7 +521,7 @@ extension NanoSocket {
     ///
     /// - Returns: The sockets domain.
     public func getSocketDomain() throws -> SocketDomain {
-        return SocketDomain(rawValue: try getSocketOption(self.socketFd, .Domain))!
+        return SocketDomain(rawValue: try getSocketOption(self, .Domain))!
     }
 
     /// Get the protocol of the socket as it was created with.
@@ -528,7 +530,7 @@ extension NanoSocket {
     ///
     /// - Returns: The sockets protocol.
     public func getSocketProtocol() throws -> SocketProtocol {
-        return SocketProtocol(rawValue: try getSocketOption(self.socketFd, .Protocol))!
+        return SocketProtocol(rawValue: try getSocketOption(self, .Protocol))!
     }
 
     /// Get the protocol family of the socket as it was created with.
@@ -552,7 +554,7 @@ extension NanoSocket {
     /// - Note:    The underlying nanomsg library no longer supports setting the linger option,
     ///            linger time will therefore always it's default value.
     public func getLinger() throws -> TimeInterval {
-        return try getSocketOption(self.socketFd, .Linger)
+        return try getSocketOption(self, .Linger)
     }
 
     /// Specifies how long the socket should try to send pending outbound messages after the socket
@@ -572,7 +574,7 @@ extension NanoSocket {
     public func setLinger(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getLinger()
 
-        try setSocketOption(self.socketFd, .Linger, seconds)
+        try setSocketOption(self, .Linger, seconds)
 
         return originalValue
     }
@@ -587,7 +589,7 @@ extension NanoSocket {
     ///
     /// - Returns: The sockets reconnect interval.
     public func getReconnectInterval() throws -> TimeInterval {
-        return try getSocketOption(self.socketFd, .ReconnectInterval)
+        return try getSocketOption(self, .ReconnectInterval)
     }
 
     /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
@@ -605,7 +607,7 @@ extension NanoSocket {
     public func setReconnectInterval(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getReconnectInterval()
 
-        try setSocketOption(self.socketFd, .ReconnectInterval, seconds)
+        try setSocketOption(self, .ReconnectInterval, seconds)
 
         return originalValue
     }
@@ -622,7 +624,7 @@ extension NanoSocket {
     ///
     /// - Returns: The sockets reconnect maximum interval.
     public func getReconnectIntervalMaximum() throws -> TimeInterval {
-        return try getSocketOption(self.socketFd, .ReconnectIntervalMaximum)
+        return try getSocketOption(self, .ReconnectIntervalMaximum)
     }
 
     /// This is to be used only in addition to `set/getReconnectInterval()`. It specifies maximum reconnection
@@ -642,7 +644,7 @@ extension NanoSocket {
     public func setReconnectIntervalMaximum(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getReconnectInterval()
 
-        try setSocketOption(self.socketFd, .ReconnectIntervalMaximum, seconds)
+        try setSocketOption(self, .ReconnectIntervalMaximum, seconds)
 
         return originalValue
     }
@@ -657,7 +659,7 @@ extension NanoSocket {
     ///
     /// - Note:    This feature is deamed as experimental by the underlying nanomsg library.
     public func getSocketName() throws -> String {
-        return try getSocketOption(self.socketFd, .SocketName)
+        return try getSocketOption(self, .SocketName)
     }
 
     /// Socket name for error reporting and statistics.
@@ -675,7 +677,7 @@ extension NanoSocket {
     public func setSocketName(_ socketName: String) throws -> String {
         let originalValue = try self.getSocketName()
 
-        try setSocketOption(self.socketFd, .SocketName, socketName)
+        try setSocketOption(self, .SocketName, socketName)
 
         return originalValue
     }
@@ -688,7 +690,7 @@ extension NanoSocket {
     ///
     /// - Returns: The IP4v4/Ipv6 type.
     public func getIPv4Only() throws -> Bool {
-        return try getSocketOption(self.socketFd, .IPv4Only)
+        return try getSocketOption(self, .IPv4Only)
     }
 
     /// If true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
@@ -704,7 +706,7 @@ extension NanoSocket {
     public func setIPv4Only(_ ip4Only: Bool) throws -> Bool {
         let originalValue = try self.getIPv4Only()
 
-        try setSocketOption(self.socketFd, .IPv4Only, ip4Only)
+        try setSocketOption(self, .IPv4Only, ip4Only)
 
         return originalValue
     }
@@ -717,7 +719,7 @@ extension NanoSocket {
     ///
     /// - Returns: The number of hops before a message is dropped.
     public func getMaxTTL() throws -> Int {
-        return try getSocketOption(self.socketFd, .MaxTTL)
+        return try getSocketOption(self, .MaxTTL)
     }
 
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
@@ -735,7 +737,7 @@ extension NanoSocket {
     public func setMaxTTL(hops: Int) throws -> Int {
         let originalValue = try self.getMaxTTL()
 
-        try setSocketOption(self.socketFd, .MaxTTL, hops)
+        try setSocketOption(self, .MaxTTL, hops)
 
         return originalValue
     }
@@ -749,7 +751,7 @@ extension NanoSocket {
     ///
     /// - Returns: Is Nagle's algorithm enabled.
     public func getTCPNoDelay(transportMechanism: TransportMechanism = .TCP) throws -> Bool {
-        let valueReturned: CInt = try getSocketOption(self.socketFd, .TCPNoDelay, transportMechanism)
+        let valueReturned: CInt = try getSocketOption(self, .TCPNoDelay, transportMechanism)
 
         return (valueReturned == NN_TCP_NODELAY)
     }
@@ -770,7 +772,7 @@ extension NanoSocket {
 
         let valueToSet: CInt = (disableNagles) ? NN_TCP_NODELAY : 0
 
-        try setSocketOption(self.socketFd, .TCPNoDelay, valueToSet, transportMechanism)
+        try setSocketOption(self, .TCPNoDelay, valueToSet, transportMechanism)
 
         return originalValue
     }
@@ -785,7 +787,7 @@ extension NanoSocket {
     ///
     /// - Returns: The web sockets message type.
     public func getWebSocketMessageType() throws -> WebSocketMessageType {
-        return WebSocketMessageType(rawValue: try getSocketOption(self.socketFd, .WebSocketMessageType, .WebSocket))
+        return WebSocketMessageType(rawValue: try getSocketOption(self, .WebSocketMessageType, .WebSocket))
     }
 
     /// This value determines whether data messages are sent as WebSocket text frames, or binary frames,
@@ -803,7 +805,7 @@ extension NanoSocket {
     public func setWebSocketMessageType(_ type: WebSocketMessageType) throws -> WebSocketMessageType {
         let originalValue = try self.getWebSocketMessageType()
 
-        try setSocketOption(self.socketFd, .WebSocketMessageType, type, .WebSocket)
+        try setSocketOption(self, .WebSocketMessageType, type, .WebSocket)
 
         return originalValue
     }
@@ -816,7 +818,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getEstablishedConnections() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .EstablishedConnections)
+        return try getSocketStatistic(self, .EstablishedConnections)
     }
 
     /// The number of connections successfully established that were accepted by this socket.
@@ -825,7 +827,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getAcceptedConnections() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .AcceptedConnections)
+        return try getSocketStatistic(self, .AcceptedConnections)
     }
 
     /// The number of established connections that were dropped by this socket.
@@ -834,7 +836,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getDroppedConnections() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .DroppedConnections)
+        return try getSocketStatistic(self, .DroppedConnections)
     }
 
     /// The number of established connections that were closed by this socket, typically due to protocol errors.
@@ -843,7 +845,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getBrokenConnections() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .BrokenConnections)
+        return try getSocketStatistic(self, .BrokenConnections)
     }
 
     /// The number of errors encountered by this socket trying to connect to a remote peer.
@@ -852,7 +854,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getConnectErrors() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .ConnectErrors)
+        return try getSocketStatistic(self, .ConnectErrors)
     }
 
     /// The number of errors encountered by this socket trying to bind to a local address.
@@ -861,7 +863,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getBindErrors() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .BindErrors)
+        return try getSocketStatistic(self, .BindErrors)
     }
 
     /// The number of errors encountered by this socket trying to accept a a connection from a remote peer.
@@ -870,7 +872,7 @@ extension NanoSocket {
     ///
     /// - Returns: As per description.
     public func getAcceptErrors() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .AcceptErrors)
+        return try getSocketStatistic(self, .AcceptErrors)
     }
 
     /// The number of connections currently in progress to this socket.
@@ -881,7 +883,7 @@ extension NanoSocket {
     ///
     /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentInProgressConnections() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .CurrentInProgressConnections)
+        return try getSocketStatistic(self, .CurrentInProgressConnections)
     }
 
     /// The number of connections currently estabalished to this socket.
@@ -892,7 +894,7 @@ extension NanoSocket {
     ///
     /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentConnections() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .CurrentConnections)
+        return try getSocketStatistic(self, .CurrentConnections)
     }
 
     /// The number of end-point errors.
@@ -903,6 +905,6 @@ extension NanoSocket {
     ///
     /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentEndPointErrors() throws -> UInt64 {
-        return try getSocketStatistic(self.socketFd, .CurrentEndPointErrors)
+        return try getSocketStatistic(self, .CurrentEndPointErrors)
     }
 }

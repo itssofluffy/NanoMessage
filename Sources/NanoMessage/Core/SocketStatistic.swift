@@ -116,8 +116,8 @@ extension SocketStatistic: CustomStringConvertible {
 /// For example, the nn_inproc(7) transport does not maintain any of the connection related statistics.
 ///
 /// - Parameters:
-///   - socketFd: The NanoSocket file descriptor
-///   - option:   The nanomsg statistic option.
+///   - nanoSocket: The nano socket to use
+///   - option:     The nanomsg statistic option.
 ///
 /// - Throws: `NanoMessageError.GetSocketStatistic` if an issue was encountered.
 ///
@@ -127,8 +127,8 @@ extension SocketStatistic: CustomStringConvertible {
 ///            to facilitate observability and debugging. The actual statistics themselves as well as
 ///            their meanings are unstable, and subject to change without notice. Programs should not
 ///            depend on the presence or values of any particular statistic. 
-internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) throws -> UInt64 {
-    let statistic = nn_get_statistic(socketFd, option.rawValue)
+internal func getSocketStatistic(_ nanoSocket: NanoSocket, _ option: SocketStatistic) throws -> UInt64 {
+    let statistic = nn_get_statistic(nanoSocket.fileDescriptor, option.rawValue)
 
     guard (statistic >= 0) else {
         throw NanoMessageError.GetSocketStatistic(code: nn_errno(), option: option)
@@ -141,8 +141,8 @@ internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) th
 /// For example, the nn_inproc(7) transport does not maintain any of the connection related statistics.
 ///
 /// - Parameters:
-///   - socketFd: The NanoSocket file descriptor
-///   - option:   The nanomsg statistic option.
+///   - nanoSocket: The nano socket to use
+///   - option:     The nanomsg statistic option.
 ///
 /// - Throws: `NanoMessageError.GetSocketStatistic` if an issue was encountered.
 ///
@@ -152,8 +152,8 @@ internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) th
 ///            to facilitate observability and debugging. The actual statistics themselves as well as
 ///            their meanings are unstable, and subject to change without notice. Programs should not
 ///            depend on the presence or values of any particular statistic. 
-internal func getSocketStatistic(_ socketFd: CInt, _ option: SocketStatistic) throws -> Priority {
-    let statistic = nn_get_statistic(socketFd, option.rawValue)
+internal func getSocketStatistic(_ nanoSocket: NanoSocket, _ option: SocketStatistic) throws -> Priority {
+    let statistic = nn_get_statistic(nanoSocket.fileDescriptor, option.rawValue)
 
     guard (statistic >= 0) else {
         throw NanoMessageError.GetSocketStatistic(code: nn_errno(), option: option)

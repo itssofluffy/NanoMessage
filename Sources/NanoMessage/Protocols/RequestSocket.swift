@@ -70,7 +70,7 @@ extension RequestSocket {
     ///
     /// - Returns: The sockets resend interval.
     public func getResendInterval() throws -> TimeInterval {
-        return try getSocketOption(self.socketFd, .ResendInterval, .RequestProtocol)
+        return try getSocketOption(self, .ResendInterval, .RequestProtocol)
     }
 
     /// If reply is not received in specified amount of milliseconds, the request will be automatically resent.
@@ -86,7 +86,7 @@ extension RequestSocket {
     public func setResendInterval(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getResendInterval()
 
-        try setSocketOption(self.socketFd, .ResendInterval, seconds, .RequestProtocol)
+        try setSocketOption(self, .ResendInterval, seconds, .RequestProtocol)
 
         return originalValue
     }

@@ -113,7 +113,7 @@ extension NanoMessageError: CustomStringConvertible {
             case .PollSocket(let code):
                 return "pollSocket() failed: " + errorString(code)
             case .SocketIsADevice(let socket):
-                return "NanoSocket \(socket.socketFd) Is A Device"
+                return "NanoSocket \(socket.fileDescriptor) Is A Device"
             case .SendMessage(let code):
                 return "sendMessage() failed: " + errorString(code)
             case .MessageNotSent:

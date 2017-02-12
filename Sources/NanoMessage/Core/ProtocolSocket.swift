@@ -329,7 +329,7 @@ extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode) // chain down the receiveMessage signature stock.
 
-        return ReceiveString(received.bytes, try String(data: received.message))
+        return ReceiveString(bytes: received.bytes, message: try String(data: received.message))
     }
 
     /// Receive a message setting the receive timeout and attempt to restore to back to it's original value.
@@ -407,7 +407,7 @@ extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(timeout: TimeInterval) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
-        return ReceiveString(received.bytes, try String(data: received.message))
+        return ReceiveString(bytes: received.bytes, message: try String(data: received.message))
     }
 
     /// Receive a message.
@@ -449,7 +449,7 @@ extension ProtocolSocket where Self: Receiver {
     public func receiveMessage(timeout: Timeout) throws -> ReceiveString {
         let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
-        return ReceiveString(received.bytes, try String(data: received.message))
+        return ReceiveString(bytes: received.bytes, message: try String(data: received.message))
     }
 }
 
@@ -585,7 +585,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets send buffer size.
     public func getSendBufferSize() throws -> UInt {
-        return try getSocketOption(self._nanoSocket.socketFd, .SendBuffer)
+        return try getSocketOption(self._nanoSocket, .SendBuffer)
     }
 
     /// Size of the send buffer, in bytes. To prevent blocking for messages larger than the buffer,
@@ -602,7 +602,7 @@ extension ProtocolSocket where Self: Sender {
     public func setSendBufferSize(bytes: UInt) throws -> UInt {
         let originalValue = try self.getSendBufferSize()
 
-        try setSocketOption(self._nanoSocket.socketFd, .SendBuffer, bytes)
+        try setSocketOption(self._nanoSocket, .SendBuffer, bytes)
 
         return originalValue
     }
@@ -616,7 +616,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets send timeout in timeinterval (-1 seconds if there is no timeout).
     public func getSendTimeout() throws -> TimeInterval {
-        return try getSocketOption(self._nanoSocket.socketFd, .SendTimeout)
+        return try getSocketOption(self._nanoSocket, .SendTimeout)
     }
 
     /// The timeout for send operation on the socket, in milliseconds. If message cannot be sent within
@@ -633,7 +633,7 @@ extension ProtocolSocket where Self: Sender {
     public func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getSendTimeout()
 
-        try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, seconds)
+        try setSocketOption(self._nanoSocket, .SendTimeout, seconds)
 
         return originalValue
     }
@@ -652,7 +652,7 @@ extension ProtocolSocket where Self: Sender {
     public func setSendTimeout(seconds: Timeout) throws -> TimeInterval {
         let originalValue = try self.getSendTimeout()
 
-        try setSocketOption(self._nanoSocket.socketFd, .SendTimeout, seconds.rawValue)
+        try setSocketOption(self._nanoSocket, .SendTimeout, seconds.rawValue)
 
         return originalValue
     }
@@ -668,7 +668,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets send priority.
     public func getSendPriority() throws -> Priority {
-        return try getSocketOption(self._nanoSocket.socketFd, .SendPriority)
+        return try getSocketOption(self._nanoSocket, .SendPriority)
     }
 
     /// Retrieves outbound priority currently set on the socket. This option has no effect on socket types that
@@ -687,7 +687,7 @@ extension ProtocolSocket where Self: Sender {
     public func setSendPriority(_ priority: Priority) throws -> Priority {
         let originalValue = try self.getSendPriority()
 
-        try setSocketOption(self._nanoSocket.socketFd, .SendPriority, priority)
+        try setSocketOption(self._nanoSocket, .SendPriority, priority)
 
         return originalValue
     }
@@ -699,7 +699,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets underlying send file descriptor.
     public func getSendFd() throws -> Int {
-        return try getSocketOption(self._nanoSocket.socketFd, .SendFd)
+        return try getSocketOption(self._nanoSocket, .SendFd)
     }
 }
 
@@ -713,7 +713,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets receive buffer size.
     public func getReceiveBufferSize() throws -> UInt {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveBuffer)
+        return try getSocketOption(self._nanoSocket, .ReceiveBuffer)
     }
 
     /// Size of the receive buffer, in bytes. To prevent blocking for messages larger than the buffer,
@@ -730,7 +730,7 @@ extension ProtocolSocket where Self: Receiver {
     public func setReceiveBufferSize(bytes: UInt) throws -> UInt {
         let originalValue = try self.getReceiveBufferSize()
 
-        try setSocketOption(self._nanoSocket.socketFd, .ReceiveBuffer, bytes)
+        try setSocketOption(self._nanoSocket, .ReceiveBuffer, bytes)
 
         return originalValue
     }
@@ -746,7 +746,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Note:    The receive size is unlimited is not currently supported
     public func getMaximumMessageSize() throws -> Int {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumMessageSize)
+        return try getSocketOption(self._nanoSocket, .ReceiveMaximumMessageSize)
     }
 
     /// Maximum message size that can be received, in bytes. Negative value means that the received size
@@ -763,7 +763,7 @@ extension ProtocolSocket where Self: Receiver {
     public func setMaximumMessageSize(bytes: Int) throws -> Int {
         let originalValue = try self.getMaximumMessageSize()
 
-        try setSocketOption(self._nanoSocket.socketFd, .ReceiveMaximumMessageSize, (bytes < 0) ? -1 : bytes)
+        try setSocketOption(self._nanoSocket, .ReceiveMaximumMessageSize, (bytes < 0) ? -1 : bytes)
 
         return originalValue
     }
@@ -777,7 +777,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets receive timeout in timeinterval (-1 seconds if there is no timeout).
     public func getReceiveTimeout() throws -> TimeInterval {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout)
+        return try getSocketOption(self._nanoSocket, .ReceiveTimeout)
     }
 
     /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
@@ -794,7 +794,7 @@ extension ProtocolSocket where Self: Receiver {
     public func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getReceiveTimeout()
 
-        try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, seconds)
+        try setSocketOption(self._nanoSocket, .ReceiveTimeout, seconds)
 
         return originalValue
     }
@@ -813,7 +813,7 @@ extension ProtocolSocket where Self: Receiver {
     public func setReceiveTimeout(seconds: Timeout) throws -> TimeInterval {
         let originalValue = try self.getReceiveTimeout()
 
-        try setSocketOption(self._nanoSocket.socketFd, .ReceiveTimeout, seconds.rawValue)
+        try setSocketOption(self._nanoSocket, .ReceiveTimeout, seconds.rawValue)
 
         return originalValue
     }
@@ -828,7 +828,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets receive timeout.
     public func getReceivePriority() throws -> Priority {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceivePriority)
+        return try getSocketOption(self._nanoSocket, .ReceivePriority)
     }
 
     /// The inbound priority for endpoints subsequently added to the socket. When receiving a message, messages
@@ -846,7 +846,7 @@ extension ProtocolSocket where Self: Receiver {
     public func setReceivePriority(_ priority: Priority) throws -> Priority {
         let originalValue = try self.getReceivePriority()
 
-        try setSocketOption(self._nanoSocket.socketFd, .ReceivePriority, priority)
+        try setSocketOption(self._nanoSocket, .ReceivePriority, priority)
 
         return originalValue
     }
@@ -858,7 +858,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets underlying receiver file descriptor.
     public func getReceiveFd() throws -> Int {
-        return try getSocketOption(self._nanoSocket.socketFd, .ReceiveFd)
+        return try getSocketOption(self._nanoSocket, .ReceiveFd)
     }
 }
 
@@ -869,7 +869,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: As per description.
     public func getMessagesSent() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket.socketFd, .MessagesSent)
+        return try getSocketStatistic(self._nanoSocket, .MessagesSent)
     }
 
     /// The number of bytes sent by this socket.
@@ -878,7 +878,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: As per description.
     public func getBytesSent() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket.socketFd, .BytesSent)
+        return try getSocketStatistic(self._nanoSocket, .BytesSent)
     }
 
     /// The current send priority of the socket.
@@ -887,7 +887,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: As per description.
     public func getCurrentSendPriority() throws -> Priority {
-        return try getSocketStatistic(self._nanoSocket.socketFd, .CurrentSendPriority)
+        return try getSocketStatistic(self._nanoSocket, .CurrentSendPriority)
     }
 }
 
@@ -898,7 +898,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: As per description.
     public func getMessagesReceived() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket.socketFd, .MessagesReceived)
+        return try getSocketStatistic(self._nanoSocket, .MessagesReceived)
     }
 
     /// The number of bytes received by this socket.
@@ -907,6 +907,6 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: As per description.
     public func getBytesReceived() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket.socketFd, .BytesReceived)
+        return try getSocketStatistic(self._nanoSocket, .BytesReceived)
     }
 }

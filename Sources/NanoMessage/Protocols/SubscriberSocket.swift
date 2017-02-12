@@ -269,7 +269,7 @@ extension SubscriberSocket {
                     throw NanoMessageError.TopicLength
                 }
 
-                try setSocketOption(self.socketFd, .Subscribe, topic, .SubscriberProtocol)
+                try setSocketOption(self, .Subscribe, topic, .SubscriberProtocol)
 
                 self.subscribedTopics.insert(topic)
             }
@@ -309,7 +309,7 @@ extension SubscriberSocket {
             let topicSubscribed = self.isTopicSubscribed(topic)
 
             if (topicSubscribed) {
-                try setSocketOption(self.socketFd, .UnSubscribe, topic, .SubscriberProtocol)
+                try setSocketOption(self, .UnSubscribe, topic, .SubscriberProtocol)
 
                 self.subscribedTopics.remove(topic)
 
@@ -351,7 +351,7 @@ extension SubscriberSocket {
                     try self.unsubscribeFrom(topic: topic)
                 }
 
-                try setSocketOption(self.socketFd, .Subscribe, "", .SubscriberProtocol)
+                try setSocketOption(self, .Subscribe, "", .SubscriberProtocol)
 
                 self.subscribedToAllTopics = true
             }
@@ -371,7 +371,7 @@ extension SubscriberSocket {
         }
 
         if (self.subscribedToAllTopics) {
-            try setSocketOption(self.socketFd, .UnSubscribe, "", .SubscriberProtocol)
+            try setSocketOption(self, .UnSubscribe, "", .SubscriberProtocol)
         }
 
         self.subscribedToAllTopics = false

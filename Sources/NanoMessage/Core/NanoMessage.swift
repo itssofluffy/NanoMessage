@@ -131,7 +131,7 @@ public func poll(sockets: [NanoSocket], timeout: TimeInterval = TimeInterval(sec
             eventMask = eventMask | _polloutMask
         }
 
-        pollFds.append(nn_pollfd(fd: socket.socketFd, events: eventMask, revents: 0))
+        pollFds.append(nn_pollfd(fd: socket.fileDescriptor, events: eventMask, revents: 0))
     }
 
     try pollFds.withUnsafeMutableBufferPointer { fds -> Void in                           // poll the list of nano sockets.

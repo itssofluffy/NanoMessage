@@ -72,7 +72,7 @@ extension SurveyorSocket {
     ///
     /// - Returns: The sockets deadline timeout.
     public func getDeadline() throws -> TimeInterval {
-        return try getSocketOption(self.socketFd, .SurveyDeadline, .SurveyorProtocol)
+        return try getSocketOption(self, .SurveyDeadline, .SurveyorProtocol)
     }
 
     /// Specifies how long to wait for responses to the survey. Once the deadline expires,
@@ -90,7 +90,7 @@ extension SurveyorSocket {
     public func setDeadline(seconds: TimeInterval) throws -> TimeInterval {
         let originalValue = try self.getDeadline()
 
-        try setSocketOption(self.socketFd, .SurveyDeadline, seconds, .SurveyorProtocol)
+        try setSocketOption(self, .SurveyDeadline, seconds, .SurveyorProtocol)
 
         return originalValue
     }
