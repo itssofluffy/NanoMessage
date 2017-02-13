@@ -1,4 +1,3 @@
-
 /*
     NanoSocket.swift
 
@@ -168,13 +167,21 @@ public class NanoSocket {
 }
 
 extension NanoSocket {
-    /// Get socket priorites (receive/send)
+    /// Establish an endpoint on the socket.
+    ///
+    /// - Parameters:
+    ///   - url:                Consists of two parts as follows: transport://address. The transport specifies the
+    ///                         underlying transport protocol to use. The meaning of the address part is specific
+    ///                         to the underlying transport protocol.
+    ///   - name:               An optional endpoint name.
+    ///   - type:               The connection type used to establish the endpoint.
+    ///   - establishEndPoint:  Closure used to establish the endpoint.
     ///
     /// - Throws:  `NanoMessageError.GetSocketOption`
     ///
-    /// - Returns: Tuple of receive and send send priorities, if either is nil then
-    ///            socket is either not a receiver or sender.
-    private func _socketPriorities() throws -> SocketPriorities {
+    /// - Returns: An endpoint that has just been established. The endpoint can be later used to remove the
+    ///            endpoint from the socket via `removeEndPoint()` function.
+    private func _establishEndPoint(url: URL, name: String, type: ConnectionType, _ establishEndPoint: () throws -> CInt) throws -> EndPoint {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
@@ -185,7 +192,20 @@ extension NanoSocket {
             sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
         }
 
-        return SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority)
+        let ipv4Only = try self.getIPv4Only()
+
+        let endPointId = try establishEndPoint()
+
+        let endPoint = EndPoint(id:         Int(endPointId),
+                                url:        url,
+                                type:       type,
+                                priorities: SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority),
+                                ipv4Only:   ipv4Only,
+                                name:       name)
+
+        self.endPoints.insert(endPoint)
+
+        return endPoint
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -204,29 +224,17 @@ extension NanoSocket {
     /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        var endPointId: CInt = -1
+        return try self._establishEndPoint(url: url, name: name, type: .Bind, {
+            try url.absoluteString.withCString { address in
+                let endPointId = nn_bind(self.fileDescriptor, address)
 
-        let priorities = try self._socketPriorities()
-        let ipv4Only = try self.getIPv4Only()
+                guard (endPointId >= 0) else {
+                    throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
+                }
 
-        try url.absoluteString.withCString { address in
-            endPointId = nn_bind(self.fileDescriptor, address)
-
-            guard (endPointId >= 0) else {
-                throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
+                return endPointId
             }
-        }
-
-        let endPoint = EndPoint(id:         Int(endPointId),
-                                url:        url,
-                                type:       .Bind,
-                                priorities: priorities,
-                                ipv4Only:   ipv4Only,
-                                name:       name)
-
-        self.endPoints.insert(endPoint)
-
-        return endPoint
+        })
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -266,29 +274,17 @@ extension NanoSocket {
     /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        var endPointId: CInt = -1
+        return try self._establishEndPoint(url: url, name: name, type: .Connect, {
+            try url.absoluteString.withCString { address in
+                let endPointId = nn_connect(self.fileDescriptor, address)
 
-        let priorities = try self._socketPriorities()
-        let ipv4Only = try self.getIPv4Only()
+                guard (endPointId >= 0) else {
+                    throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
+                }
 
-        try url.absoluteString.withCString { address in
-            endPointId = nn_connect(self.fileDescriptor, address)
-
-            guard (endPointId >= 0) else {
-                throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
+                return endPointId
             }
-        }
-
-        let endPoint = EndPoint(id:         Int(endPointId),
-                                url:        url,
-                                type:       .Connect,
-                                priorities: priorities,
-                                ipv4Only:   ipv4Only,
-                                name:       name)
-
-        self.endPoints.insert(endPoint)
-
-        return endPoint
+        })
     }
 
     /// Adds a remote endpoint to the socket. The library would then try to connect to the specified remote endpoint.
