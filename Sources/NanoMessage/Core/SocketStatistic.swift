@@ -153,11 +153,7 @@ internal func getSocketStatistic(_ nanoSocket: NanoSocket, _ option: SocketStati
 ///            their meanings are unstable, and subject to change without notice. Programs should not
 ///            depend on the presence or values of any particular statistic. 
 internal func getSocketStatistic(_ nanoSocket: NanoSocket, _ option: SocketStatistic) throws -> Priority {
-    let statistic = nn_get_statistic(nanoSocket.fileDescriptor, option.rawValue)
-
-    guard (statistic >= 0) else {
-        throw NanoMessageError.GetSocketStatistic(code: nn_errno(), option: option)
-    }
+    let statistic: UInt64 = try getSocketStatistic(nanoSocket, option)
 
     return Priority(level: Int(statistic))
 }
