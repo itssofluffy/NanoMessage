@@ -99,13 +99,13 @@ public class NanoSocket {
         // rely on the fact that getting the receive/send file descriptor for a socket type from
         // the underlying library that does not support receive/send will throw a nil to determine
         // if the socket is capable of receiving or ending.
-        if let _ = try? getSocketOption(self.fileDescriptor, .ReceiveFd) {
+        if let _ = try? getSocketOption(self.fileDescriptor, .ReceiveFileDescriptor) {
             self.receiverSocket = true
         } else {
             self.receiverSocket = false
         }
 
-        if let _ = try? getSocketOption(self.fileDescriptor, .SendFd) {
+        if let _ = try? getSocketOption(self.fileDescriptor, .SendFileDescriptor) {
             self.senderSocket = true
         } else {
             self.senderSocket = false
@@ -707,6 +707,8 @@ extension NanoSocket {
         return originalValue
     }
 
+    @available(*, unavailable, renamed: "getMaximumTTL")
+    public func getMaxTTL() throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
     /// message is received (for example via the `bindToSocket()` function) counts as a single hop.
     /// This provides a form of protection against inadvertent loops.
@@ -714,10 +716,13 @@ extension NanoSocket {
     /// - Throws:  `NanoMessageError.GetSocketOption`
     ///
     /// - Returns: The number of hops before a message is dropped.
-    public func getMaxTTL() throws -> Int {
-        return try getSocketOption(self, .MaxTTL)
+    public func getMaximumTTL() throws -> Int {
+        return try getSocketOption(self, .MaximumTTL)
     }
 
+    @available(*, unavailable, renamed: "getMaximumTTL")
+    @discardableResult
+    public func setMaxTTL(hops: Int) throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
     /// message is received (for example via the `bindToSocket()` function) counts as a single hop.
     /// This provides a form of protection against inadvertent loops.
@@ -730,10 +735,10 @@ extension NanoSocket {
     ///
     /// - Returns: The number of hops before a message is dropped before being set.
     @discardableResult
-    public func setMaxTTL(hops: Int) throws -> Int {
-        let originalValue = try self.getMaxTTL()
+    public func setMaximumTTL(hops: Int) throws -> Int {
+        let originalValue = try self.getMaximumTTL()
 
-        try setSocketOption(self, .MaxTTL, hops)
+        try setSocketOption(self, .MaximumTTL, hops)
 
         return originalValue
     }

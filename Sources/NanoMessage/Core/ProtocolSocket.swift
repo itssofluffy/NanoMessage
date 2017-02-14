@@ -127,7 +127,7 @@ extension ProtocolSocket where Self: Sender {
     ///            guaranteed and no error will be thrown. 
     @discardableResult
     public func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int {
-        guard (timeout >= 0) else {
+        guard (timeout.milliseconds > 0) else {
             throw NanoMessageError.InvalidSendTimeout(timeout: timeout)
         }
 
@@ -380,7 +380,7 @@ extension ProtocolSocket where Self: Receiver {
     /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
     ///            guaranteed behaviour and no error will be thrown. 
     public func receiveMessage(timeout: TimeInterval) throws -> ReceiveData {
-        guard (timeout >= 0) else {
+        guard (timeout.milliseconds > 0) else {
             throw NanoMessageError.InvalidReceiveTimeout(timeout: timeout)
         }
 
@@ -692,14 +692,16 @@ extension ProtocolSocket where Self: Sender {
         return originalValue
     }
 
+    @available(*, unavailable, renamed: "getSendFileDescriptor")
+    public func getSendFd() throws -> Int { fatalError() }
     /// Retrieves the underlying file descriptor for the messages that can be sent to the socket.
     /// The descriptor should be used only for polling and never read from or written to.
     ///
     /// - Throws:  `NanoMessageError.GetSocketOption`
     ///
     /// - Returns: The sockets underlying send file descriptor.
-    public func getSendFd() throws -> Int {
-        return try getSocketOption(self._nanoSocket, .SendFd)
+    public func getSendFileDescriptor() throws -> Int {
+        return try getSocketOption(self._nanoSocket, .SendFileDescriptor)
     }
 }
 
@@ -851,14 +853,16 @@ extension ProtocolSocket where Self: Receiver {
         return originalValue
     }
 
+    @available(*, unavailable, renamed: "getReceiveFileDescriptor")
+    public func getReceiveFd() throws -> Int { fatalError() }
     /// Retrieves the underlying file descriptor for the messages that are received on the socket.
     /// The descriptor should be used only for polling and never read from or written to.
     ///
     /// - Throws:  `NanoMessageError.GetSocketOption`
     ///
     /// - Returns: The sockets underlying receiver file descriptor.
-    public func getReceiveFd() throws -> Int {
-        return try getSocketOption(self._nanoSocket, .ReceiveFd)
+    public func getReceiveFileDescriptor() throws -> Int {
+        return try getSocketOption(self._nanoSocket, .ReceiveFileDescriptor)
     }
 }
 

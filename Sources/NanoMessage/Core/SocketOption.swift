@@ -39,10 +39,10 @@ public enum SocketOption: CInt {
     case SendPriority
     case ReceivePriority
     case IPv4Only
-    case SendFd
-    case ReceiveFd
+    case SendFileDescriptor
+    case ReceiveFileDescriptor
     case SocketName
-    case MaxTTL
+    case MaximumTTL
     case ResendInterval
     case Subscribe
     case UnSubscribe
@@ -78,13 +78,13 @@ public enum SocketOption: CInt {
                 return NN_RCVPRIO
             case .IPv4Only:
                 return NN_IPV4ONLY
-            case .SendFd:
+            case .SendFileDescriptor:
                 return NN_SNDFD
-            case .ReceiveFd:
+            case .ReceiveFileDescriptor:
                 return NN_RCVFD
             case .SocketName:
                 return NN_SOCKET_NAME
-            case .MaxTTL:
+            case .MaximumTTL:
                 return NN_MAXTTL
             case .ResendInterval:
                 return NN_REQ_RESEND_IVL
@@ -131,14 +131,14 @@ extension SocketOption: CustomStringConvertible {
                 return "receive priority"
             case .IPv4Only:
                 return "ipv4 only"
-            case .SendFd:
-                return "send fd"
-            case .ReceiveFd:
-                return "receive fd"
+            case .SendFileDescriptor:
+                return "send file descriptor"
+            case .ReceiveFileDescriptor:
+                return "receive file descriptor"
             case .SocketName:
                 return "socket name"
-            case .MaxTTL:
-                return "max ttl"
+            case .MaximumTTL:
+                return "maximum ttl"
             case .ResendInterval:
                 return "resend interval"
             case .Subscribe:
