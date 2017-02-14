@@ -720,7 +720,7 @@ extension NanoSocket {
         return try getSocketOption(self, .MaximumTTL)
     }
 
-    @available(*, unavailable, renamed: "getMaximumTTL")
+    @available(*, unavailable, renamed: "setMaximumTTL")
     @discardableResult
     public func setMaxTTL(hops: Int) throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
