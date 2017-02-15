@@ -181,20 +181,20 @@ extension NanoSocket {
     ///
     /// - Returns: An endpoint that has just been established. The endpoint can be later used to remove the
     ///            endpoint from the socket via `removeEndPoint()` function.
-    private func _establishEndPoint(url: URL, name: String, type: ConnectionType, _ establishEndPoint: (UnsafePointer<Int8>) throws -> CInt) throws -> EndPoint {
-        var receivePriority: Priority?
-        var sendPriority: Priority?
+    private func _establishEndPoint(url: URL, name: String, type: ConnectionType, _ establishEndPoint: (UnsafePointer<Int8>) throws -> CInt) rethrows -> EndPoint {
+        return try url.absoluteString.withCString { address in
+            var receivePriority: Priority?
+            var sendPriority: Priority?
 
-        if (self.receiverSocket) {                                         // if this is a receiver socket then...
-            receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
-        }
-        if (self.senderSocket) {                                           // if this is a sender socket then...
-            sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
-        }
+            if (self.receiverSocket) {                                         // if this is a receiver socket then...
+                receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
+            }
+            if (self.senderSocket) {                                           // if this is a sender socket then...
+                sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
+            }
 
-        let ipv4Only = try self.getIPv4Only()
+            let ipv4Only = try self.getIPv4Only()
 
-        return try url.absoluteString.withCString { address -> EndPoint in
             let endPointId = try establishEndPoint(address)
 
             let endPoint = EndPoint(id:         Int(endPointId),
