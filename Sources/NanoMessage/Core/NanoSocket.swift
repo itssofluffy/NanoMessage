@@ -181,7 +181,7 @@ extension NanoSocket {
     ///
     /// - Returns: An endpoint that has just been established. The endpoint can be later used to remove the
     ///            endpoint from the socket via `removeEndPoint()` function.
-    private func _establishEndPoint(url: URL, name: String, type: ConnectionType, _ establishEndPoint: () throws -> CInt) throws -> EndPoint {
+    private func _establishEndPoint(url: URL, name: String, type: ConnectionType, _ establishEndPoint: (UnsafePointer<Int8>) throws -> CInt) throws -> EndPoint {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
@@ -194,18 +194,20 @@ extension NanoSocket {
 
         let ipv4Only = try self.getIPv4Only()
 
-        let endPointId = try establishEndPoint()
+        return try url.absoluteString.withCString { address -> EndPoint in
+            let endPointId = try establishEndPoint(address)
 
-        let endPoint = EndPoint(id:         Int(endPointId),
-                                url:        url,
-                                type:       type,
-                                priorities: SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority),
-                                ipv4Only:   ipv4Only,
-                                name:       name)
+            let endPoint = EndPoint(id:         Int(endPointId),
+                                    url:        url,
+                                    type:       type,
+                                    priorities: SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority),
+                                    ipv4Only:   ipv4Only,
+                                    name:       name)
 
-        self.endPoints.insert(endPoint)
+            self.endPoints.insert(endPoint)
 
-        return endPoint
+            return endPoint
+        }
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -224,16 +226,14 @@ extension NanoSocket {
     /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try self._establishEndPoint(url: url, name: name, type: .Bind, {
-            try url.absoluteString.withCString { address in
-                let endPointId = nn_bind(self.fileDescriptor, address)
+        return try self._establishEndPoint(url: url, name: name, type: .Bind, { address in
+            let endPointId = nn_bind(self.fileDescriptor, address)
 
-                guard (endPointId >= 0) else {
-                    throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
-                }
-
-                return endPointId
+            guard (endPointId >= 0) else {
+                throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
             }
+
+            return endPointId
         })
     }
 
@@ -274,16 +274,14 @@ extension NanoSocket {
     /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try self._establishEndPoint(url: url, name: name, type: .Connect, {
-            try url.absoluteString.withCString { address in
-                let endPointId = nn_connect(self.fileDescriptor, address)
+        return try self._establishEndPoint(url: url, name: name, type: .Connect, { address in
+            let endPointId = nn_connect(self.fileDescriptor, address)
 
-                guard (endPointId >= 0) else {
-                    throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
-                }
-
-                return endPointId
+            guard (endPointId >= 0) else {
+                throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
             }
+
+            return endPointId
         })
     }
 
