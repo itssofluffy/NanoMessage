@@ -34,13 +34,13 @@ extension SocketPriorities: CustomStringConvertible {
     public var description: String {
         var description = "receive: "
 
-        if let priority = self.receive {
+        if let priority = receive {
             description += "(\(priority))"
         } else {
             description += "nil"
         }
         description += ", send: "
-        if let priority = self.send {
+        if let priority = send {
             description += "(\(priority))"
         } else {
             description += "nil"

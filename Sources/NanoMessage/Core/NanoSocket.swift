@@ -48,23 +48,23 @@ public class NanoSocket {
     ///          to determine the minimum pause between each attempt.
     public var closeAttempts: Int {
         get {
-            return self._closeAttempts
+            return _closeAttempts
         }
         set (attempts) {
-            self._closeAttempts = clamp(value: attempts, lower: 1, upper: 1000)
+            _closeAttempts = clamp(value: attempts, lower: 1, upper: 1000)
         }
     }
     /// The socket/end-point close time in timeinterval.
     fileprivate var _closeDelay: TimeInterval {
         var delay = TimeInterval(milliseconds: 1000)
 
-        if let linger = try? self.getLinger() {
+        if let linger = try? getLinger() {
             if (linger > 0) {                               // account for infinate linger timeout.
                 delay = linger
             }
         }
 
-        return TimeInterval(milliseconds: delay.milliseconds / self.closeAttempts)
+        return TimeInterval(milliseconds: delay.milliseconds / closeAttempts)
     }
     /// Determine if when de-referencing the socket we are going to keep attempting to close the socket until successful.
     ///
@@ -88,50 +88,50 @@ public class NanoSocket {
     /// - Throws: `MutexError.MutexInit`
     ///           `NanoMessageError.NanoSocket` if the nanomsg socket has failed to be created
     public init(socketDomain: SocketDomain, socketProtocol: SocketProtocol) throws {
-        try self.mutex = Mutex()
+        try mutex = Mutex()
 
-        self.fileDescriptor = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
+        fileDescriptor = nn_socket(socketDomain.rawValue, socketProtocol.rawValue)
 
-        guard (self.fileDescriptor >= 0) else {
+        guard (fileDescriptor >= 0) else {
             throw NanoMessageError.NanoSocket(code: nn_errno())
         }
 
         // rely on the fact that getting the receive/send file descriptor for a socket type from
         // the underlying library that does not support receive/send will throw a nil to determine
         // if the socket is capable of receiving or ending.
-        if let _ = try? getSocketOption(self.fileDescriptor, .ReceiveFileDescriptor) {
-            self.receiverSocket = true
+        if let _ = try? getSocketOption(fileDescriptor, .ReceiveFileDescriptor) {
+            receiverSocket = true
         } else {
-            self.receiverSocket = false
+            receiverSocket = false
         }
 
-        if let _ = try? getSocketOption(self.fileDescriptor, .SendFileDescriptor) {
-            self.senderSocket = true
+        if let _ = try? getSocketOption(fileDescriptor, .SendFileDescriptor) {
+            senderSocket = true
         } else {
-            self.senderSocket = false
+            senderSocket = false
         }
     }
 
     deinit {
         func _closeSocket() throws {
-            if (self.fileDescriptor >= 0) {                             // if we have a valid nanomsg socket file descriptor then...
+            if (fileDescriptor >= 0) {                                  // if we have a valid nanomsg socket file descriptor then...
                 var loopCount = 0
 
                 while (true) {
-                    let returnCode = nn_close(self.fileDescriptor)      // try and close the nanomsg socket
+                    let returnCode = nn_close(fileDescriptor)           // try and close the nanomsg socket
 
                     if (returnCode < 0) {                               // if `nn_close()` failed then...
                         let errno = nn_errno()
 
                         if (errno == EINTR) {                           // if we were interrupted by a signal, reattempt is allowed by the native library
-                            if (loopCount >= self.closeAttempts) {      // we've reached our limit so say we were interrupted
+                            if (loopCount >= closeAttempts) {           // we've reached our limit so say we were interrupted
                                 throw NanoMessageError.Interrupted
                             }
                         } else {
                             throw NanoMessageError.Close(code: errno)
                         }
 
-                        usleep(self._closeDelay)                        // zzzz...
+                        usleep(_closeDelay)                             // zzzz...
 
                         loopCount += 1
                     } else {
@@ -152,7 +152,7 @@ public class NanoSocket {
 
                 print("\(dynamicType).\(#function) failed: \(NanoMessageError.Interrupted))", to: &errorStream)
 
-                if (self.blockTillCloseSuccess) {
+                if (blockTillCloseSuccess) {
                     terminateLoop = false
                 }
             } catch let error as NanoMessageError {
@@ -186,14 +186,14 @@ extension NanoSocket {
             var receivePriority: Priority?
             var sendPriority: Priority?
 
-            if (self.receiverSocket) {                                         // if this is a receiver socket then...
+            if (receiverSocket) {                                              // if this is a receiver socket then...
                 receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
             }
-            if (self.senderSocket) {                                           // if this is a sender socket then...
+            if (senderSocket) {                                                // if this is a sender socket then...
                 sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
             }
 
-            let ipv4Only = try self.getIPv4Only()
+            let ipv4Only = try getIPv4Only()
 
             let endPointId = try establishEndPoint(address)
 
@@ -204,7 +204,7 @@ extension NanoSocket {
                                     ipv4Only:   ipv4Only,
                                     name:       name)
 
-            self.endPoints.insert(endPoint)
+            endPoints.insert(endPoint)
 
             return endPoint
         }
@@ -226,8 +226,8 @@ extension NanoSocket {
     /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try self._establishEndPoint(url: url, name: name, type: .Bind, { address in
-            let endPointId = nn_bind(self.fileDescriptor, address)
+        return try _establishEndPoint(url: url, name: name, type: .Bind, { address in
+            let endPointId = nn_bind(fileDescriptor, address)
 
             guard (endPointId >= 0) else {
                 throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
@@ -253,7 +253,7 @@ extension NanoSocket {
     /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func bindToURL(_ url: URL, name: String = "") throws -> Int {
-        let endPoint: EndPoint = try self.bindToURL(url, name: name)
+        let endPoint: EndPoint = try bindToURL(url, name: name)
 
         return endPoint.id
     }
@@ -274,8 +274,8 @@ extension NanoSocket {
     /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try self._establishEndPoint(url: url, name: name, type: .Connect, { address in
-            let endPointId = nn_connect(self.fileDescriptor, address)
+        return try _establishEndPoint(url: url, name: name, type: .Connect, { address in
+            let endPointId = nn_connect(fileDescriptor, address)
 
             guard (endPointId >= 0) else {
                 throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
@@ -301,7 +301,7 @@ extension NanoSocket {
     /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func connectToURL(_ url: URL, name: String = "") throws -> Int {
-        let endPoint: EndPoint = try self.connectToURL(url, name: name)
+        let endPoint: EndPoint = try connectToURL(url, name: name)
 
         return endPoint.id
     }
@@ -317,21 +317,21 @@ extension NanoSocket {
     /// - Returns: If the endpoint was removed, false indicates that the endpoint was not attached to the socket.
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
-        if (self.endPoints.contains(endPoint)) {
+        if (endPoints.contains(endPoint)) {
             var loopCount = 0
 
             while (true) {
-                let returnCode = nn_shutdown(self.fileDescriptor, CInt(endPoint.id))  // attempt to close down the endpoint
+                let returnCode = nn_shutdown(fileDescriptor, CInt(endPoint.id))       // attempt to close down the endpoint
 
                 if (returnCode < 0) {                                                 // if `nn_shutdown()` failed then...
                     let errno = nn_errno()
 
                     if (errno == EINTR) {                                             // if we were interrupted by a signal, reattempt is allowed by the native library
-                        if (loopCount >= self.closeAttempts) {
+                        if (loopCount >= closeAttempts) {
                             throw NanoMessageError.Interrupted
                         }
 
-                        usleep(self._closeDelay)                                      // zzzz...
+                        usleep(_closeDelay)                                           // zzzz...
 
                         loopCount += 1
                     } else {
@@ -342,7 +342,7 @@ extension NanoSocket {
                 }
             }
 
-            self.endPoints.remove(endPoint)
+            endPoints.remove(endPoint)
 
             return true
         }
@@ -361,8 +361,8 @@ extension NanoSocket {
     /// - Returns: If the endpoint was removed, false indicates that the endpoint was not attached to the socket.
     @discardableResult
     public func removeEndPoint(_ endPointId: Int) throws -> Bool {
-        if let endPoint = self.endPoints.first(where: { $0.id == endPointId }) {
-            return try self.removeEndPoint(endPoint)            // access the first occurance as end-point.id is/should be unique!?
+        if let endPoint = endPoints.first(where: { $0.id == endPointId }) {
+            return try removeEndPoint(endPoint)            // access the first occurance as end-point.id is/should be unique!?
         }
 
         return false
@@ -379,8 +379,8 @@ extension NanoSocket {
     /// - Returns: If the endpoint was removed, false indicates that the endpoint was not attached to the socket.
     @discardableResult
     public func removeEndPoint(_ endPointURL: URL) throws -> Bool {
-        if let endPoint = self.endPoints.first(where: { $0.url.absoluteString == endPointURL.absoluteString }) {
-            return try self.removeEndPoint(endPoint)            // access the first occurance as end-point.url is/should be unique!?
+        if let endPoint = endPoints.first(where: { $0.url.absoluteString == endPointURL.absoluteString }) {
+            return try removeEndPoint(endPoint)            // access the first occurance as end-point.url is/should be unique!?
         }
 
         return false
@@ -410,7 +410,7 @@ extension NanoSocket {
     /// - Throws: `NanoMessageError.SocketIsADevice`
     ///           `NanoMessageError.BindToSocket` if a problem has been encountered.
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
-        guard (!self.socketIsADevice) else {
+        guard (!socketIsADevice) else {
             throw NanoMessageError.SocketIsADevice(socket: self)
         }
 
@@ -418,15 +418,15 @@ extension NanoSocket {
             throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
         }
 
-        self.socketIsADevice = true
+        socketIsADevice = true
         nanoSocket.socketIsADevice = true
 
         defer {
-            self.socketIsADevice = false
+            socketIsADevice = false
             nanoSocket.socketIsADevice = false
         }
 
-        let returnCode = nn_device(self.fileDescriptor, nanoSocket.fileDescriptor)
+        let returnCode = nn_device(fileDescriptor, nanoSocket.fileDescriptor)
 
         guard (returnCode >= 0) else {
             let errno = nn_errno()
@@ -468,17 +468,17 @@ extension NanoSocket {
     /// - Throws: `NanoMessageError.SocketIsADevice`
     ///           `NanoMessageError.LoopBack` if a problem has been encountered.
     public func loopBack() throws {
-        guard (!self.socketIsADevice) else {                                    // guard against socket already being a device socket.
+        guard (!socketIsADevice) else {                                    // guard against socket already being a device socket.
             throw NanoMessageError.SocketIsADevice(socket: self)
         }
 
-        self.socketIsADevice = true
+        socketIsADevice = true
 
         defer {
-            self.socketIsADevice = false
+            socketIsADevice = false
         }
 
-        let returnCode = nn_device(self.fileDescriptor, -1)
+        let returnCode = nn_device(fileDescriptor, -1)
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.LoopBack(code: nn_errno())
@@ -533,7 +533,7 @@ extension NanoSocket {
     ///
     /// - Returns: The sockets protocol family.
     public func getSocketProtocolFamily() throws -> ProtocolFamily {
-        return ProtocolFamily(socketProtocol: try self.getSocketProtocol())
+        return ProtocolFamily(socketProtocol: try getSocketProtocol())
     }
 
     /// Specifies how long the socket should try to send pending outbound messages after the socket
@@ -566,7 +566,7 @@ extension NanoSocket {
     @available(*, unavailable, message: "nanomsg library no longer supports this feature")
     @discardableResult
     public func setLinger(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try self.getLinger()
+        let originalValue = try getLinger()
 
         try setSocketOption(self, .Linger, seconds)
 
@@ -599,7 +599,7 @@ extension NanoSocket {
     /// - Returns: The sockets reconnect interval before being set.
     @discardableResult
     public func setReconnectInterval(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try self.getReconnectInterval()
+        let originalValue = try getReconnectInterval()
 
         try setSocketOption(self, .ReconnectInterval, seconds)
 
@@ -636,7 +636,7 @@ extension NanoSocket {
     /// - Returns: The sockets reconnect maximum interval before being set.
     @discardableResult
     public func setReconnectIntervalMaximum(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try self.getReconnectInterval()
+        let originalValue = try getReconnectInterval()
 
         try setSocketOption(self, .ReconnectIntervalMaximum, seconds)
 
@@ -669,7 +669,7 @@ extension NanoSocket {
     /// - Note:    This feature is deamed as experimental by the underlying nanomsg library.
     @discardableResult
     public func setSocketName(_ socketName: String) throws -> String {
-        let originalValue = try self.getSocketName()
+        let originalValue = try getSocketName()
 
         try setSocketOption(self, .SocketName, socketName)
 
@@ -698,7 +698,7 @@ extension NanoSocket {
     /// - Returns: The IP4v4/Ipv6 type before being set.
     @discardableResult
     public func setIPv4Only(_ ip4Only: Bool) throws -> Bool {
-        let originalValue = try self.getIPv4Only()
+        let originalValue = try getIPv4Only()
 
         try setSocketOption(self, .IPv4Only, ip4Only)
 
@@ -734,7 +734,7 @@ extension NanoSocket {
     /// - Returns: The number of hops before a message is dropped before being set.
     @discardableResult
     public func setMaximumTTL(hops: Int) throws -> Int {
-        let originalValue = try self.getMaximumTTL()
+        let originalValue = try getMaximumTTL()
 
         try setSocketOption(self, .MaximumTTL, hops)
 
@@ -767,7 +767,7 @@ extension NanoSocket {
     /// - Returns: Is Nagle's algorithm enabled before being set.
     @discardableResult
     public func setTCPNoDelay(disableNagles: Bool, transportMechanism: TransportMechanism = .TCP) throws -> Bool {
-        let originalValue = try self.getTCPNoDelay(transportMechanism: transportMechanism)
+        let originalValue = try getTCPNoDelay(transportMechanism: transportMechanism)
 
         let valueToSet: CInt = (disableNagles) ? NN_TCP_NODELAY : 0
 
@@ -802,7 +802,7 @@ extension NanoSocket {
     /// - Returns: The web sockets message type before being set.
     @discardableResult
     public func setWebSocketMessageType(_ type: WebSocketMessageType) throws -> WebSocketMessageType {
-        let originalValue = try self.getWebSocketMessageType()
+        let originalValue = try getWebSocketMessageType()
 
         try setSocketOption(self, .WebSocketMessageType, type, .WebSocket)
 

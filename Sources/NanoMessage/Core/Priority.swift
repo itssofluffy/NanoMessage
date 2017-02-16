@@ -44,6 +44,6 @@ extension Priority: Equatable {
 
 extension Priority: CustomStringConvertible {
     public var description: String {
-        return "level: \(self.level)"
+        return "level: \(level)"
     }
 }

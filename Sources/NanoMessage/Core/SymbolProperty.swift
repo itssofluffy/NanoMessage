@@ -42,7 +42,7 @@ public struct SymbolProperty {
 
 extension SymbolProperty: Hashable {
     public var hashValue: Int {
-        return fnv1a(typeToBytes(self.namespace) + typeToBytes(self.value))
+        return fnv1a(typeToBytes(namespace) + typeToBytes(value))
     }
 }
 
@@ -60,6 +60,6 @@ extension SymbolProperty: Equatable {
 
 extension SymbolProperty: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "namespace: \(self.namespace), name: \(self.name), value: \(self.value), type: \(self.type), unit: \(self.unit)"
+        return "namespace: \(namespace), name: \(name), value: \(value), type: \(type), unit: \(unit)"
     }
 }

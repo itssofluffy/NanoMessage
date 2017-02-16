@@ -35,28 +35,28 @@ public final class SurveyorSocket: NanoSocket, ProtocolSocket, Receiver, Sender,
     public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try self.connectToURL(url)
+        let _: EndPoint = try connectToURL(url)
     }
 
     public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
-            let _: EndPoint = try self.connectToURL(url)
+            let _: EndPoint = try connectToURL(url)
         }
     }
 
     public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try self.bindToURL(url)
+        let _: EndPoint = try bindToURL(url)
     }
 
     public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
-            let _: EndPoint = try self.bindToURL(url)
+            let _: EndPoint = try bindToURL(url)
         }
     }
 }
@@ -88,7 +88,7 @@ extension SurveyorSocket {
     /// - Returns: The sockets deadline timeout before being set.
     @discardableResult
     public func setDeadline(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try self.getDeadline()
+        let originalValue = try getDeadline()
 
         try setSocketOption(self, .SurveyDeadline, seconds, .SurveyorProtocol)
 

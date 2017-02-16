@@ -41,13 +41,13 @@ public struct EndPoint {
         self.type = type
         self.priorities = priorities
         self.ipv4Only = ipv4Only
-        self.name = (name.isEmpty) ? String(self.id) : name
+        self.name = (name.isEmpty) ? String(id) : name
     }
 }
 
 extension EndPoint: Hashable {
     public var hashValue: Int {
-        return fnv1a(self.id)
+        return fnv1a(id)
     }
 }
 
@@ -65,9 +65,9 @@ extension EndPoint: Equatable {
 
 extension EndPoint: CustomStringConvertible {
     public var description: String {
-        var description = "id: \(self.id), url: \(self.url.absoluteString), type: \(self.type), transport: \(self.transport), priorities: (\(self.priorities)), ipv4only: \(self.ipv4Only)"
-        if (!self.name.isEmpty) {
-            description += ", name: \(self.name)"
+        var description = "id: \(id), url: \(url.absoluteString), type: \(type), transport: \(transport), priorities: (\(priorities)), ipv4only: \(ipv4Only)"
+        if (!name.isEmpty) {
+            description += ", name: \(name)"
         }
 
         return description

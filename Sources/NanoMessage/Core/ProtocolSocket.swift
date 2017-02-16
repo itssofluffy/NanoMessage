@@ -53,7 +53,7 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: The number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        return try sendPayloadToSocket(self._nanoSocket, message, blockingMode)
+        return try sendPayloadToSocket(_nanoSocket, message, blockingMode)
     }
 
     /// Send a message.
@@ -72,7 +72,7 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: the number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        return try self.sendMessage(C7.Data(message), blockingMode: blockingMode)   // chain down the sendMessage signature stack
+        return try sendMessage(C7.Data(message), blockingMode: blockingMode)   // chain down the sendMessage signature stack
     }
 
     /// Send a message setting the send timeout and attempt to restore to back to it's original value.
@@ -91,19 +91,19 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: the number of bytes sent.
     @discardableResult
     private func _sendMessageWithTimeout(_ message: C7.Data, timeout: TimeInterval) throws -> Int {
-        let originalTimeout = try self.setSendTimeout(seconds: timeout)
+        let originalTimeout = try setSendTimeout(seconds: timeout)
 
         defer {
             if (originalTimeout != timeout) {
                 do {
-                    try self.setSendTimeout(seconds: originalTimeout)
+                    try setSendTimeout(seconds: originalTimeout)
                 } catch {
                     print(error, to: &errorStream)
                 }
             }
         }
 
-        return try self.sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
+        return try sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
     }
 
     /// Send a message.
@@ -131,7 +131,7 @@ extension ProtocolSocket where Self: Sender {
             throw NanoMessageError.InvalidSendTimeout(timeout: timeout)
         }
 
-        return try self._sendMessageWithTimeout(message, timeout: timeout)
+        return try _sendMessageWithTimeout(message, timeout: timeout)
     }
 
     /// Send a message.
@@ -155,7 +155,7 @@ extension ProtocolSocket where Self: Sender {
     ///            guaranteed behaviour and no error will be thrown. 
     @discardableResult
     public func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int {
-        return try self.sendMessage(C7.Data(message), timeout: timeout)           // chain down the sendMessage signature stack
+        return try sendMessage(C7.Data(message), timeout: timeout)           // chain down the sendMessage signature stack
     }
 
     /// Send a message.
@@ -173,7 +173,7 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: The number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: C7.Data, timeout: Timeout) throws -> Int {
-        return try self._sendMessageWithTimeout(message, timeout: TimeInterval(seconds: timeout.rawValue))
+        return try _sendMessageWithTimeout(message, timeout: TimeInterval(seconds: timeout.rawValue))
     }
 
     /// Send a message.
@@ -193,7 +193,7 @@ extension ProtocolSocket where Self: Sender {
     /// - Note:    This is the same as sendMessage(..., blockingMode: .Blocking) and is included for symantics.
     @discardableResult
     public func sendMessage(_ message: String, timeout: Timeout) throws -> Int {
-        return try self.sendMessage(C7.Data(message), timeout: timeout)           // chain down the sendMessage signature stack.
+        return try sendMessage(C7.Data(message), timeout: timeout)           // chain down the sendMessage signature stack.
     }
 }
 
@@ -207,7 +207,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
@@ -229,7 +229,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
+        sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
     }
 
     /// Asynchronous send a message.
@@ -240,7 +240,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let bytesSent = try self.sendMessage(message, timeout: timeout)
@@ -261,7 +261,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.sendMessage(C7.Data(message), timeout: timeout, closureHandler)
+        sendMessage(C7.Data(message), timeout: timeout, closureHandler)
     }
 
     /// Asynchronous send a message.
@@ -271,7 +271,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let bytesSent = try self.sendMessage(message, timeout: timeout)
@@ -291,7 +291,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func sendMessage(_ message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        self.sendMessage(C7.Data(message), timeout: timeout, closureHandler)
+        sendMessage(C7.Data(message), timeout: timeout, closureHandler)
     }
 }
 
@@ -310,7 +310,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
-        return try receivePayloadFromSocket(self._nanoSocket, blockingMode)
+        return try receivePayloadFromSocket(_nanoSocket, blockingMode)
     }
 
     /// Receive a message.
@@ -327,7 +327,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveString {
-        let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode) // chain down the receiveMessage signature stock.
+        let received: ReceiveData = try receiveMessage(blockingMode: blockingMode) // chain down the receiveMessage signature stock.
 
         return ReceiveString(bytes: received.bytes, message: try String(data: received.message))
     }
@@ -346,19 +346,19 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: the number of bytes received and the received message
     private func _receiveMessageWith(timeout: TimeInterval) throws -> ReceiveData {
-        let originalTimeout = try self.setReceiveTimeout(seconds: timeout)
+        let originalTimeout = try setReceiveTimeout(seconds: timeout)
 
         defer {
             if (originalTimeout != timeout) {
                 do {
-                    try self.setReceiveTimeout(seconds: originalTimeout)
+                    try setReceiveTimeout(seconds: originalTimeout)
                 } catch {
                     print(error, to: &errorStream)
                 }
             }
         }
 
-        return try self.receiveMessage(blockingMode: .Blocking)    // chain down the receiveMessage signature stock.
+        return try receiveMessage(blockingMode: .Blocking)    // chain down the receiveMessage signature stock.
     }
 
     /// Receive a message.
@@ -384,7 +384,7 @@ extension ProtocolSocket where Self: Receiver {
             throw NanoMessageError.InvalidReceiveTimeout(timeout: timeout)
         }
 
-        return try self._receiveMessageWith(timeout: timeout)
+        return try _receiveMessageWith(timeout: timeout)
     }
 
     /// Receive a message.
@@ -405,7 +405,7 @@ extension ProtocolSocket where Self: Receiver {
     /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
     ///            guaranteed behaviour and no error will be thrown. 
     public func receiveMessage(timeout: TimeInterval) throws -> ReceiveString {
-        let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
+        let received: ReceiveData = try receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
         return ReceiveString(bytes: received.bytes, message: try String(data: received.message))
     }
@@ -427,7 +427,7 @@ extension ProtocolSocket where Self: Receiver {
     /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
     ///            guaranteed behaviour and no error will be thrown. 
     public func receiveMessage(timeout: Timeout) throws -> ReceiveData {
-        return try self._receiveMessageWith(timeout: TimeInterval(seconds: timeout.rawValue))
+        return try _receiveMessageWith(timeout: TimeInterval(seconds: timeout.rawValue))
     }
 
     /// Receive a message.
@@ -447,7 +447,7 @@ extension ProtocolSocket where Self: Receiver {
     /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
     ///            guaranteed behaviour and no error will be thrown. 
     public func receiveMessage(timeout: Timeout) throws -> ReceiveString {
-        let received: ReceiveData = try self.receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
+        let received: ReceiveData = try receiveMessage(timeout: timeout)  // chain down the receiveMessage signature stock.
 
         return ReceiveString(bytes: received.bytes, message: try String(data: received.message))
     }
@@ -462,7 +462,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode)
@@ -483,7 +483,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveString = try self.receiveMessage(blockingMode: blockingMode)
@@ -503,7 +503,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveData = try self.receiveMessage(timeout: timeout)
@@ -523,7 +523,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveString = try self.receiveMessage(timeout: timeout)
@@ -542,7 +542,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveData = try self.receiveMessage(timeout: timeout)
@@ -561,7 +561,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
     public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
-        self._nanoSocket.aioQueue.async(group: self._nanoSocket.aioGroup) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveString = try self.receiveMessage(timeout: timeout)
@@ -585,7 +585,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets send buffer size.
     public func getSendBufferSize() throws -> UInt {
-        return try getSocketOption(self._nanoSocket, .SendBuffer)
+        return try getSocketOption(_nanoSocket, .SendBuffer)
     }
 
     /// Size of the send buffer, in bytes. To prevent blocking for messages larger than the buffer,
@@ -600,9 +600,9 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: The sockets send buffer size before being set.
     @discardableResult
     public func setSendBufferSize(bytes: UInt) throws -> UInt {
-        let originalValue = try self.getSendBufferSize()
+        let originalValue = try getSendBufferSize()
 
-        try setSocketOption(self._nanoSocket, .SendBuffer, bytes)
+        try setSocketOption(_nanoSocket, .SendBuffer, bytes)
 
         return originalValue
     }
@@ -616,7 +616,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets send timeout in timeinterval (-1 seconds if there is no timeout).
     public func getSendTimeout() throws -> TimeInterval {
-        return try getSocketOption(self._nanoSocket, .SendTimeout)
+        return try getSocketOption(_nanoSocket, .SendTimeout)
     }
 
     /// The timeout for send operation on the socket, in milliseconds. If message cannot be sent within
@@ -631,9 +631,9 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: The sockets send timeout in timeinterval before being set.
     @discardableResult
     public func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try self.getSendTimeout()
+        let originalValue = try getSendTimeout()
 
-        try setSocketOption(self._nanoSocket, .SendTimeout, seconds)
+        try setSocketOption(_nanoSocket, .SendTimeout, seconds)
 
         return originalValue
     }
@@ -650,9 +650,9 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: The sockets send timeout in timeinterval before being set.
     @discardableResult
     public func setSendTimeout(seconds: Timeout) throws -> TimeInterval {
-        let originalValue = try self.getSendTimeout()
+        let originalValue = try getSendTimeout()
 
-        try setSocketOption(self._nanoSocket, .SendTimeout, seconds.rawValue)
+        try setSocketOption(_nanoSocket, .SendTimeout, seconds.rawValue)
 
         return originalValue
     }
@@ -668,7 +668,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets send priority.
     public func getSendPriority() throws -> Priority {
-        return try getSocketOption(self._nanoSocket, .SendPriority)
+        return try getSocketOption(_nanoSocket, .SendPriority)
     }
 
     /// Retrieves outbound priority currently set on the socket. This option has no effect on socket types that
@@ -685,9 +685,9 @@ extension ProtocolSocket where Self: Sender {
     /// - Returns: The sockets send priority before being set.
     @discardableResult
     public func setSendPriority(_ priority: Priority) throws -> Priority {
-        let originalValue = try self.getSendPriority()
+        let originalValue = try getSendPriority()
 
-        try setSocketOption(self._nanoSocket, .SendPriority, priority)
+        try setSocketOption(_nanoSocket, .SendPriority, priority)
 
         return originalValue
     }
@@ -701,7 +701,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: The sockets underlying send file descriptor.
     public func getSendFileDescriptor() throws -> Int {
-        return try getSocketOption(self._nanoSocket, .SendFileDescriptor)
+        return try getSocketOption(_nanoSocket, .SendFileDescriptor)
     }
 }
 
@@ -715,7 +715,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets receive buffer size.
     public func getReceiveBufferSize() throws -> UInt {
-        return try getSocketOption(self._nanoSocket, .ReceiveBuffer)
+        return try getSocketOption(_nanoSocket, .ReceiveBuffer)
     }
 
     /// Size of the receive buffer, in bytes. To prevent blocking for messages larger than the buffer,
@@ -730,9 +730,9 @@ extension ProtocolSocket where Self: Receiver {
     /// - Returns: The sockets receive buffer size before being set.
     @discardableResult
     public func setReceiveBufferSize(bytes: UInt) throws -> UInt {
-        let originalValue = try self.getReceiveBufferSize()
+        let originalValue = try getReceiveBufferSize()
 
-        try setSocketOption(self._nanoSocket, .ReceiveBuffer, bytes)
+        try setSocketOption(_nanoSocket, .ReceiveBuffer, bytes)
 
         return originalValue
     }
@@ -748,7 +748,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Note:    The receive size is unlimited is not currently supported
     public func getMaximumMessageSize() throws -> Int {
-        return try getSocketOption(self._nanoSocket, .ReceiveMaximumMessageSize)
+        return try getSocketOption(_nanoSocket, .ReceiveMaximumMessageSize)
     }
 
     /// Maximum message size that can be received, in bytes. Negative value means that the received size
@@ -763,9 +763,9 @@ extension ProtocolSocket where Self: Receiver {
     /// - Returns: The sockets receive buffer size before being set.
     @discardableResult
     public func setMaximumMessageSize(bytes: Int) throws -> Int {
-        let originalValue = try self.getMaximumMessageSize()
+        let originalValue = try getMaximumMessageSize()
 
-        try setSocketOption(self._nanoSocket, .ReceiveMaximumMessageSize, (bytes < 0) ? -1 : bytes)
+        try setSocketOption(_nanoSocket, .ReceiveMaximumMessageSize, (bytes < 0) ? -1 : bytes)
 
         return originalValue
     }
@@ -779,7 +779,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets receive timeout in timeinterval (-1 seconds if there is no timeout).
     public func getReceiveTimeout() throws -> TimeInterval {
-        return try getSocketOption(self._nanoSocket, .ReceiveTimeout)
+        return try getSocketOption(_nanoSocket, .ReceiveTimeout)
     }
 
     /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
@@ -794,9 +794,9 @@ extension ProtocolSocket where Self: Receiver {
     /// - Returns: The sockets receive timeout in timeinterval before being set.
     @discardableResult
     public func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try self.getReceiveTimeout()
+        let originalValue = try getReceiveTimeout()
 
-        try setSocketOption(self._nanoSocket, .ReceiveTimeout, seconds)
+        try setSocketOption(_nanoSocket, .ReceiveTimeout, seconds)
 
         return originalValue
     }
@@ -813,9 +813,9 @@ extension ProtocolSocket where Self: Receiver {
     /// - Returns: The sockets receive timeout in timeinterval before being set.
     @discardableResult
     public func setReceiveTimeout(seconds: Timeout) throws -> TimeInterval {
-        let originalValue = try self.getReceiveTimeout()
+        let originalValue = try getReceiveTimeout()
 
-        try setSocketOption(self._nanoSocket, .ReceiveTimeout, seconds.rawValue)
+        try setSocketOption(_nanoSocket, .ReceiveTimeout, seconds.rawValue)
 
         return originalValue
     }
@@ -830,7 +830,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets receive timeout.
     public func getReceivePriority() throws -> Priority {
-        return try getSocketOption(self._nanoSocket, .ReceivePriority)
+        return try getSocketOption(_nanoSocket, .ReceivePriority)
     }
 
     /// The inbound priority for endpoints subsequently added to the socket. When receiving a message, messages
@@ -846,9 +846,9 @@ extension ProtocolSocket where Self: Receiver {
     /// - Returns: The sockets receive timeout before being set.
     @discardableResult
     public func setReceivePriority(_ priority: Priority) throws -> Priority {
-        let originalValue = try self.getReceivePriority()
+        let originalValue = try getReceivePriority()
 
-        try setSocketOption(self._nanoSocket, .ReceivePriority, priority)
+        try setSocketOption(_nanoSocket, .ReceivePriority, priority)
 
         return originalValue
     }
@@ -862,7 +862,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: The sockets underlying receiver file descriptor.
     public func getReceiveFileDescriptor() throws -> Int {
-        return try getSocketOption(self._nanoSocket, .ReceiveFileDescriptor)
+        return try getSocketOption(_nanoSocket, .ReceiveFileDescriptor)
     }
 }
 
@@ -873,7 +873,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: As per description.
     public func getMessagesSent() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket, .MessagesSent)
+        return try getSocketStatistic(_nanoSocket, .MessagesSent)
     }
 
     /// The number of bytes sent by this socket.
@@ -882,7 +882,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: As per description.
     public func getBytesSent() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket, .BytesSent)
+        return try getSocketStatistic(_nanoSocket, .BytesSent)
     }
 
     /// The current send priority of the socket.
@@ -891,7 +891,7 @@ extension ProtocolSocket where Self: Sender {
     ///
     /// - Returns: As per description.
     public func getCurrentSendPriority() throws -> Priority {
-        return try getSocketStatistic(self._nanoSocket, .CurrentSendPriority)
+        return try getSocketStatistic(_nanoSocket, .CurrentSendPriority)
     }
 }
 
@@ -902,7 +902,7 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: As per description.
     public func getMessagesReceived() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket, .MessagesReceived)
+        return try getSocketStatistic(_nanoSocket, .MessagesReceived)
     }
 
     /// The number of bytes received by this socket.
@@ -911,6 +911,6 @@ extension ProtocolSocket where Self: Receiver {
     ///
     /// - Returns: As per description.
     public func getBytesReceived() throws -> UInt64 {
-        return try getSocketStatistic(self._nanoSocket, .BytesReceived)
+        return try getSocketStatistic(_nanoSocket, .BytesReceived)
     }
 }

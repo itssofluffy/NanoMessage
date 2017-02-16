@@ -52,28 +52,28 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
     public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try self.connectToURL(url)
+        let _: EndPoint = try connectToURL(url)
     }
 
     public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
-            let _: EndPoint = try self.connectToURL(url)
+            let _: EndPoint = try connectToURL(url)
         }
     }
 
     public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try self.bindToURL(url)
+        let _: EndPoint = try bindToURL(url)
     }
 
     public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
-            let _: EndPoint = try self.bindToURL(url)
+            let _: EndPoint = try bindToURL(url)
         }
     }
 }
@@ -95,10 +95,10 @@ extension SubscriberSocket {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
         /// Does the message/payload contain the specified topic
         func _messageHasTopic(_ topic: C7.Data, _ message: C7.Data) -> Bool {
-            if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
+            if (((ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
                 if (C7.Data(message[0 ..< topic.count]) != topic) {
                     return false
-                } else if (self.ignoreTopicSeperator || message[topic.count] == self.topicSeperator) {
+                } else if (ignoreTopicSeperator || message[topic.count] == topicSeperator) {
                     return true
                 }
             }
@@ -108,22 +108,22 @@ extension SubscriberSocket {
 
         /// Get the topic from the message/payload if it exists using the topic seperator.
         func _getTopicFromMessage(_ message: C7.Data) -> C7.Data {
-            if let index = message.index(of: self.topicSeperator) {
+            if let index = message.index(of: topicSeperator) {
                 return C7.Data(message[0 ..< index])
             }
 
             return message
         }
 
-        self.receivedTopic = C7.Data()
+        receivedTopic = C7.Data()
 
         var received = try receivePayloadFromSocket(self, blockingMode)
 
         if (received.bytes > 0) {                                               // we have a message to process...
-            if (!self.subscribedToAllTopics || self.ignoreTopicSeperator) {     // determine how to extract the topic.
-                for topic in self.subscribedTopics {
+            if (!subscribedToAllTopics || ignoreTopicSeperator) {               // determine how to extract the topic.
+                for topic in subscribedTopics {
                     if (_messageHasTopic(topic, received.message)) {
-                        self.receivedTopic = topic
+                        receivedTopic = topic
 
                         break
                     }
@@ -132,17 +132,17 @@ extension SubscriberSocket {
                 let topic = _getTopicFromMessage(received.message)
 
                 if (topic != received.message) {
-                    self.receivedTopic = topic
+                    receivedTopic = topic
                 }
             }
 
-            if (self.receivedTopic.isEmpty) {                                   // check we've extracted a topic
+            if (receivedTopic.isEmpty) {                                        // check we've extracted a topic
                 throw NanoMessageError.NoTopic
             }
 
-            if (self.removeTopicFromMessage) {                                  // are we removing the topic from the message/payload...
-                var offset = self.receivedTopic.count
-                if (self.subscribedToAllTopics || !self.ignoreTopicSeperator) {
+            if (removeTopicFromMessage) {                                       // are we removing the topic from the message/payload...
+                var offset = receivedTopic.count
+                if (subscribedToAllTopics || !ignoreTopicSeperator) {
                     offset += 1
                 }
 
@@ -151,11 +151,11 @@ extension SubscriberSocket {
             }
 
             // remember which topics we've received and how many.
-            if var topicCount = self.receivedTopics[self.receivedTopic] {
+            if var topicCount = receivedTopics[receivedTopic] {
                 topicCount += 1
-                self.receivedTopics[self.receivedTopic] = topicCount
+                receivedTopics[receivedTopic] = topicCount
             } else {
-                self.receivedTopics[self.receivedTopic] = 1
+                receivedTopics[receivedTopic] = 1
             }
         }
 
@@ -171,7 +171,7 @@ extension SubscriberSocket {
     ///
     /// - Returns: If the topic has been subscribed too.
     public func isTopicSubscribed(_ topic: C7.Data) -> Bool {
-        return self.subscribedTopics.contains(topic)
+        return subscribedTopics.contains(topic)
     }
 
     /// Is the specified topic already subscribed too.
@@ -181,7 +181,7 @@ extension SubscriberSocket {
     ///
     /// - Returns: If the topic has been subscribed too.
     public func isTopicSubscribed(_ topic: String) -> Bool {
-        return self.isTopicSubscribed(C7.Data(topic))
+        return isTopicSubscribed(C7.Data(topic))
     }
 
     /// Check all topics for equal lengths.
@@ -191,7 +191,7 @@ extension SubscriberSocket {
         var equalLengths = true
         var topicLengths = -1
 
-        for topic in self.subscribedTopics {
+        for topic in subscribedTopics {
             if (topicLengths < 0) {
                 topicLengths = topic.count
             } else if (topicLengths != topic.count) {
@@ -211,16 +211,16 @@ extension SubscriberSocket {
     ///
     /// - Returns: Has the function been successful.
     public func flipIgnoreTopicSeperator() throws -> Bool {
-        if (!self.subscribedToAllTopics) {
-            if (!self.ignoreTopicSeperator) {
-                let topics = self._validateTopicLengths()
+        if (!subscribedToAllTopics) {
+            if (!ignoreTopicSeperator) {
+                let topics = _validateTopicLengths()
 
                 if (!topics.equalLengths) {
                     throw NanoMessageError.InvalidTopic
                 }
             }
 
-            self.ignoreTopicSeperator = !self.ignoreTopicSeperator
+            ignoreTopicSeperator = !ignoreTopicSeperator
 
             return true
         }
@@ -242,7 +242,7 @@ extension SubscriberSocket {
     public func subscribeTo(topic: C7.Data) throws -> Bool {
         /// Check topic length against (any) existing topics is see if it is of equal length.
         func _validTopicLengths(_ topic: C7.Data) -> Bool {
-            let topics = self._validateTopicLengths()
+            let topics = _validateTopicLengths()
 
             if (!topics.equalLengths) {
                 return false
@@ -256,12 +256,12 @@ extension SubscriberSocket {
         }
 
         if (!topic.isEmpty) {
-            let topicSubscribed = self.isTopicSubscribed(topic)
+            let topicSubscribed = isTopicSubscribed(topic)
 
             if (!topicSubscribed) {
-                if (self.subscribedToAllTopics) {
-                    try self.unsubscribeFromAllTopics()
-                } else if (self.ignoreTopicSeperator && !_validTopicLengths(topic)) {
+                if (subscribedToAllTopics) {
+                    try unsubscribeFromAllTopics()
+                } else if (ignoreTopicSeperator && !_validTopicLengths(topic)) {
                     throw NanoMessageError.InvalidTopic
                 }
 
@@ -271,7 +271,7 @@ extension SubscriberSocket {
 
                 try setSocketOption(self, .Subscribe, topic, .SubscriberProtocol)
 
-                self.subscribedTopics.insert(topic)
+                subscribedTopics.insert(topic)
             }
 
             return !topicSubscribed
@@ -292,7 +292,7 @@ extension SubscriberSocket {
     /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: String) throws -> Bool {
-        return try self.subscribeTo(topic: C7.Data(topic))
+        return try subscribeTo(topic: C7.Data(topic))
     }
 
     /// Unsubscibe from a topic.
@@ -306,15 +306,15 @@ extension SubscriberSocket {
     @discardableResult
     public func unsubscribeFrom(topic: C7.Data) throws -> Bool {
         if (!topic.isEmpty) {
-            let topicSubscribed = self.isTopicSubscribed(topic)
+            let topicSubscribed = isTopicSubscribed(topic)
 
             if (topicSubscribed) {
                 try setSocketOption(self, .UnSubscribe, topic, .SubscriberProtocol)
 
-                self.subscribedTopics.remove(topic)
+                subscribedTopics.remove(topic)
 
-                if (self.subscribedTopics.isEmpty) {
-                    try self.unsubscribeFromAllTopics()
+                if (subscribedTopics.isEmpty) {
+                    try unsubscribeFromAllTopics()
                 }
             }
 
@@ -334,7 +334,7 @@ extension SubscriberSocket {
     /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
     public func unsubscribeFrom(topic: String) throws -> Bool {
-        return try self.unsubscribeFrom(topic: C7.Data(topic))
+        return try unsubscribeFrom(topic: C7.Data(topic))
     }
 
     /// Subscribe to all topics.
@@ -345,18 +345,18 @@ extension SubscriberSocket {
     ///
     /// - Note:    You cannot subscribe to all topics if `ignoreTopicSeperator` is true.
     public func subscribeToAllTopics() throws -> Bool {
-        if (!self.ignoreTopicSeperator) {
-            if (!self.subscribedToAllTopics) {
-                for topic in self.subscribedTopics {
-                    try self.unsubscribeFrom(topic: topic)
+        if (!ignoreTopicSeperator) {
+            if (!subscribedToAllTopics) {
+                for topic in subscribedTopics {
+                    try unsubscribeFrom(topic: topic)
                 }
 
                 try setSocketOption(self, .Subscribe, "", .SubscriberProtocol)
 
-                self.subscribedToAllTopics = true
+                subscribedToAllTopics = true
             }
 
-            return self.subscribedToAllTopics
+            return subscribedToAllTopics
         }
 
         return false
@@ -366,14 +366,14 @@ extension SubscriberSocket {
     ///
     /// - Throws: `NanoMessageError.SetSocketOption` if an issue has been encountered.
     public func unsubscribeFromAllTopics() throws {
-        for topic in self.subscribedTopics {
-            try self.unsubscribeFrom(topic: topic)
+        for topic in subscribedTopics {
+            try unsubscribeFrom(topic: topic)
         }
 
-        if (self.subscribedToAllTopics) {
+        if (subscribedToAllTopics) {
             try setSocketOption(self, .UnSubscribe, "", .SubscriberProtocol)
         }
 
-        self.subscribedToAllTopics = false
+        subscribedToAllTopics = false
     }
 }

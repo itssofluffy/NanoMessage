@@ -53,11 +53,11 @@ class MessageSpeedTests: XCTestCase {
 
         var completed = false
 
-        self.asyncError = nil
-        self.asyncMessagesSent = 0
-        self.asyncMessagesReceived = 0
-        self.asyncBytesSent = 0
-        self.asyncBytesReceived = 0
+        asyncError = nil
+        asyncMessagesSent = 0
+        asyncMessagesReceived = 0
+        asyncBytesSent = 0
+        asyncBytesReceived = 0
 
         do {
             let node0 = try PushSocket()
@@ -108,7 +108,7 @@ class MessageSpeedTests: XCTestCase {
                         }
                 }
 
-                if let error = self.asyncError {
+                if let error = asyncError {
                     throw error
                 }
             }
@@ -118,7 +118,7 @@ class MessageSpeedTests: XCTestCase {
                 node1.aioGroup.wait()
             }
 
-            if let error = self.asyncError {
+            if let error = asyncError {
                 throw error
             }
 
@@ -131,10 +131,10 @@ class MessageSpeedTests: XCTestCase {
             XCTAssertEqual(bytesSent, bytesReceived, "bytesSent != bytesReceived")
 
             if (receiveType == .Asynchronously) {
-                XCTAssertEqual(messagesSent, self.asyncMessagesSent, "messagesSent != asyncMessagesSent")
-                XCTAssertEqual(bytesSent, self.asyncBytesSent, "bytesSent != asyncBytesSent")
-                XCTAssertEqual(messagesReceived, self.asyncMessagesReceived, "messagesReceived != asyncMessagesReceived")
-                XCTAssertEqual(bytesReceived, self.asyncBytesReceived, "bytesReceived != asyncBytesReceived")
+                XCTAssertEqual(messagesSent, asyncMessagesSent, "messagesSent != asyncMessagesSent")
+                XCTAssertEqual(bytesSent, asyncBytesSent, "bytesSent != asyncBytesSent")
+                XCTAssertEqual(messagesReceived, asyncMessagesReceived, "messagesReceived != asyncMessagesReceived")
+                XCTAssertEqual(bytesReceived, asyncBytesReceived, "bytesReceived != asyncBytesReceived")
             }
 
             print("Message Size: \(messageSize) Bytes, Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
