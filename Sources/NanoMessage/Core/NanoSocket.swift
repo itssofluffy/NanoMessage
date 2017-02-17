@@ -79,6 +79,38 @@ public class NanoSocket {
     /// async mutex lock.
     internal var mutex: Mutex
 
+    /// Attempt a call to the underlying library within a loop with a delay.
+    ///
+    /// - Parameters:
+    ///   - call:   nanomsg 'c' function to call.
+    ///   - error:  error associated with the parameter `call`.
+    ///
+    /// - Throws: `NanoMessageError.Interrupted`
+    ///           whatever was passed as the parameter `error`
+    fileprivate func _attemptClosure(call nanomsgCall: () -> CInt, error nanomsgError: (CInt) -> Error) throws {
+        var loopCount = 0
+
+        while (true) {
+            if (nanomsgCall() < 0) {                          // call the passed underlying library.
+                let errno = nn_errno()
+
+                if (errno == EINTR) {                         // if we were interrupted by a signal, reattempt is allowed by the native library
+                    if (loopCount >= closeAttempts) {
+                        throw NanoMessageError.Interrupted
+                    }
+
+                    usleep(_closeDelay)                       // zzzz...
+
+                    loopCount += 1
+                } else {
+                    throw nanomsgError(errno)                 // throw the passed error
+                }
+            } else {
+                break                                         // we've closed the endpoint succesfully
+            }
+        }
+    }
+
     /// Creates a nanomsg socket with the specified socketDomain and socketProtocol.
     ///
     /// - Parameters:
@@ -113,40 +145,11 @@ public class NanoSocket {
     }
 
     deinit {
-        func _closeSocket() throws {
-            if (fileDescriptor >= 0) {                                  // if we have a valid nanomsg socket file descriptor then...
-                var loopCount = 0
-
-                while (true) {
-                    let returnCode = nn_close(fileDescriptor)           // try and close the nanomsg socket
-
-                    if (returnCode < 0) {                               // if `nn_close()` failed then...
-                        let errno = nn_errno()
-
-                        if (errno == EINTR) {                           // if we were interrupted by a signal, reattempt is allowed by the native library
-                            if (loopCount >= closeAttempts) {           // we've reached our limit so say we were interrupted
-                                throw NanoMessageError.Interrupted
-                            }
-                        } else {
-                            throw NanoMessageError.Close(code: errno)
-                        }
-
-                        usleep(_closeDelay)                             // zzzz...
-
-                        loopCount += 1
-                    } else {
-                        break                                           // we've closed the socket succesfully
-                    }
-                }
-            }
-        }
-
-        // are we going to terminate the `repeat` loop below.
-        var terminateLoop = true
+        var terminateLoop = true                        // are we going to terminate the `repeat` loop below.
 
         repeat {
             do {
-                try _closeSocket()
+                try _attemptClosure(call: { return nn_close(fileDescriptor) }, error: { return NanoMessageError.Close(code: $0) })
             } catch NanoMessageError.Interrupted {
                 let dynamicType = type(of: self)
 
@@ -318,29 +321,8 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         if (endPoints.contains(endPoint)) {
-            var loopCount = 0
-
-            while (true) {
-                let returnCode = nn_shutdown(fileDescriptor, CInt(endPoint.id))       // attempt to close down the endpoint
-
-                if (returnCode < 0) {                                                 // if `nn_shutdown()` failed then...
-                    let errno = nn_errno()
-
-                    if (errno == EINTR) {                                             // if we were interrupted by a signal, reattempt is allowed by the native library
-                        if (loopCount >= closeAttempts) {
-                            throw NanoMessageError.Interrupted
-                        }
-
-                        usleep(_closeDelay)                                           // zzzz...
-
-                        loopCount += 1
-                    } else {
-                        throw NanoMessageError.RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
-                    }
-                } else {
-                    break                                                             // we've closed the endpoint succesfully
-                }
-            }
+            try _attemptClosure(call:  { return nn_shutdown(fileDescriptor, CInt(endPoint.id)) },
+                                error: { return NanoMessageError.RemoveEndPoint(code: $0, url: endPoint.url, endPointId: endPoint.id) })
 
             endPoints.remove(endPoint)
 
