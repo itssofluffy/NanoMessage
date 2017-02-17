@@ -87,7 +87,7 @@ public class NanoSocket {
     ///
     /// - Throws: `NanoMessageError.Interrupted`
     ///           whatever was passed as the parameter `error`
-    fileprivate func _attemptClosure(call nanomsgCall: () -> CInt, error nanomsgError: (CInt) -> Error) throws {
+    fileprivate func _attemptClosure(call nanomsgCall: () -> CInt, error nanomsgError: (CInt) -> NanoMessageError) throws {
         var loopCount = 0
 
         while (true) {
@@ -149,7 +149,12 @@ public class NanoSocket {
 
         repeat {
             do {
-                try _attemptClosure(call: { return nn_close(fileDescriptor) }, error: { return NanoMessageError.Close(code: $0) })
+                try _attemptClosure(call:  {
+                                        return nn_close(fileDescriptor)
+                                    },
+                                    error: { errno in
+                                        return .Close(code: errno)
+                                    })
             } catch NanoMessageError.Interrupted {
                 let dynamicType = type(of: self)
 
@@ -184,33 +189,44 @@ extension NanoSocket {
     ///
     /// - Returns: An endpoint that has just been established. The endpoint can be later used to remove the
     ///            endpoint from the socket via `removeEndPoint()` function.
-    private func _establishEndPoint(url: URL, name: String, type: ConnectionType, _ establishEndPoint: (UnsafePointer<Int8>) throws -> CInt) rethrows -> EndPoint {
-        return try url.absoluteString.withCString { address in
-            var receivePriority: Priority?
-            var sendPriority: Priority?
+    private func _establishEndPoint(url:                URL,
+                                    name:               String,
+                                    type:               ConnectionType,
+                                    call nanomsgCall:   (UnsafePointer<Int8>) -> CInt,
+                                    error nanomsgError: (CInt) -> NanoMessageError) throws -> EndPoint {
+        var receivePriority: Priority?
+        var sendPriority: Priority?
 
-            if (receiverSocket) {                                              // if this is a receiver socket then...
-                receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
-            }
-            if (senderSocket) {                                                // if this is a sender socket then...
-                sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
-            }
-
-            let ipv4Only = try getIPv4Only()
-
-            let endPointId = try establishEndPoint(address)
-
-            let endPoint = EndPoint(id:         Int(endPointId),
-                                    url:        url,
-                                    type:       type,
-                                    priorities: SocketPriorities(receivePriority: receivePriority, sendPriority: sendPriority),
-                                    ipv4Only:   ipv4Only,
-                                    name:       name)
-
-            endPoints.insert(endPoint)
-
-            return endPoint
+        if (receiverSocket) {                                              // if this is a receiver socket then...
+            receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
         }
+        if (senderSocket) {                                                // if this is a sender socket then...
+            sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
+        }
+
+        let ipv4Only = try getIPv4Only()
+
+        let endPointId = try url.absoluteString.withCString { address -> Int in
+            let returnCode = nanomsgCall(address)
+
+            guard (returnCode >= 0) else {
+                throw nanomsgError(nn_errno())
+            }
+
+            return Int(returnCode)
+        }
+
+        let endPoint = EndPoint(id:         endPointId,
+                                url:        url,
+                                type:       type,
+                                priorities: SocketPriorities(receivePriority: receivePriority,
+                                                             sendPriority:    sendPriority),
+                                ipv4Only:   ipv4Only,
+                                name:       name)
+
+        endPoints.insert(endPoint)
+
+        return endPoint
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -229,15 +245,15 @@ extension NanoSocket {
     /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try _establishEndPoint(url: url, name: name, type: .Bind, { address in
-            let endPointId = nn_bind(fileDescriptor, address)
-
-            guard (endPointId >= 0) else {
-                throw NanoMessageError.BindToURL(code: nn_errno(), url: url)
-            }
-
-            return endPointId
-        })
+        return try _establishEndPoint(url:   url,
+                                      name:  name,
+                                      type:  .Bind,
+                                      call:  { address in
+                                          return nn_bind(fileDescriptor, address)
+                                      },
+                                      error: { errno in
+                                          return .BindToURL(code: errno, url: url)
+                                      })
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -277,15 +293,15 @@ extension NanoSocket {
     /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try _establishEndPoint(url: url, name: name, type: .Connect, { address in
-            let endPointId = nn_connect(fileDescriptor, address)
-
-            guard (endPointId >= 0) else {
-                throw NanoMessageError.ConnectToURL(code: nn_errno(), url: url)
-            }
-
-            return endPointId
-        })
+        return try _establishEndPoint(url:   url,
+                                      name:  name,
+                                      type:  .Connect,
+                                      call:  { address in
+                                          return nn_connect(fileDescriptor, address)
+                                      },
+                                      error: { errno in
+                                          return .ConnectToURL(code: errno, url: url)
+                                      })
     }
 
     /// Adds a remote endpoint to the socket. The library would then try to connect to the specified remote endpoint.
@@ -321,8 +337,12 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         if (endPoints.contains(endPoint)) {
-            try _attemptClosure(call:  { return nn_shutdown(fileDescriptor, CInt(endPoint.id)) },
-                                error: { return NanoMessageError.RemoveEndPoint(code: $0, url: endPoint.url, endPointId: endPoint.id) })
+            try _attemptClosure(call:  {
+                                    return nn_shutdown(fileDescriptor, CInt(endPoint.id))
+                                },
+                                error: { errno in
+                                    return .RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
+                                })
 
             endPoints.remove(endPoint)
 

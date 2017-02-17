@@ -212,12 +212,8 @@ extension SubscriberSocket {
     /// - Returns: Has the function been successful.
     public func flipIgnoreTopicSeperator() throws -> Bool {
         if (!subscribedToAllTopics) {
-            if (!ignoreTopicSeperator) {
-                let topics = _validateTopicLengths()
-
-                if (!topics.equalLengths) {
-                    throw NanoMessageError.InvalidTopic
-                }
+            if (!ignoreTopicSeperator && !_validateTopicLengths().equalLengths) {
+                throw NanoMessageError.InvalidTopic
             }
 
             ignoreTopicSeperator = !ignoreTopicSeperator
