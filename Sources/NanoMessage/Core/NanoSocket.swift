@@ -26,6 +26,7 @@ import ISFLibrary
 import C7
 import Dispatch
 import Mutex
+import FNVHashValue
 
 /// A NanoMessage base socket.
 public class NanoSocket {
@@ -87,7 +88,8 @@ public class NanoSocket {
     ///
     /// - Throws: `NanoMessageError.Interrupted`
     ///           whatever was passed as the parameter `error`
-    fileprivate func _attemptClosure(call nanomsgCall: () -> CInt, error nanomsgError: (CInt) -> NanoMessageError) throws {
+    fileprivate func _attemptClosure(call  nanomsgCall:  () -> CInt,
+                                     error nanomsgError: (CInt) -> NanoMessageError) throws {
         var loopCount = 0
 
         while (true) {
@@ -192,7 +194,7 @@ extension NanoSocket {
     private func _establishEndPoint(url:                URL,
                                     name:               String,
                                     type:               ConnectionType,
-                                    call nanomsgCall:   (UnsafePointer<Int8>) -> CInt,
+                                    call  nanomsgCall:  (UnsafePointer<Int8>) -> CInt,
                                     error nanomsgError: (CInt) -> NanoMessageError) throws -> EndPoint {
         var receivePriority: Priority?
         var sendPriority: Priority?
@@ -907,5 +909,29 @@ extension NanoSocket {
     /// - Note:    This feature is undocumented in the underlying nanomsg library
     public func getCurrentEndPointErrors() throws -> UInt64 {
         return try getSocketStatistic(self, .CurrentEndPointErrors)
+    }
+}
+
+extension NanoSocket: Hashable {
+    public var hashValue: Int {
+        return fnv1a(fileDescriptor)
+    }
+}
+
+extension NanoSocket: Comparable {
+    public static func <(lhs: NanoSocket, rhs: NanoSocket) -> Bool {
+        return (lhs.fileDescriptor < rhs.fileDescriptor)
+    }
+}
+
+extension NanoSocket: Equatable {
+    public static func ==(lhs: NanoSocket, rhs: NanoSocket) -> Bool {
+        return (lhs.fileDescriptor == rhs.fileDescriptor)
+    }
+}
+
+extension NanoSocket: CustomStringConvertible {
+    public var description: String {
+        return "fileDescriptor: \(fileDescriptor)"
     }
 }

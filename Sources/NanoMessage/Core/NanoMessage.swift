@@ -119,23 +119,23 @@ public func poll(sockets: [NanoSocket], timeout: TimeInterval = TimeInterval(sec
     var pollResults = [PollResult]()
 
     for socket in sockets {
-        guard (!socket.socketIsADevice) else {                                            // guard against polling a device socket.
+        guard (!socket.socketIsADevice) else {                                        // guard against polling a device socket.
             throw NanoMessageError.SocketIsADevice(socket: socket)
         }
 
-        var eventMask = CShort.allZeros                                                   //
-        if (socket.receiverSocket) {                                                      // if the socket can receive then set the event mask appropriately.
+        var eventMask = CShort.allZeros                                               //
+        if (socket.receiverSocket) {                                                  // if the socket can receive then set the event mask appropriately.
             eventMask = _pollinMask
         }
-        if (socket.senderSocket) {                                                        // if the socket can send then set the event mask appropriately.
+        if (socket.senderSocket) {                                                    // if the socket can send then set the event mask appropriately.
             eventMask = eventMask | _polloutMask
         }
 
         pollFds.append(nn_pollfd(fd: socket.fileDescriptor, events: eventMask, revents: 0))
     }
 
-    try pollFds.withUnsafeMutableBufferPointer { fds -> Void in                           // poll the list of nano sockets.
-        let returnCode = nn_poll(fds.baseAddress, CInt(sockets.count), CInt(timeout.milliseconds))
+    try pollFds.withUnsafeMutableBufferPointer { fileDescriptors in                   // poll the list of nano sockets.
+        let returnCode = nn_poll(fileDescriptors.baseAddress, CInt(sockets.count), CInt(timeout.milliseconds))
 
         guard (returnCode >= 0) else {
             throw NanoMessageError.PollSocket(code: nn_errno())
@@ -143,8 +143,8 @@ public func poll(sockets: [NanoSocket], timeout: TimeInterval = TimeInterval(sec
     }
 
     for loopCount in 0 ... sockets.count - 1 {
-        let messageIsWaiting = ((pollFds[loopCount].revents & _pollinMask) != 0)          // using the event masks determine our return values
-        let sendIsBlocked = ((pollFds[loopCount].revents & _polloutMask) != 0)            //
+        let messageIsWaiting = ((pollFds[loopCount].revents & _pollinMask) != 0)      // using the event masks determine our return values
+        let sendIsBlocked = ((pollFds[loopCount].revents & _polloutMask) != 0)        //
 
         pollResults.append(PollResult(messageIsWaiting: messageIsWaiting, sendIsBlocked: sendIsBlocked))
     }
