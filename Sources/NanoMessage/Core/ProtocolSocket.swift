@@ -201,23 +201,25 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
-    ///                     If the message cannot be sent straight away, the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message:        C7.Data,
-                            blockingMode:     BlockingMode = .Blocking,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotSent`
+    ///   - success:      The closure to use when the async functionallity is succesful.
+    ///   - failure:      The closure to use when the async functionallity fails.
+    public func sendMessage(_ message:    C7.Data,
+                            blockingMode: BlockingMode = .Blocking,
+                            success:      @escaping (Int) -> Void,
+                            failure:      @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
 
-                    closureHandler(bytesSent, nil)
+                    success(bytesSent)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -225,36 +227,40 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
-    ///                     If the message cannot be sent straight away, the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message:        String,
-                            blockingMode:     BlockingMode = .Blocking,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotSent`
+    ///   - success:      The closure to use when the async functionallity is succesful.
+    ///   - failure:      The closure to use when the async functionallity fails.
+    public func sendMessage(_ message:    String,
+                            blockingMode: BlockingMode = .Blocking,
+                            success:      @escaping (Int) -> Void,
+                            failure:      @escaping (Error) -> Void) {
+        sendMessage(C7.Data(message), blockingMode: blockingMode, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - timeout:        Specifies that the send should be performed in non-blocking mode for a timeinterval.
-    ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message:        C7.Data,
-                            timeout:          TimeInterval,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    ///   - message: The message to send.
+    ///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
+    ///              If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func sendMessage(_ message: C7.Data,
+                            timeout:   TimeInterval,
+                            success:   @escaping (Int) -> Void,
+                            failure:   @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, nil)
+                    success(bytesSent)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -262,34 +268,38 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - timeout:        Specifies that the send should be performed in non-blocking mode for a timeinterval.
-    ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message:        String,
-                            timeout:          TimeInterval,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(C7.Data(message), timeout: timeout, closureHandler)
+    ///   - message: The message to send.
+    ///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
+    ///              If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func sendMessage(_ message: String,
+                            timeout:   TimeInterval,
+                            success:   @escaping (Int) -> Void,
+                            failure:   @escaping (Error) -> Void) {
+        sendMessage(C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message:        C7.Data,
-                            timeout:          Timeout,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    ///   - message: The message to send.
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func sendMessage(_ message: C7.Data,
+                            timeout:   Timeout,
+                            success:   @escaping (Int) -> Void,
+                            failure:   @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, nil)
+                    success(bytesSent)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -297,13 +307,15 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - message:        The message to send.
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message:        String,
-                            timeout:          Timeout,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(C7.Data(message), timeout: timeout, closureHandler)
+    ///   - message: The message to send.
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func sendMessage(_ message: String,
+                            timeout:   Timeout,
+                            success:   @escaping (Int) -> Void,
+                            failure:   @escaping (Error) -> Void) {
+        sendMessage(C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 }
 
@@ -469,21 +481,23 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - blockingMode:   Specifies if the socket should operate in blocking or non-blocking mode.
-    ///                     if in non-blocking mode and there is no message to receive the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotReceived`.
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(blockingMode:     BlockingMode = .Blocking,
-                               _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    ///   - blockingMode: Specifies if the socket should operate in blocking or non-blocking mode.
+    ///                   if in non-blocking mode and there is no message to receive the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotReceived`.
+    ///   - success:      The closure to use when the async functionallity is succesful.
+    ///   - failure:      The closure to use when the async functionallity fails.
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking,
+                               success:      @escaping (ReceiveData) -> Void,
+                               failure:      @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveData = try self.receiveMessage(blockingMode: blockingMode)
 
-                    closureHandler(received, nil)
+                    success(received)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -491,21 +505,23 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - blockingMode:   Specifies if the socket should operate in blocking or non-blocking mode.
-    ///                     if in non-blocking mode and there is no message to receive the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotReceived`.
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(blockingMode:     BlockingMode = .Blocking,
-                               _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    ///   - blockingMode: Specifies if the socket should operate in blocking or non-blocking mode.
+    ///                   if in non-blocking mode and there is no message to receive the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotReceived`.
+    ///   - success:      The closure to use when the async functionallity is succesful.
+    ///   - failure:      The closure to use when the async functionallity fails.
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking,
+                               success:      @escaping (ReceiveString) -> Void,
+                               failure:      @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveString = try self.receiveMessage(blockingMode: blockingMode)
 
-                    closureHandler(received, nil)
+                    success(received)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -513,20 +529,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - timeout:        Specifies if the socket should operate in non-blocking mode for a timeout interval.
-    ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout:          TimeInterval,
-                               _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
+    ///              If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func receiveMessage(timeout: TimeInterval,
+                               success: @escaping (ReceiveData) -> Void,
+                               failure: @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveData = try self.receiveMessage(timeout: timeout)
 
-                    closureHandler(received, nil)
+                    success(received)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -534,20 +552,22 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - timeout:        Specifies if the socket should operate in non-blocking mode for a timeout interval.
-    ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout:          TimeInterval,
-                               _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
+    ///              If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func receiveMessage(timeout: TimeInterval,
+                               success: @escaping (ReceiveString) -> Void,
+                               failure: @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveString = try self.receiveMessage(timeout: timeout)
 
-                    closureHandler(received, nil)
+                    success(received)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -555,19 +575,21 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout:          Timeout,
-                               _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func receiveMessage(timeout: Timeout,
+                               success: @escaping (ReceiveData) -> Void,
+                               failure: @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveData = try self.receiveMessage(timeout: timeout)
 
-                    closureHandler(received, nil)
+                    success(received)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -575,19 +597,21 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout:          Timeout,
-                               _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionallity is succesful.
+    ///   - failure: The closure to use when the async functionallity fails.
+    public func receiveMessage(timeout: Timeout,
+                               success: @escaping (ReceiveString) -> Void,
+                               failure: @escaping (Error) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
                     let received: ReceiveString = try self.receiveMessage(timeout: timeout)
 
-                    closureHandler(received, nil)
+                    success(received)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }

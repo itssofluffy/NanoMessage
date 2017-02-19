@@ -40,6 +40,14 @@ class MessageSpeedTests: XCTestCase {
         case Asynchronously
     }
 
+    func setError(_ error: Error) {
+        try! asyncErrorMutex.tryLock {
+            if (asyncError == nil) {
+               asyncError = error
+            }
+        }
+    }
+
     func testMessageSpeed(receiveType: ReceiveType, connectAddress: String, bindAddress: String = "") {
         guard let connectURL = URL(string: connectAddress) else {
             XCTAssert(false, "connectURL is invalid")
@@ -82,30 +90,25 @@ class MessageSpeedTests: XCTestCase {
                         let _ = try node0.sendMessage(messagePayload)
                         let _: ReceiveData = try node1.receiveMessage()
                     case .Asynchronously:
-                        node0.sendMessage(messagePayload, { (bytesSent: Int?, error: Error?) -> Void in
-                            if let error = error {
-                                try! self.asyncErrorMutex.tryLock {
-                                    if (self.asyncError == nil) {
-                                        self.asyncError = error
-                                    }
-                                }
-                            } else {
-                                self.asyncMessagesSent += 1
-                                self.asyncBytesSent += UInt64(bytesSent!)
-                            }
-                        })
-                        node1.receiveMessage { (receive: ReceiveData?, error: Error?) -> Void in
-                            if let error = error {
-                                try! self.asyncErrorMutex.tryLock {
-                                    if (self.asyncError == nil) {
-                                        self.asyncError = error
-                                    }
-                                }
-                            } else {
-                                self.asyncMessagesReceived += 1
-                                self.asyncBytesReceived += UInt64(receive!.bytes)
-                            }
-                        }
+                        node0.sendMessage(messagePayload,
+                                          success: { bytesSent in
+                                              if (self.asyncError == nil) {
+                                                  self.asyncMessagesSent += 1
+                                                  self.asyncBytesSent += UInt64(bytesSent)
+                                              }
+                                          },
+                                          failure: { error in
+                                              self.setError(error)
+                                          })
+                        node1.receiveMessage(success: { (received: ReceiveData) in
+                                                 if (self.asyncError == nil) {
+                                                     self.asyncMessagesReceived += 1
+                                                     self.asyncBytesReceived += UInt64(received.bytes)
+                                                 }
+                                             },
+                                             failure: { error in
+                                                 self.setError(error)
+                                             })
                 }
 
                 if let error = asyncError {

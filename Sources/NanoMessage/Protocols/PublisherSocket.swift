@@ -149,16 +149,18 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
-    ///                     If the message cannot be sent straight away, the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            C7.Data,
-                            message:          C7.Data,
-                            blockingMode:     BlockingMode = .Blocking,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    ///   - topic:        The topic to send.
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotSent`
+    ///   - success:      The closure to use when the async functionality completes succesfully.
+    ///   - failure:      The closure to use when the async functionality fails.
+    public func sendMessage(topic:        C7.Data,
+                            message:      C7.Data,
+                            blockingMode: BlockingMode = .Blocking,
+                            success:      @escaping (Int) -> Void,
+                            failure:      @escaping (Error) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
@@ -166,10 +168,10 @@ extension PublisherSocket {
 
                     let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
 
-                    closureHandler(bytesSent, nil)
+                    success(bytesSent)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -177,62 +179,70 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
-    ///                     If the message cannot be sent straight away, the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            C7.Data,
-                            message:          String,
-                            blockingMode:     BlockingMode = .Blocking,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: topic, message: C7.Data(message), blockingMode: blockingMode, closureHandler)
+    ///   - topic:        The topic to send.
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotSent`
+    ///   - success:      The closure to use when the async functionality completes succesfully.
+    ///   - failure:      The closure to use when the async functionality fails.
+    public func sendMessage(topic:        C7.Data,
+                            message:      String,
+                            blockingMode: BlockingMode = .Blocking,
+                            success:      @escaping (Int) -> Void,
+                            failure:      @escaping (Error) -> Void) {
+        sendMessage(topic: topic, message: C7.Data(message), blockingMode: blockingMode, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
-    ///                     If the message cannot be sent straight away, the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            String,
-                            message:          C7.Data,
-                            blockingMode:     BlockingMode = .Blocking,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: message, blockingMode: blockingMode, closureHandler)
+    ///   - topic:        The topic to send.
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotSent`
+    ///   - success:      The closure to use when the async functionality completes succesfully.
+    ///   - failure:      The closure to use when the async functionality fails.
+    public func sendMessage(topic:        String,
+                            message:      C7.Data,
+                            blockingMode: BlockingMode = .Blocking,
+                            success:      @escaping (Int) -> Void,
+                            failure:      @escaping (Error) -> Void) {
+        sendMessage(topic: C7.Data(topic), message: message, blockingMode: blockingMode, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - blockingMode:   Specifies that the send should be performed in non-blocking mode.
-    ///                     If the message cannot be sent straight away, the closureHandler
-    ///                     will be passed `NanoMessageError.MessageNotSent`
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            String,
-                            message:          String,
-                            blockingMode:     BlockingMode = .Blocking,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: C7.Data(message), blockingMode: blockingMode, closureHandler)
+    ///   - topic:        The topic to send.
+    ///   - message:      The message to send.
+    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
+    ///                   If the message cannot be sent straight away, the closureHandler
+    ///                   will be passed `NanoMessageError.MessageNotSent`
+    ///   - success:      The closure to use when the async functionality completes succesfully.
+    ///   - failure:      The closure to use when the async functionality fails.
+    public func sendMessage(topic:        String,
+                            message:      String,
+                            blockingMode: BlockingMode = .Blocking,
+                            success:      @escaping (Int) -> Void,
+                            failure:      @escaping (Error) -> Void) {
+        sendMessage(topic: C7.Data(topic), message: C7.Data(message), blockingMode: blockingMode, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        The timeout interval to set.
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            C7.Data,
-                            message:          C7.Data,
-                            timeout:          TimeInterval,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: The timeout interval to set.
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   C7.Data,
+                            message: C7.Data,
+                            timeout: TimeInterval,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
@@ -240,10 +250,10 @@ extension PublisherSocket {
 
                     let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, nil)
+                    success(bytesSent)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -251,56 +261,64 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        The timeout interval to set.
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            C7.Data,
-                            message:          String,
-                            timeout:          TimeInterval,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, closureHandler)
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: The timeout interval to set.
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   C7.Data,
+                            message: String,
+                            timeout: TimeInterval,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
+        sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        The timeout interval to set.
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            String,
-                            message:          C7.Data,
-                            timeout:          TimeInterval,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, closureHandler)
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: The timeout interval to set.
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   String,
+                            message: C7.Data,
+                            timeout: TimeInterval,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
+        sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        The timeout interval to set.
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            String,
-                            message:          String,
-                            timeout:          TimeInterval,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: The timeout interval to set.
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   String,
+                            message: String,
+                            timeout: TimeInterval,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
+        sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            C7.Data,
-                            message:          C7.Data,
-                            timeout:          Timeout,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   C7.Data,
+                            message: C7.Data,
+                            timeout: Timeout,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
@@ -308,10 +326,10 @@ extension PublisherSocket {
 
                     let bytesSent = try self.sendMessage(message, timeout: timeout)
 
-                    closureHandler(bytesSent, nil)
+                    success(bytesSent)
                 }
             } catch {
-                closureHandler(nil, error)
+                failure(error)
             }
         }
     }
@@ -319,43 +337,49 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            C7.Data,
-                            message:          String,
-                            timeout:          Timeout,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, closureHandler)
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   C7.Data,
+                            message: String,
+                            timeout: Timeout,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
+        sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            String,
-                            message:          C7.Data,
-                            timeout:          Timeout,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, closureHandler)
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   String,
+                            message: C7.Data,
+                            timeout: Timeout,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
+        sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, success: success, failure: failure)
     }
 
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:          The topic to send.
-    ///   - message:        The message to send.
-    ///   - timeout:        .Never
-    ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic:            String,
-                            message:          String,
-                            timeout:          Timeout,
-                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
+    ///   - topic:   The topic to send.
+    ///   - message: The message to send.
+    ///   - timeout: .Never
+    ///   - success: The closure to use when the async functionality completes succesfully.
+    ///   - failure: The closure to use when the async functionality fails.
+    public func sendMessage(topic:   String,
+                            message: String,
+                            timeout: Timeout,
+                            success: @escaping (Int) -> Void,
+                            failure: @escaping (Error) -> Void) {
+        sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 }
 

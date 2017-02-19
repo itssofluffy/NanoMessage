@@ -26,16 +26,64 @@ import C7
 /// ASync Publisher socket protocol.
 public protocol ASyncPublisher {
     // ASync Output functions.
-    func sendMessage(topic: C7.Data, message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: C7.Data, message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: String, message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: String, message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: C7.Data, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: C7.Data, message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: String, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: String, message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: C7.Data, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: C7.Data, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: String, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(topic: String, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
+    func sendMessage(topic:        C7.Data,
+                     message:      C7.Data,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        C7.Data,
+                     message:      String,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        String,
+                     message:      C7.Data,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        String,
+                     message:      String,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        C7.Data,
+                     message:      C7.Data,
+                     timeout:      TimeInterval,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        C7.Data,
+                     message:      String,
+                     timeout:      TimeInterval,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        String,
+                     message:      C7.Data,
+                     timeout:      TimeInterval,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        String,
+                     message:      String,
+                     timeout:      TimeInterval,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        C7.Data,
+                     message:      C7.Data,
+                     timeout:      Timeout,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        C7.Data,
+                     message:      String,
+                     timeout:      Timeout,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        String,
+                     message:      C7.Data,
+                     timeout:      Timeout,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(topic:        String,
+                     message:      String,
+                     timeout:      Timeout,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
 }

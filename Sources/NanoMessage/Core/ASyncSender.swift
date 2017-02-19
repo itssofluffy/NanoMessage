@@ -26,10 +26,28 @@ import C7
 /// ASync Sender socket protocol.
 public protocol ASyncSender {
     // ASync Output functions.
-    func sendMessage(_ message: C7.Data, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: String, blockingMode: BlockingMode, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
-    func sendMessage(_ message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void)
+    func sendMessage(_ message:    C7.Data,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(_ message:    String,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(_ message:    C7.Data,
+                     timeout:      TimeInterval,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(_ message:    String,
+                     timeout:      TimeInterval,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(_ message:    C7.Data,
+                     timeout:      Timeout,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
+    func sendMessage(_ message:    String,
+                     timeout:      Timeout,
+                     success:      @escaping (Int) -> Void,
+                     failure:      @escaping (Error) -> Void)
 }

@@ -78,7 +78,8 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
 ///
 /// - Returns: The number of bytes received and the received message
-internal func receivePayloadFromSocket(_ nanoSocket: NanoSocket, _ blockingMode: BlockingMode) throws -> ReceiveData {
+internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
+                                       _ blockingMode: BlockingMode) throws -> ReceiveData {
     guard (!nanoSocket.socketIsADevice) else {
         throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }
