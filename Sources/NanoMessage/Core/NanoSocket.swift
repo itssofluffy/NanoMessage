@@ -447,18 +447,21 @@ extension NanoSocket {
     /// Starts a device asynchronously to bind the socket to another and forward messages between two sockets
     ///
     /// - Parameters:
-    ///   - nanoSocket:     The socket to bind too.
-    ///   - queue:          The dispatch queue to use
-    ///   - group:          The dispatch group to use.
-    ///   - closureHandler: The closure to use when the 'bind' terminates.
+    ///   - nanoSocket: The socket to bind too.
+    ///   - queue:      The dispatch queue to use
+    ///   - group:      The dispatch group to use.
+    ///   - failure:    The closure to use when the 'bind' fails.
     ///
     /// - Returns:          The despatched work item.
-    public func bindToSocket(_ nanoSocket: NanoSocket, queue: DispatchQueue, group: DispatchGroup, _ closureHandler: @escaping (Error?) -> Void) -> DispatchWorkItem {
+    public func bindToSocket(_ nanoSocket: NanoSocket,
+                             queue:        DispatchQueue,
+                             group:        DispatchGroup,
+                             failure:      @escaping (Error) -> Void) -> DispatchWorkItem {
         let workItem = DispatchWorkItem {
             do {
                 try self.bindToSocket(nanoSocket)
             } catch {
-                closureHandler(error)
+                failure(error)
             }
         }
 
@@ -492,17 +495,19 @@ extension NanoSocket {
     /// Starts a 'loopback' on the socket asynchronously, it loops and sends any messages received from the socket back to itself.
     ///
     /// - Parameters:
-    ///   - queue:          The dispatch queue to use
-    ///   - group:          The dispatch group to use.
-    ///   - closureHandler: The closure to use when the 'loopback' terminates.
+    ///   - queue:   The dispatch queue to use
+    ///   - group:   The dispatch group to use.
+    ///   - failure: The closure to use when the 'loopback' fails.
     ///
     /// - Returns:          The despatched work item.
-    public func loopBack(queue: DispatchQueue, group: DispatchGroup, _ closureHandler: @escaping (Error?) -> Void) -> DispatchWorkItem {
+    public func loopBack(queue:   DispatchQueue,
+                         group:   DispatchGroup,
+                         failure: @escaping (Error) -> Void) -> DispatchWorkItem {
         let workItem = DispatchWorkItem {
             do {
                 try self.loopBack()
             } catch {
-                closureHandler(error)
+                failure(error)
             }
         }
 

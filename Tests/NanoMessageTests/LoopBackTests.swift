@@ -49,10 +49,8 @@ class LoopBackTests: XCTestCase {
             let queue = DispatchQueue(label: "com.nanomessage.loopback")
             let group = DispatchGroup()
 
-            let workItem = node0.loopBack(queue: queue, group: group, {
-                if let error = $0 {
-                    print(error)
-                }
+            let workItem = node0.loopBack(queue: queue, group: group, failure: { error in
+                 print(error)
             })
 
             let node1 = try BusSocket()

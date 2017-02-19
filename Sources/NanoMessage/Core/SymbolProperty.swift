@@ -31,7 +31,11 @@ public struct SymbolProperty {
     public let type: SymbolPropertyType
     public let unit: SymbolPropertyUnit
 
-    public init(namespace: CInt, name: String, value: CInt, type: CInt, unit: CInt) {
+    public init(namespace: CInt,
+                name:      String,
+                value:     CInt,
+                type:      CInt,
+                unit:      CInt) {
         self.namespace = SymbolPropertyNamespace(rawValue: namespace)
         self.name = name
         self.value = value
@@ -48,7 +52,8 @@ extension SymbolProperty: Hashable {
 
 extension SymbolProperty: Comparable {
     public static func <(lhs: SymbolProperty, rhs: SymbolProperty) -> Bool {
-        return ((lhs.namespace.rawValue < rhs.namespace.rawValue) || (lhs.namespace.rawValue == rhs.namespace.rawValue && lhs.value < rhs.value))
+        return ((lhs.namespace.rawValue < rhs.namespace.rawValue) ||
+                (lhs.namespace.rawValue == rhs.namespace.rawValue && lhs.value < rhs.value))
     }
 }
 

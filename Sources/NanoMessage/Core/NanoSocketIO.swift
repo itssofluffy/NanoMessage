@@ -40,7 +40,9 @@ private let NN_MSG: size_t = -1
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: The number of bytes sent.
-internal func sendPayloadToSocket(_ nanoSocket: NanoSocket, _ payload: Data, _ blockingMode: BlockingMode) throws -> Int {
+internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
+                                  _ payload:      Data,
+                                  _ blockingMode: BlockingMode) throws -> Int {
     guard (!nanoSocket.socketIsADevice) else {
         throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }

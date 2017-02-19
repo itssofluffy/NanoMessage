@@ -206,7 +206,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message:        C7.Data,
+                            blockingMode:     BlockingMode = .Blocking,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -228,7 +230,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message:        String,
+                            blockingMode:     BlockingMode = .Blocking,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(C7.Data(message), blockingMode: blockingMode, closureHandler)
     }
 
@@ -239,7 +243,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - timeout:        Specifies that the send should be performed in non-blocking mode for a timeinterval.
     ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message:        C7.Data,
+                            timeout:          TimeInterval,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -260,7 +266,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - timeout:        Specifies that the send should be performed in non-blocking mode for a timeinterval.
     ///                     If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message:        String,
+                            timeout:          TimeInterval,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(C7.Data(message), timeout: timeout, closureHandler)
     }
 
@@ -270,7 +278,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - message:        The message to send.
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message:        C7.Data,
+                            timeout:          Timeout,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -290,7 +300,9 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - message:        The message to send.
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func sendMessage(_ message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(_ message:        String,
+                            timeout:          Timeout,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(C7.Data(message), timeout: timeout, closureHandler)
     }
 }
@@ -461,7 +473,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     if in non-blocking mode and there is no message to receive the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    public func receiveMessage(blockingMode:     BlockingMode = .Blocking,
+                               _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -482,7 +495,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                     if in non-blocking mode and there is no message to receive the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    public func receiveMessage(blockingMode:     BlockingMode = .Blocking,
+                               _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -502,7 +516,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - timeout:        Specifies if the socket should operate in non-blocking mode for a timeout interval.
     ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    public func receiveMessage(timeout:          TimeInterval,
+                               _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -522,7 +537,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - timeout:        Specifies if the socket should operate in non-blocking mode for a timeout interval.
     ///                     If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout: TimeInterval, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    public func receiveMessage(timeout:          TimeInterval,
+                               _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -541,7 +557,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// - Parameters:
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
+    public func receiveMessage(timeout:          Timeout,
+                               _ closureHandler: @escaping (ReceiveData?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {
@@ -560,7 +577,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// - Parameters:
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionallity completes.
-    public func receiveMessage(timeout: Timeout, _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
+    public func receiveMessage(timeout:          Timeout,
+                               _ closureHandler: @escaping (ReceiveString?, Error?) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             do {
                 try self._nanoSocket.mutex.lock {

@@ -155,7 +155,10 @@ extension PublisherSocket {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: C7.Data, message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            C7.Data,
+                            message:          C7.Data,
+                            blockingMode:     BlockingMode = .Blocking,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
@@ -180,7 +183,10 @@ extension PublisherSocket {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: C7.Data, message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            C7.Data,
+                            message:          String,
+                            blockingMode:     BlockingMode = .Blocking,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: topic, message: C7.Data(message), blockingMode: blockingMode, closureHandler)
     }
 
@@ -193,7 +199,10 @@ extension PublisherSocket {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: String, message: C7.Data, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            String,
+                            message:          C7.Data,
+                            blockingMode:     BlockingMode = .Blocking,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: C7.Data(topic), message: message, blockingMode: blockingMode, closureHandler)
     }
 
@@ -206,7 +215,10 @@ extension PublisherSocket {
     ///                     If the message cannot be sent straight away, the closureHandler
     ///                     will be passed `NanoMessageError.MessageNotSent`
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: String, message: String, blockingMode: BlockingMode = .Blocking, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            String,
+                            message:          String,
+                            blockingMode:     BlockingMode = .Blocking,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: C7.Data(topic), message: C7.Data(message), blockingMode: blockingMode, closureHandler)
     }
 
@@ -217,7 +229,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        The timeout interval to set.
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: C7.Data, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            C7.Data,
+                            message:          C7.Data,
+                            timeout:          TimeInterval,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
@@ -240,7 +255,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        The timeout interval to set.
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: C7.Data, message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            C7.Data,
+                            message:          String,
+                            timeout:          TimeInterval,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, closureHandler)
     }
 
@@ -251,7 +269,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        The timeout interval to set.
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: String, message: C7.Data, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            String,
+                            message:          C7.Data,
+                            timeout:          TimeInterval,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, closureHandler)
     }
 
@@ -262,7 +283,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        The timeout interval to set.
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: String, message: String, timeout: TimeInterval, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            String,
+                            message:          String,
+                            timeout:          TimeInterval,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
     }
 
@@ -273,7 +297,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: C7.Data, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            C7.Data,
+                            message:          C7.Data,
+                            timeout:          Timeout,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
@@ -296,7 +323,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: C7.Data, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            C7.Data,
+                            message:          String,
+                            timeout:          Timeout,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, closureHandler)
     }
 
@@ -307,7 +337,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: String, message: C7.Data, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            String,
+                            message:          C7.Data,
+                            timeout:          Timeout,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, closureHandler)
     }
 
@@ -318,7 +351,10 @@ extension PublisherSocket {
     ///   - message:        The message to send.
     ///   - timeout:        .Never
     ///   - closureHandler: The closure to use when the async functionality completes.
-    public func sendMessage(topic: String, message: String, timeout: Timeout, _ closureHandler: @escaping (Int?, Error?) -> Void) {
+    public func sendMessage(topic:            String,
+                            message:          String,
+                            timeout:          Timeout,
+                            _ closureHandler: @escaping (Int?, Error?) -> Void) {
         sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, closureHandler)
     }
 }
