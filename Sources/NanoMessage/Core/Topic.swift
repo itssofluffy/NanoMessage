@@ -1,7 +1,7 @@
 /*
-    ReceiveString.swift
+    Topic.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,4 +20,53 @@
     IN THE SOFTWARE.
 */
 
-public typealias ReceiveString = (bytes: Int, message: String)
+import C7
+import FNVHashValue
+import ISFLibrary
+
+public struct Topic {
+    public private(set) var data = Data()
+    public var string: String {
+        return try! String(data: data)
+    }
+
+    public init(_ topic: Data) {
+        data = topic
+    }
+
+    public init(_ topic: [Byte]) {
+        data.bytes = topic
+    }
+
+    public init(_ topic: String) {
+        data = Data(topic)
+    }
+}
+
+extension Topic {
+    public var isEmpty: Bool {
+        return data.isEmpty
+    }
+
+    public var count: Int {
+        return data.count
+    }
+}
+
+extension Topic: Hashable {
+    public var hashValue: Int {
+        return fnv1a(data)
+    }
+}
+
+extension Topic: Comparable {
+    public static func <(lhs: Topic, rhs: Topic) -> Bool {
+        return (compare(lhs: lhs.data, rhs: rhs.data) == .LessThan)
+    }
+}
+
+extension Topic: Equatable {
+    public static func ==(lhs: Topic, rhs: Topic) -> Bool {
+        return (lhs.data == rhs.data)
+    }
+}

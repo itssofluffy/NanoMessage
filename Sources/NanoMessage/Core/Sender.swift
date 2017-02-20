@@ -21,23 +21,16 @@
 */
 
 import Foundation
-import C7
 
 /// Sender socket protocol.
 public protocol Sender {
     // Output functions.
     @discardableResult
-    func sendMessage(_ message: C7.Data, blockingMode: BlockingMode) throws -> Int
+    func sendMessage(_ message: Message, blockingMode: BlockingMode) throws -> Int
     @discardableResult
-    func sendMessage(_ message: String, blockingMode: BlockingMode) throws -> Int
+    func sendMessage(_ message: Message, timeout: TimeInterval) throws -> Int
     @discardableResult
-    func sendMessage(_ message: C7.Data, timeout: TimeInterval) throws -> Int
-    @discardableResult
-    func sendMessage(_ message: String, timeout: TimeInterval) throws -> Int
-    @discardableResult
-    func sendMessage(_ message: C7.Data, timeout: Timeout) throws -> Int
-    @discardableResult
-    func sendMessage(_ message: String, timeout: Timeout) throws -> Int
+    func sendMessage(_ message: Message, timeout: Timeout) throws -> Int
     // socket option functions.
     func getSendBufferSize() throws -> UInt
     @discardableResult

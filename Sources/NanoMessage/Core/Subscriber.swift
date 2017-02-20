@@ -23,20 +23,17 @@
 import C7
 
 protocol Subscriber: Receiver {
-    var receivedTopic: Data { get }                       // implement private set
-    var receivedTopics: Dictionary<Data, UInt64> { get }  // implement private set
+    var receivedTopic: Topic { get }                      // implement private set
+    var receivedTopics: Dictionary<Topic, UInt64> { get } // implement private set
     var removeTopicFromMessage: Bool { get set }
     var ignoreTopicSeperator: Bool { get }                // implement private set
-    var subscribedTopics: Set<Data> { get }               // implement private set
+    var subscribedTopics: Set<Topic> { get }              // implement private set
     var subscribedToAllTopics: Bool { get }               // implement private set
 
-    func isTopicSubscribed(_ topic: Data) -> Bool
-    func isTopicSubscribed(_ topic: String) -> Bool
+    func isTopicSubscribed(_ topic: Topic) -> Bool
     func flipIgnoreTopicSeperator() throws -> Bool
-    func subscribeTo(topic: Data) throws -> Bool
-    func subscribeTo(topic: String) throws -> Bool
-    func unsubscribeFrom(topic: Data) throws -> Bool
-    func unsubscribeFrom(topic: String) throws -> Bool
+    func subscribeTo(topic: Topic) throws -> Bool
+    func unsubscribeFrom(topic: Topic) throws -> Bool
     func subscribeToAllTopics() throws -> Bool
     func unsubscribeFromAllTopics() throws
 }

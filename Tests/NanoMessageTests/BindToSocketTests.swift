@@ -76,18 +76,18 @@ class BindToSocketTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.connectToURL('\(connectURL2)') < 0")
 
             let node2bytesSent = try node2.sendMessage(payload)
-            XCTAssertEqual(node2bytesSent, payload.utf8.count, "node2bytesSent != payload.utf8.count")
+            XCTAssertEqual(node2bytesSent, payload.count, "node2bytesSent != payload.count")
 
-            let node3Received: ReceiveString = try node3.receiveMessage()
-            XCTAssertEqual(node3Received.bytes, node3Received.message.utf8.count, "node3.bytes != message.utf8.count")
-            XCTAssertEqual(node3Received.message, payload, "node3.message != payload")
+            let node3Received = try node3.receiveMessage()
+            XCTAssertEqual(node3Received.bytes, node3Received.message.count, "node3.bytes != node3Received.message.count")
+            XCTAssertEqual(node3Received.message, payload, "node3Received.message != payload")
 
             let node3bytesSent = try node3.sendMessage(payload)
-            XCTAssertEqual(node3bytesSent, payload.utf8.count, "node3bytesSent != payload.utf8.count")
+            XCTAssertEqual(node3bytesSent, payload.count, "node3bytesSent != payload.count")
 
-            let node2Received: ReceiveString = try node2.receiveMessage()
-            XCTAssertEqual(node2Received.bytes, node2Received.message.utf8.count, "node2.bytes != message.utf8.count")
-            XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
+            let node2Received = try node2.receiveMessage()
+            XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2Received.bytes != node2Received.message.count")
+            XCTAssertEqual(node2Received.message, payload, "node2Received.message != payload")
 
             let messagesSent = try node2.getMessagesSent()
             let messagesReceived = try node3.getMessagesReceived()

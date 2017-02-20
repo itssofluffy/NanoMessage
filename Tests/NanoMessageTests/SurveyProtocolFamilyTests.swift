@@ -62,19 +62,19 @@ class SurveyProtocolFamilyTests: XCTestCase {
             pauseForBind()
 
             var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
+            XCTAssertEqual(bytesSent, payload.count, "node0.bytesSent != payload.count")
 
             usleep(TimeInterval(seconds: 0.75)) // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
 
-            var node1Received: ReceiveString = try node1.receiveMessage()
-            XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")
+            let node1Received = try node1.receiveMessage()
+            XCTAssertEqual(node1Received.bytes, node1Received.message.count, "node1.bytes != node1Received.message.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
 
             bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
+            XCTAssertEqual(bytesSent, payload.count, "node1.bytesSent != payload.count")
 
             do {
-                var _: ReceiveString = try node0.receiveMessage()
+                var _ = try node0.receiveMessage()
                 XCTAssert(false, "received a message on node0")
             } catch NanoMessageError.ReceiveTimedOut {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")   // we have timedout...yah!!!

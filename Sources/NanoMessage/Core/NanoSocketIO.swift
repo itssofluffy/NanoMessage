@@ -79,7 +79,7 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
 ///
 /// - Returns: The number of bytes received and the received message
 internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
-                                       _ blockingMode: BlockingMode) throws -> ReceiveData {
+                                       _ blockingMode: BlockingMode) throws -> ReceiveMessage {
     guard (!nanoSocket.socketIsADevice) else {
         throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }
@@ -110,5 +110,5 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
 
     buffer.deinitialize(count: bytesReceived)   // not sure if this needed because of the deallocation using nn_freemsg() but does seem to hurt.
 
-    return ReceiveData(bytes: bytesReceived, message: Data(payload))
+    return ReceiveMessage(bytes: bytesReceived, message: Message(payload))
 }

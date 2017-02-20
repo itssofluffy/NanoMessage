@@ -47,7 +47,7 @@ do {
 
     while (true) {
         do {
-            let _: ReceiveData = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+            let _ = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
         } catch NanoMessageError.ReceiveTimedOut {
             break
         } catch {

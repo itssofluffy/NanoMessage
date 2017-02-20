@@ -49,28 +49,28 @@ class BusProtocolFamilyTests: XCTestCase {
 
             pauseForBind()
 
-            try node0.sendMessage("A")
-            try node1.sendMessage("AB")
-            try node2.sendMessage("ABC")
+            try node0.sendMessage(Message("A"))
+            try node1.sendMessage(Message("AB"))
+            try node2.sendMessage(Message("ABC"))
 
             let timeout = TimeInterval(seconds: 1)
 
             for _ in 0 ... 1 {
-                let received: ReceiveString = try node0.receiveMessage(timeout: timeout)
+                let received = try node0.receiveMessage(timeout: timeout)
                 XCTAssertGreaterThanOrEqual(received.bytes, 0, "node0.received.bytes < 0")
                 let boolTest = (received.bytes == 2 || received.bytes == 3) ? true : false
                 XCTAssertEqual(boolTest, true, "node0.received.bytes != 2 && node0.received.bytes != 3")
             }
 
             for _ in 0 ... 1 {
-                let received: ReceiveString = try node1.receiveMessage(timeout: timeout)
+                let received = try node1.receiveMessage(timeout: timeout)
                 XCTAssertGreaterThanOrEqual(received.bytes, 0, "node1.received.bytes < 0")
                 let boolTest = (received.bytes == 1 || received.bytes == 3) ? true : false
                 XCTAssertEqual(boolTest, true, "node1.received.bytes != 2 && node1.received.bytes != 3")
             }
 
             for _ in 0 ... 1 {
-                let received: ReceiveString = try node2.receiveMessage(timeout: timeout)
+                let received = try node2.receiveMessage(timeout: timeout)
                 XCTAssertGreaterThanOrEqual(received.bytes, 0, "node2.received.bytes < 0")
                 let boolTest = (received.bytes == 1 || received.bytes == 2) ? true : false
                 XCTAssertEqual(boolTest, true, "node2.received.bytes != 2 && node2.received.bytes != 2")

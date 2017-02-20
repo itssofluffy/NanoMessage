@@ -119,18 +119,18 @@ class SocketStatisticTests: XCTestCase {
             pauseForBind()
 
             var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node0.bytesSent != payload.utf8.count")
+            XCTAssertEqual(bytesSent, payload.count, "node0.bytesSent != payload.count")
 
-            var node1Received: ReceiveString = try node1.receiveMessage()
-            XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "node1.bytes != message.utf8.count")
-            XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
+            let node1Received = try node1.receiveMessage()
+            XCTAssertEqual(node1Received.bytes, node1Received.message.count, "node1Received.bytes != node1Received.message.count")
+            XCTAssertEqual(node1Received.message, payload, "node1Received.message != payload")
 
             bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "node1.bytesSent != payload.utf8.count")
+            XCTAssertEqual(bytesSent, payload.count, "node1.bytesSent != payload.count")
 
-            var node0Received: ReceiveString = try node0.receiveMessage()
-            XCTAssertEqual(node0Received.bytes, node0Received.message.utf8.count, "node0.bytes != message.utf8.count")
-            XCTAssertEqual(node0Received.message, payload, "node0.message != payload")
+            let node0Received = try node0.receiveMessage()
+            XCTAssertEqual(node0Received.bytes, node0Received.message.count, "node0Received.bytes != node0Received.message.count")
+            XCTAssertEqual(node0Received.message, payload, "node0Received.message != payload")
 
             node0EstablishedConnections = try node0.getEstablishedConnections()
             XCTAssertEqual(node0EstablishedConnections, 1, "node0.getEstablishedConnections() != 1")
@@ -143,9 +143,9 @@ class SocketStatisticTests: XCTestCase {
             node0MessagesReceived = try node0.getMessagesReceived()
             XCTAssertEqual(node0MessagesReceived, 1, "node0.getMessagesReceived() != 1")
             node0BytesSent = try node0.getBytesSent()
-            XCTAssertEqual(node0BytesSent, UInt64(payload.utf8.count), "node0.getBytesSent() != \(payload.utf8.count)")
+            XCTAssertEqual(node0BytesSent, UInt64(payload.count), "node0.getBytesSent() != \(payload.count)")
             node0BytesReceived = try node0.getBytesReceived()
-            XCTAssertEqual(node0BytesReceived, UInt64(payload.utf8.count), "node0.getBytesReceived() != \(payload.utf8.count)")
+            XCTAssertEqual(node0BytesReceived, UInt64(payload.count), "node0.getBytesReceived() != \(payload.count)")
 
             node1EstablishedConnections = try node1.getEstablishedConnections()
             XCTAssertEqual(node1EstablishedConnections, 0, "node0.getEstablishedConnections() != 0")
@@ -158,9 +158,9 @@ class SocketStatisticTests: XCTestCase {
             node1MessagesReceived = try node1.getMessagesReceived()
             XCTAssertEqual(node1MessagesReceived, 1, "node1.getMessagesReceived() != 1")
             node1BytesSent = try node1.getBytesSent()
-            XCTAssertEqual(node1BytesSent, UInt64(payload.utf8.count), "node1.getBytesSent() != \(payload.utf8.count)")
+            XCTAssertEqual(node1BytesSent, UInt64(payload.count), "node1.getBytesSent() != \(payload.count)")
             node1BytesReceived = try node1.getBytesReceived()
-            XCTAssertEqual(node1BytesReceived, UInt64(payload.utf8.count), "node1.getBytesReceived() != \(payload.utf8.count)")
+            XCTAssertEqual(node1BytesReceived, UInt64(payload.count), "node1.getBytesReceived() != \(payload.count)")
 
             completed = true
         } catch let error as NanoMessageError {

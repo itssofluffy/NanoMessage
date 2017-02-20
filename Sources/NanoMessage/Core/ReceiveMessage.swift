@@ -1,7 +1,7 @@
 /*
-    ASyncSender.swift
+    ReceiveMessage.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,21 +20,4 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
-/// ASync Sender socket protocol.
-public protocol ASyncSender {
-    // ASync Output functions.
-    func sendMessage(_ message:    Message,
-                     blockingMode: BlockingMode,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
-    func sendMessage(_ message:    Message,
-                     timeout:      TimeInterval,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
-    func sendMessage(_ message:    Message,
-                     timeout:      Timeout,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
-}
+public typealias ReceiveMessage = (bytes: Int, message: Message)

@@ -47,13 +47,13 @@ do {
 
     print(endPoint)
 
-    try node0.subscribeTo(topic: "interesting")
+    try node0.subscribeTo(topic: Topic("interesting"))
 
     while (true) {
-        let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+        let received = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
 
         print("topic            : \(node0.receivedTopic)")
-        print("message          : \(received.message)")
+        print("message          : \(received.message.string)")
         print("bytes            : \(received.bytes)")
 
         let socket = try node0.pollSocket(timeout: TimeInterval(seconds: 0.25))

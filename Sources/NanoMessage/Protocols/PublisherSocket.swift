@@ -33,9 +33,9 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
     /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
     /// The topic to send.
-    public fileprivate(set) var sendTopic = C7.Data()
+    public fileprivate(set) var sendTopic = Topic(C7.Data())
     /// A Dictionary of the topics sent with a count of the times sent.
-    public fileprivate(set) var sentTopics = Dictionary<C7.Data, UInt64>()
+    public fileprivate(set) var sentTopics = Dictionary<Topic, UInt64>()
     /// Prepend the topic to the start of the message when sending.
     public var prependTopic = true
     /// When prepending the topic to the message do we ignore the topic seperator,
@@ -85,10 +85,10 @@ extension PublisherSocket {
     ///
     /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined.
     ///             `NanoMessageError.TopicLength` if the topic length too large.
-    fileprivate func _validateTopic(_ topic: C7.Data) throws {
+    fileprivate func _validateTopic(_ topic: Topic) throws {
         if (topic.isEmpty) {
             throw NanoMessageError.NoTopic
-        } else if (topic.count > NanoMessage.maximumTopicLength) {
+        } else if (topic.data.count > NanoMessage.maximumTopicLength) {
             throw NanoMessageError.TopicLength
         }
     }
@@ -110,19 +110,19 @@ extension PublisherSocket {
     ///
     /// - Returns: The number of bytes sent.
     @discardableResult
-    public func sendMessage(_ message: C7.Data, blockingMode: BlockingMode = .Blocking) throws -> Int {
+    public func sendMessage(_ message: Message, blockingMode: BlockingMode = .Blocking) throws -> Int {
         var messagePayload: C7.Data
 
         if (prependTopic) {                                   // we are prepending the topic to the start of the message.
             try _validateTopic(sendTopic)                     // check that we have a valid topic to send.
 
             if (ignoreTopicSeperator) {                       // check if we are ignoring the topic seperator.
-                messagePayload = sendTopic + message
+                messagePayload = sendTopic.data + message.data
             } else {
-                messagePayload = sendTopic + [topicSeperator] + message
+                messagePayload = sendTopic.data + [topicSeperator] + message.data
             }
         } else {
-            messagePayload = message
+            messagePayload = message.data
         }
 
         let bytesSent = try sendPayloadToSocket(self, messagePayload, blockingMode)
@@ -137,7 +137,7 @@ extension PublisherSocket {
             }
 
             if (resetTopicAfterSend) {                        // are we resetting the topic?
-                sendTopic = C7.Data()                         // reset the topic, don't use setSendTopic() as this checks for isEmpty!
+                sendTopic = Topic(C7.Data())                  // reset the topic, don't use setSendTopic() as this checks for isEmpty!
             }
         }
 
@@ -149,24 +149,22 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:        The topic to send.
-    ///   - message:      The message to send.
+    ///   - payload:      The topic and message to send.
     ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
     ///                   If the message cannot be sent straight away, the closureHandler
     ///                   will be passed `NanoMessageError.MessageNotSent`
     ///   - success:      The closure to use when the async functionality completes succesfully.
     ///   - failure:      The closure to use when the async functionality fails.
-    public func sendMessage(topic:        C7.Data,
-                            message:      C7.Data,
+    public func sendMessage(payload:      PublisherMessage,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (Int) -> Void,
                             failure:      @escaping (Error) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
-                    try self.setSendTopic(topic)
+                    try self.setSendTopic(payload.topic)
 
-                    let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
+                    let bytesSent = try self.sendMessage(payload.message, blockingMode: blockingMode)
 
                     success(bytesSent)
                 }
@@ -179,76 +177,20 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:        The topic to send.
-    ///   - message:      The message to send.
-    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-    ///                   If the message cannot be sent straight away, the closureHandler
-    ///                   will be passed `NanoMessageError.MessageNotSent`
-    ///   - success:      The closure to use when the async functionality completes succesfully.
-    ///   - failure:      The closure to use when the async functionality fails.
-    public func sendMessage(topic:        C7.Data,
-                            message:      String,
-                            blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (Int) -> Void,
-                            failure:      @escaping (Error) -> Void) {
-        sendMessage(topic: topic, message: C7.Data(message), blockingMode: blockingMode, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:        The topic to send.
-    ///   - message:      The message to send.
-    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-    ///                   If the message cannot be sent straight away, the closureHandler
-    ///                   will be passed `NanoMessageError.MessageNotSent`
-    ///   - success:      The closure to use when the async functionality completes succesfully.
-    ///   - failure:      The closure to use when the async functionality fails.
-    public func sendMessage(topic:        String,
-                            message:      C7.Data,
-                            blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (Int) -> Void,
-                            failure:      @escaping (Error) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: message, blockingMode: blockingMode, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:        The topic to send.
-    ///   - message:      The message to send.
-    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-    ///                   If the message cannot be sent straight away, the closureHandler
-    ///                   will be passed `NanoMessageError.MessageNotSent`
-    ///   - success:      The closure to use when the async functionality completes succesfully.
-    ///   - failure:      The closure to use when the async functionality fails.
-    public func sendMessage(topic:        String,
-                            message:      String,
-                            blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (Int) -> Void,
-                            failure:      @escaping (Error) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: C7.Data(message), blockingMode: blockingMode, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
+    ///   - payload: The topic and message to send.
     ///   - timeout: The timeout interval to set.
     ///   - success: The closure to use when the async functionality completes succesfully.
     ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   C7.Data,
-                            message: C7.Data,
+    public func sendMessage(payload: PublisherMessage,
                             timeout: TimeInterval,
                             success: @escaping (Int) -> Void,
                             failure: @escaping (Error) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
-                    try self.setSendTopic(topic)
+                    try self.setSendTopic(payload.topic)
 
-                    let bytesSent = try self.sendMessage(message, timeout: timeout)
+                    let bytesSent = try self.sendMessage(payload.message, timeout: timeout)
 
                     success(bytesSent)
                 }
@@ -261,70 +203,20 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
-    ///   - timeout: The timeout interval to set.
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   C7.Data,
-                            message: String,
-                            timeout: TimeInterval,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
-        sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
-    ///   - timeout: The timeout interval to set.
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   String,
-                            message: C7.Data,
-                            timeout: TimeInterval,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
-    ///   - timeout: The timeout interval to set.
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   String,
-                            message: String,
-                            timeout: TimeInterval,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
+    ///   - payload: The topic and message to send.
     ///   - timeout: .Never
     ///   - success: The closure to use when the async functionality completes succesfully.
     ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   C7.Data,
-                            message: C7.Data,
+    public func sendMessage(payload: PublisherMessage,
                             timeout: Timeout,
                             success: @escaping (Int) -> Void,
                             failure: @escaping (Error) -> Void) {
         aioQueue.async(group: aioGroup) {
             do {
                 try self.mutex.lock {
-                    try self.setSendTopic(topic)
+                    try self.setSendTopic(payload.topic)
 
-                    let bytesSent = try self.sendMessage(message, timeout: timeout)
+                    let bytesSent = try self.sendMessage(payload.message, timeout: timeout)
 
                     success(bytesSent)
                 }
@@ -332,54 +224,6 @@ extension PublisherSocket {
                 failure(error)
             }
         }
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
-    ///   - timeout: .Never
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   C7.Data,
-                            message: String,
-                            timeout: Timeout,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
-        sendMessage(topic: topic, message: C7.Data(message), timeout: timeout, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
-    ///   - timeout: .Never
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   String,
-                            message: C7.Data,
-                            timeout: Timeout,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: message, timeout: timeout, success: success, failure: failure)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - topic:   The topic to send.
-    ///   - message: The message to send.
-    ///   - timeout: .Never
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
-    public func sendMessage(topic:   String,
-                            message: String,
-                            timeout: Timeout,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
-        sendMessage(topic: C7.Data(topic), message: C7.Data(message), timeout: timeout, success: success, failure: failure)
     }
 }
 
@@ -391,20 +235,9 @@ extension PublisherSocket {
     ///
     /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined to send.
     ///             `NanoMessageError.TopicLength` if the topic length too large.
-    public func setSendTopic(_ topic: C7.Data) throws {
+    public func setSendTopic(_ topic: Topic) throws {
         try _validateTopic(topic)               // check that we have a valid topic.
 
         sendTopic = topic
-    }
-
-    /// set the topic to send.
-    ///
-    /// - Parameters:
-    ///   - topic:  The topic to send.
-    ///
-    /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined to send.
-    ///             `NanoMessageError.TopicLength` if the topic length too large.
-    public func setSendTopic(_ topic: String) throws {
-        try setSendTopic(C7.Data(topic))
     }
 }

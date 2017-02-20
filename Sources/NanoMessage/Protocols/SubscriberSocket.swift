@@ -35,13 +35,13 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
     /// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
     public fileprivate(set) var ignoreTopicSeperator = false
     /// The topic last received.
-    public fileprivate(set) var receivedTopic = C7.Data()
+    public fileprivate(set) var receivedTopic = Topic(C7.Data())
     /// A dictionary of topics and their count that have been received
-    public fileprivate(set) var receivedTopics = Dictionary<C7.Data, UInt64>()
+    public fileprivate(set) var receivedTopics = Dictionary<Topic, UInt64>()
     /// Remove the topic from the received data.
     public var removeTopicFromMessage = true
     /// A set of all the subscribed topics.
-    public fileprivate(set) var subscribedTopics = Set<C7.Data>()
+    public fileprivate(set) var subscribedTopics = Set<Topic>()
     /// Is the socket subscribed to all topics
     public fileprivate(set) var subscribedToAllTopics = false
 
@@ -92,13 +92,13 @@ extension SubscriberSocket {
     ///            `NanoMessageError.TimedOut` the receive timedout.
     ///
     /// - Returns: the number of bytes received and the received message
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveData {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveMessage {
         /// Does the message/payload contain the specified topic
-        func _messageHasTopic(_ topic: C7.Data, _ message: C7.Data) -> Bool {
-            if (((ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
-                if (C7.Data(message[0 ..< topic.count]) != topic) {
+        func _messageHasTopic(_ topic: Topic, _ message: Message) -> Bool {
+            if (((ignoreTopicSeperator) ? topic.count : topic.data.count + 1) <= message.count) {
+                if (C7.Data(message.data[0 ..< topic.count]) != topic.data) {
                     return false
-                } else if (ignoreTopicSeperator || message[topic.count] == topicSeperator) {
+                } else if (ignoreTopicSeperator || message.data[topic.count] == topicSeperator) {
                     return true
                 }
             }
@@ -107,15 +107,15 @@ extension SubscriberSocket {
         }
 
         /// Get the topic from the message/payload if it exists using the topic seperator.
-        func _getTopicFromMessage(_ message: C7.Data) -> C7.Data {
-            if let index = message.index(of: topicSeperator) {
-                return C7.Data(message[0 ..< index])
+        func _getTopicFromMessage(_ message: Message) -> Topic {
+            if let index = message.data.index(of: topicSeperator) {
+                return Topic(C7.Data(message.data[0 ..< index]))
             }
 
-            return message
+            return Topic(message.data)
         }
 
-        receivedTopic = C7.Data()
+        receivedTopic = Topic(C7.Data())
 
         var received = try receivePayloadFromSocket(self, blockingMode)
 
@@ -131,7 +131,7 @@ extension SubscriberSocket {
             } else {
                 let topic = _getTopicFromMessage(received.message)
 
-                if (topic != received.message) {
+                if (topic.data != received.message.data) {
                     receivedTopic = topic
                 }
             }
@@ -146,8 +146,8 @@ extension SubscriberSocket {
                     offset += 1
                 }
 
-                let range = received.message.startIndex ..< received.message.index(received.message.startIndex, offsetBy: offset)
-                received.message.removeSubrange(range)
+                let range = received.message.data.startIndex ..< received.message.data.index(received.message.data.startIndex, offsetBy: offset)
+                received.message.data.removeSubrange(range)
             }
 
             // remember which topics we've received and how many.
@@ -170,18 +170,8 @@ extension SubscriberSocket {
     ///   - topic: The topic to check.
     ///
     /// - Returns: If the topic has been subscribed too.
-    public func isTopicSubscribed(_ topic: C7.Data) -> Bool {
+    public func isTopicSubscribed(_ topic: Topic) -> Bool {
         return subscribedTopics.contains(topic)
-    }
-
-    /// Is the specified topic already subscribed too.
-    ///
-    /// - Parameters:
-    ///   - topic: The topic to check.
-    ///
-    /// - Returns: If the topic has been subscribed too.
-    public func isTopicSubscribed(_ topic: String) -> Bool {
-        return isTopicSubscribed(C7.Data(topic))
     }
 
     /// Check all topics for equal lengths.
@@ -235,9 +225,9 @@ extension SubscriberSocket {
     ///
     /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
-    public func subscribeTo(topic: C7.Data) throws -> Bool {
+    public func subscribeTo(topic: Topic) throws -> Bool {
         /// Check topic length against (any) existing topics is see if it is of equal length.
-        func _validTopicLengths(_ topic: C7.Data) -> Bool {
+        func _validTopicLengths(_ topic: Topic) -> Bool {
             let topics = _validateTopicLengths()
 
             if (!topics.equalLengths) {
@@ -265,7 +255,7 @@ extension SubscriberSocket {
                     throw NanoMessageError.TopicLength
                 }
 
-                try setSocketOption(self, .Subscribe, topic, .SubscriberProtocol)
+                try setSocketOption(self, .Subscribe, topic.data, .SubscriberProtocol)
 
                 subscribedTopics.insert(topic)
             }
@@ -274,21 +264,6 @@ extension SubscriberSocket {
         }
 
         return false
-    }
-
-    /// Subscibe to a topic.
-    ///
-    /// - Parameters:
-    ///   - topic: The topic to subscribe to.
-    ///
-    /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
-    ///            `NanoMessageError.InvalidTopic` if the topic is invalid (unequal length).
-    ///            `NanoMessageError.TopicLength` if the topic size is too large.
-    ///
-    /// - Returns: If we managed to subscribed to the topic.
-    @discardableResult
-    public func subscribeTo(topic: String) throws -> Bool {
-        return try subscribeTo(topic: C7.Data(topic))
     }
 
     /// Unsubscibe from a topic.
@@ -300,12 +275,12 @@ extension SubscriberSocket {
     ///
     /// - Returns: If we managed to unsubscribed from the topic.
     @discardableResult
-    public func unsubscribeFrom(topic: C7.Data) throws -> Bool {
+    public func unsubscribeFrom(topic: Topic) throws -> Bool {
         if (!topic.isEmpty) {
             let topicSubscribed = isTopicSubscribed(topic)
 
             if (topicSubscribed) {
-                try setSocketOption(self, .UnSubscribe, topic, .SubscriberProtocol)
+                try setSocketOption(self, .UnSubscribe, topic.data, .SubscriberProtocol)
 
                 subscribedTopics.remove(topic)
 
@@ -318,19 +293,6 @@ extension SubscriberSocket {
         }
 
         return false
-    }
-
-    /// Unsubscibe from a topic.
-    ///
-    /// - Parameters:
-    ///   - topic: The topic to unsubscribe from.
-    ///
-    /// - Throws:  `NanoMessageError.SetSocketOption` if an issue has been encountered.
-    ///
-    /// - Returns: If we managed to unsubscribed from the topic.
-    @discardableResult
-    public func unsubscribeFrom(topic: String) throws -> Bool {
-        return try unsubscribeFrom(topic: C7.Data(topic))
     }
 
     /// Subscribe to all topics.

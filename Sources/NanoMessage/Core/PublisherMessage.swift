@@ -1,7 +1,7 @@
 /*
-    ReceiveData.swift
+    PublisherMessage.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,6 +20,33 @@
     IN THE SOFTWARE.
 */
 
-import C7
+import FNVHashValue
+import ISFLibrary
 
-public typealias ReceiveData = (bytes: Int, message: Data)
+public struct PublisherMessage {
+    public private(set) var topic: Topic
+    public private(set) var message: Message
+
+    public init(topic: Topic, message: Message) {
+        self.topic = topic
+        self.message = message
+    }
+}
+
+extension PublisherMessage: Hashable {
+    public var hashValue: Int {
+        return fnv1a(topic.data + message.data)
+    }
+}
+
+extension PublisherMessage: Comparable {
+    public static func <(lhs: PublisherMessage, rhs: PublisherMessage) -> Bool {
+        return (compare(lhs: lhs.topic.data + lhs.message.data, rhs: rhs.topic.data + rhs.message.data) == .LessThan)
+    }
+}
+
+extension PublisherMessage: Equatable {
+    public static func ==(lhs: PublisherMessage, rhs: PublisherMessage) -> Bool {
+        return (lhs.topic.data + lhs.message.data == rhs.topic.data + rhs.message.data)
+    }
+}

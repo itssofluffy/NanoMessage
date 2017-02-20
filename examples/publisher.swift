@@ -75,11 +75,14 @@ do {
     print(endPoint)
 
     for dataSet in messages.sorted(by: { $0.message < $1.message }) {
-        try node0.setSendTopic(dataSet.topic)
+        let topic = Topic(dataSet.topic)
+        let message = Message(dataSet.message)
 
-        print("sending topic: \(node0.sendTopic), message: \(dataSet.message)")
+        try node0.setSendTopic(topic)
 
-        try node0.sendMessage(dataSet.message, timeout: TimeInterval(seconds: 10))
+        print("sending topic: \(dataSet.topic), message: \(dataSet.message)")
+
+        try node0.sendMessage(message, timeout: TimeInterval(seconds: 10))
     }
 
     let messagesSent = try node0.getMessagesSent()

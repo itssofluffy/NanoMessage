@@ -20,15 +20,12 @@
     IN THE SOFTWARE.
 */
 
-import C7
-
 protocol Publisher: Sender, ASyncPublisher {
-    var sendTopic: Data { get }                       // implement private set.
-    var sentTopics: Dictionary<Data, UInt64> { get }  // implement private set.
+    var sendTopic: Topic { get }                       // implement private set.
+    var sentTopics: Dictionary<Topic, UInt64> { get }  // implement private set.
     var prependTopic: Bool { get set }
     var ignoreTopicSeperator: Bool { get set }
     var resetTopicAfterSend: Bool { get set }
 
-    func setSendTopic(_ topic: Data) throws
-    func setSendTopic(_ topic: String) throws
+    func setSendTopic(_ topic: Topic) throws
 }

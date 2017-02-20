@@ -23,8 +23,9 @@
 import Foundation
 import XCTest
 import ISFLibrary
+@testable import NanoMessage
 
-let payload = "This above all...to thine own self be true."
+let payload = Message("This above all...to thine own self be true.")
 
 public var pauseTime = TimeInterval(milliseconds: 200)
 public var pauseCount: UInt32 = 0

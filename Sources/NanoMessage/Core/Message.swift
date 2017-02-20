@@ -1,7 +1,7 @@
 /*
-    ASyncSender.swift
+    Message.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,21 +20,53 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
+import C7
+import FNVHashValue
+import ISFLibrary
 
-/// ASync Sender socket protocol.
-public protocol ASyncSender {
-    // ASync Output functions.
-    func sendMessage(_ message:    Message,
-                     blockingMode: BlockingMode,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
-    func sendMessage(_ message:    Message,
-                     timeout:      TimeInterval,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
-    func sendMessage(_ message:    Message,
-                     timeout:      Timeout,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
+public struct Message {
+    public internal(set) var data = Data()
+    public var string: String {
+        return try! String(data: data)
+    }
+
+    public init(_ message: Data) {
+        data = message
+    }
+
+    public init(_ message: [Byte]) {
+        data.bytes = message
+    }
+
+    public init(_ message: String) {
+        data = Data(message)
+    }
+}
+
+extension Message {
+    public var isEmpty: Bool {
+        return data.isEmpty
+    }
+
+    public var count: Int {
+        return data.count
+    }
+}
+
+extension Message: Hashable {
+    public var hashValue: Int {
+        return fnv1a(data)
+    }
+}
+
+extension Message: Comparable {
+    public static func <(lhs: Message, rhs: Message) -> Bool {
+        return (compare(lhs: lhs.data, rhs: rhs.data) == .LessThan)
+    }
+}
+
+extension Message: Equatable {
+    public static func ==(lhs: Message, rhs: Message) -> Bool {
+        return (lhs.data == rhs.data)
+    }
 }

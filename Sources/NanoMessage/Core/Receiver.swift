@@ -25,12 +25,9 @@ import Foundation
 /// Receiver socket protocol.
 public protocol Receiver: ASyncReceiver {
     // Input functions.
-    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveData
-    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveString
-    func receiveMessage(timeout: TimeInterval) throws -> ReceiveData
-    func receiveMessage(timeout: TimeInterval) throws -> ReceiveString
-    func receiveMessage(timeout: Timeout) throws -> ReceiveData
-    func receiveMessage(timeout: Timeout) throws -> ReceiveString
+    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveMessage
+    func receiveMessage(timeout: TimeInterval) throws -> ReceiveMessage
+    func receiveMessage(timeout: Timeout) throws -> ReceiveMessage
     // socket option functions.
     func getReceiveBufferSize() throws -> UInt
     @discardableResult

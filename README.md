@@ -24,7 +24,7 @@ do {
     let node0 = try PushSocket()
     let _: Int = try node0.connectToURL(url)
 
-    try node0.sendMessage("This is earth calling...earth calling...", timeout: TimeInterval(seconds: 10))
+    try node0.sendMessage(Message("This is earth calling...earth calling..."), timeout: TimeInterval(seconds: 10))
 } catch let error as NanoMessageError {
     print(error)
 } catch {
@@ -47,10 +47,10 @@ do {
     let node0 = try PullSocket()
     let _: EndPoint = try node0.bindToURL(url, name: "my local end-point")
 
-    let received: ReceiveString = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+    let received = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
 
-    print("bytes  : \(received.bytes)")     // 40
-    print("message: \(received.message)")   // This is earth calling...earth calling...
+    print("bytes  : \(received.bytes)")            // 40
+    print("message: \(received.message.string)")   // This is earth calling...earth calling...
 } catch let error as NanoMessageError {
     print(error)
 } catch {

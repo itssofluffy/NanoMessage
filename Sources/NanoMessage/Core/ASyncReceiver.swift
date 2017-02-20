@@ -21,27 +21,17 @@
 */
 
 import Foundation
-import C7
 
 /// Async Receiver socket protocol.
 public protocol ASyncReceiver {
     // ASync Input functions.
     func receiveMessage(blockingMode: BlockingMode,
-                        success:      @escaping (ReceiveData) -> Void,
-                        failure:      @escaping (Error) -> Void)
-    func receiveMessage(blockingMode: BlockingMode,
-                        success:      @escaping (ReceiveString) -> Void,
+                        success:      @escaping (ReceiveMessage) -> Void,
                         failure:      @escaping (Error) -> Void)
     func receiveMessage(timeout:      TimeInterval,
-                        success:      @escaping (ReceiveData) -> Void,
-                        failure:      @escaping (Error) -> Void)
-    func receiveMessage(timeout:      TimeInterval,
-                        success:      @escaping (ReceiveString) -> Void,
+                        success:      @escaping (ReceiveMessage) -> Void,
                         failure:      @escaping (Error) -> Void)
     func receiveMessage(timeout:      Timeout,
-                        success:      @escaping (ReceiveData) -> Void,
-                        failure:      @escaping (Error) -> Void)
-    func receiveMessage(timeout:      Timeout,
-                        success:      @escaping (ReceiveString) -> Void,
+                        success:      @escaping (ReceiveMessage) -> Void,
                         failure:      @escaping (Error) -> Void)
 }

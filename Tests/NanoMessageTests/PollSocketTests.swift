@@ -60,7 +60,7 @@ class PollSocketTests: XCTestCase {
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
             let bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.utf8.count, "bytesSent != payload.utf8.count")
+            XCTAssertEqual(bytesSent, payload.count, "bytesSent != payload.count")
 
             usleep(TimeInterval(milliseconds: 50))          // pause to make sure the message is sent.
 
@@ -70,8 +70,8 @@ class PollSocketTests: XCTestCase {
             XCTAssertEqual(pollResults[1].messageIsWaiting, true, "pollResults[1].messageIsWaiting != true")
             XCTAssertEqual(pollResults[1].sendIsBlocked, false, "pollResults[1].sendIsBlocked != false")
 
-            let node1Received: ReceiveString = try node1.receiveMessage()
-            XCTAssertEqual(node1Received.bytes, node1Received.message.utf8.count, "bytes != message.utf8.count")
+            let node1Received = try node1.receiveMessage()
+            XCTAssertEqual(node1Received.bytes, node1Received.message.count, "bytes != node1Received.message.count")
             XCTAssertEqual(node1Received.message, payload, "message != payload")
 
             let node0Poll = try node0.pollSocket(timeout: 0.25)
