@@ -70,7 +70,6 @@ extension ProtocolSocket where Self: Sender {
     ///            `NanoMessageError.SendTimedOut` the send timedout.
     ///
     /// - Returns: the number of bytes sent.
-    @discardableResult
     private func _sendMessageWithTimeout(_ message: Message, timeout: TimeInterval) throws -> Int {
         let originalTimeout = try setSendTimeout(seconds: timeout)
 

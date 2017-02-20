@@ -30,16 +30,16 @@ public struct Topic {
         return try! String(data: data)
     }
 
-    public init(_ topic: Data) {
-        data = topic
+    public init(value: Data) {
+        data = value
     }
 
-    public init(_ topic: [Byte]) {
-        data.bytes = topic
+    public init(value: [Byte]) {
+        data.bytes = value
     }
 
-    public init(_ topic: String) {
-        data = Data(topic)
+    public init(value: String) {
+        data = Data(value)
     }
 }
 

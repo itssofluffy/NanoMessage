@@ -110,5 +110,5 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
 
     buffer.deinitialize(count: bytesReceived)   // not sure if this needed because of the deallocation using nn_freemsg() but does seem to hurt.
 
-    return ReceiveMessage(bytes: bytesReceived, message: Message(payload))
+    return ReceiveMessage(bytes: bytesReceived, message: Message(value: payload))
 }

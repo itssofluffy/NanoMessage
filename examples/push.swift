@@ -65,7 +65,7 @@ do {
 
     print(endPoint)
 
-    let messagePayload = Message([UInt8](repeating: 0xff, count: messageSize))
+    let messagePayload = Message(value: [UInt8](repeating: 0xff, count: messageSize))
 
     for _ in 1 ... sendCount {
         try node0.sendMessage(messagePayload, timeout: TimeInterval(seconds: 10))

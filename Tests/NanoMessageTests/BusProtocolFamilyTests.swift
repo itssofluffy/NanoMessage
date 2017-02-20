@@ -49,9 +49,9 @@ class BusProtocolFamilyTests: XCTestCase {
 
             pauseForBind()
 
-            try node0.sendMessage(Message("A"))
-            try node1.sendMessage(Message("AB"))
-            try node2.sendMessage(Message("ABC"))
+            try node0.sendMessage(Message(value: "A"))
+            try node1.sendMessage(Message(value: "AB"))
+            try node2.sendMessage(Message(value: "ABC"))
 
             let timeout = TimeInterval(seconds: 1)
 

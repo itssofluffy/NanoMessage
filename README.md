@@ -24,7 +24,8 @@ do {
     let node0 = try PushSocket()
     let _: Int = try node0.connectToURL(url)
 
-    try node0.sendMessage(Message("This is earth calling...earth calling..."), timeout: TimeInterval(seconds: 10))
+    try node0.sendMessage(Message(value: "This is earth calling...earth calling..."),
+                          timeout: TimeInterval(seconds: 10))
 } catch let error as NanoMessageError {
     print(error)
 } catch {

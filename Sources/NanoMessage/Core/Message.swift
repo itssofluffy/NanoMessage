@@ -30,16 +30,16 @@ public struct Message {
         return try! String(data: data)
     }
 
-    public init(_ message: Data) {
-        data = message
+    public init(value: Data) {
+        data = value
     }
 
-    public init(_ message: [Byte]) {
-        data.bytes = message
+    public init(value: [Byte]) {
+        data.bytes = value
     }
 
-    public init(_ message: String) {
-        data = Data(message)
+    public init(value: String) {
+        data = Data(value)
     }
 }
 

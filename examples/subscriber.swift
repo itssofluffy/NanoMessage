@@ -47,7 +47,7 @@ do {
 
     print(endPoint)
 
-    try node0.subscribeTo(topic: Topic("interesting"))
+    try node0.subscribeTo(topic: Topic(value: "interesting"))
 
     while (true) {
         let received = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
