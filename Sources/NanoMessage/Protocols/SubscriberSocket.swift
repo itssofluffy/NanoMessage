@@ -35,7 +35,7 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
     /// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
     public fileprivate(set) var ignoreTopicSeperator = false
     /// The topic last received.
-    public fileprivate(set) var receivedTopic = Topic(value: C7.Data())
+    public fileprivate(set) var receivedTopic = Topic()
     /// A dictionary of topics and their count that have been received
     public fileprivate(set) var receivedTopics = Dictionary<Topic, UInt64>()
     /// Remove the topic from the received data.
@@ -115,7 +115,7 @@ extension SubscriberSocket {
             return Topic(value: message.data)
         }
 
-        receivedTopic = Topic(value: C7.Data())
+        receivedTopic = Topic()
 
         var received = try receivePayloadFromSocket(self, blockingMode)
 

@@ -33,7 +33,7 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
     /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
     /// The topic to send.
-    public fileprivate(set) var sendTopic = Topic(value: C7.Data())
+    public fileprivate(set) var sendTopic = Topic()
     /// A Dictionary of the topics sent with a count of the times sent.
     public fileprivate(set) var sentTopics = Dictionary<Topic, UInt64>()
     /// Prepend the topic to the start of the message when sending.
@@ -137,7 +137,7 @@ extension PublisherSocket {
             }
 
             if (resetTopicAfterSend) {                        // are we resetting the topic?
-                sendTopic = Topic(value: C7.Data())           // reset the topic, don't use setSendTopic() as this checks for isEmpty!
+                sendTopic = Topic()                           // reset the topic, don't use setSendTopic() as this checks for isEmpty!
             }
         }
 

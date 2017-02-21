@@ -26,8 +26,15 @@ import ISFLibrary
 
 public struct Topic {
     public private(set) var data = Data()
+    public var bytes: [Byte] {
+        return data.bytes
+    }
     public var string: String {
         return try! String(data: data)
+    }
+
+    public init() {
+        data = Data()
     }
 
     public init(value: Data) {
