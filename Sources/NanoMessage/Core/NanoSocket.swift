@@ -83,17 +83,17 @@ public class NanoSocket {
     /// Attempt a call to the underlying library within a loop with a delay.
     ///
     /// - Parameters:
-    ///   - call:   nanomsg 'c' function to call.
-    ///   - error:  error associated with the parameter `call`.
+    ///   - funcCall: nanomsg 'c' function to call.
+    ///   - failure:  error associated with the parameter `funcCall`.
     ///
     /// - Throws: `NanoMessageError.Interrupted`
-    ///           whatever was passed as the parameter `error`
-    fileprivate func _attemptClosure(call  nanomsgCall:  () -> CInt,
-                                     error nanomsgError: (CInt) -> NanoMessageError) throws {
+    ///           whatever was passed as the closure `failure`
+    fileprivate func _attemptClosure(funcCall: () -> CInt,
+                                     failure:  (CInt) -> NanoMessageError) throws {
         var loopCount = 0
 
         while (true) {
-            if (nanomsgCall() < 0) {                          // call the passed underlying library.
+            if (funcCall() < 0) {                             // call the passed underlying library.
                 let errno = nn_errno()
 
                 if (errno == EINTR) {                         // if we were interrupted by a signal, reattempt is allowed by the native library
@@ -105,7 +105,7 @@ public class NanoSocket {
 
                     loopCount += 1
                 } else {
-                    throw nanomsgError(errno)                 // throw the passed error
+                    throw failure(errno)                      // throw the passed error
                 }
             } else {
                 break                                         // we've closed the endpoint succesfully
@@ -151,10 +151,10 @@ public class NanoSocket {
 
         repeat {
             do {
-                try _attemptClosure(call:  {
+                try _attemptClosure(funcCall: {
                                         return nn_close(fileDescriptor)
                                     },
-                                    error: { errno in
+                                    failure:  { errno in
                                         return .Close(code: errno)
                                     })
             } catch NanoMessageError.Interrupted {
@@ -180,22 +180,23 @@ extension NanoSocket {
     /// Establish an endpoint on the socket.
     ///
     /// - Parameters:
-    ///   - url:                Consists of two parts as follows: transport://address. The transport specifies the
-    ///                         underlying transport protocol to use. The meaning of the address part is specific
-    ///                         to the underlying transport protocol.
-    ///   - name:               An optional endpoint name.
-    ///   - type:               The connection type used to establish the endpoint.
-    ///   - establishEndPoint:  Closure used to establish the endpoint.
+    ///   - url:      Consists of two parts as follows: transport://address. The transport specifies the
+    ///               underlying transport protocol to use. The meaning of the address part is specific
+    ///               to the underlying transport protocol.
+    ///   - name:     An optional endpoint name.
+    ///   - type:     The connection type used to establish the endpoint.
+    ///   - funcCall: Closure used to establish the endpoint.
+    ///   - failure:  The error should the `funcCall` fail.
     ///
     /// - Throws:  `NanoMessageError.GetSocketOption`
     ///
     /// - Returns: An endpoint that has just been established. The endpoint can be later used to remove the
     ///            endpoint from the socket via `removeEndPoint()` function.
-    private func _establishEndPoint(url:                URL,
-                                    name:               String,
-                                    type:               ConnectionType,
-                                    call  nanomsgCall:  (UnsafePointer<Int8>) -> CInt,
-                                    error nanomsgError: (CInt) -> NanoMessageError) throws -> EndPoint {
+    private func _establishEndPoint(url:      URL,
+                                    name:     String,
+                                    type:     ConnectionType,
+                                    funcCall: (UnsafePointer<Int8>) -> CInt,
+                                    failure:  (CInt) -> NanoMessageError) throws -> EndPoint {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
@@ -209,10 +210,10 @@ extension NanoSocket {
         let ipv4Only = try getIPv4Only()
 
         let endPointId = try url.absoluteString.withCString { address -> Int in
-            let returnCode = nanomsgCall(address)
+            let returnCode = funcCall(address)
 
             guard (returnCode >= 0) else {
-                throw nanomsgError(nn_errno())
+                throw failure(nn_errno())
             }
 
             return Int(returnCode)
@@ -231,6 +232,32 @@ extension NanoSocket {
         return endPoint
     }
 
+    /// Dispatch a call asynchronously
+    ///
+    /// - Parameters:
+    ///   - queue:    The dispatch queue to use
+    ///   - group:    The dispatch group to use.
+    ///   - funcCall: The closure to call.
+    ///   - failure:  The closure to use if the 'funcCall' fails.
+    ///
+    /// - Returns:    The despatched work item.
+    private func _dispatchWorkItem(queue:    DispatchQueue,
+                                   group:    DispatchGroup,
+                                   funcCall: @escaping () throws -> Void,
+                                   failure:  @escaping (Error) -> Void) -> DispatchWorkItem {
+        let workItem = DispatchWorkItem {
+            do {
+                try funcCall()
+            } catch {
+                failure(error)
+            }
+        }
+
+        queue.async(group: group, execute: workItem)
+
+        return workItem
+    }
+
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
     ///
     /// - Parameters:
@@ -247,13 +274,13 @@ extension NanoSocket {
     /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try _establishEndPoint(url:   url,
-                                      name:  name,
-                                      type:  .Bind,
-                                      call:  { address in
+        return try _establishEndPoint(url:      url,
+                                      name:     name,
+                                      type:     .Bind,
+                                      funcCall: { address in
                                           return nn_bind(fileDescriptor, address)
                                       },
-                                      error: { errno in
+                                      failure:  { errno in
                                           return .BindToURL(code: errno, url: url)
                                       })
     }
@@ -295,13 +322,13 @@ extension NanoSocket {
     /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
     public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try _establishEndPoint(url:   url,
-                                      name:  name,
-                                      type:  .Connect,
-                                      call:  { address in
+        return try _establishEndPoint(url:      url,
+                                      name:     name,
+                                      type:     .Connect,
+                                      funcCall: { address in
                                           return nn_connect(fileDescriptor, address)
                                       },
-                                      error: { errno in
+                                      failure:  { errno in
                                           return .ConnectToURL(code: errno, url: url)
                                       })
     }
@@ -339,10 +366,10 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         if (endPoints.contains(endPoint)) {
-            try _attemptClosure(call:  {
+            try _attemptClosure(funcCall: {
                                     return nn_shutdown(fileDescriptor, CInt(endPoint.id))
                                 },
-                                error: { errno in
+                                failure:  { errno in
                                     return .RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
                                 })
 
@@ -450,24 +477,19 @@ extension NanoSocket {
     ///   - nanoSocket: The socket to bind too.
     ///   - queue:      The dispatch queue to use
     ///   - group:      The dispatch group to use.
-    ///   - failure:    The closure to use when the 'bind' fails.
+    ///   - failure:    The closure to use if the 'bindToSocket()' fails.
     ///
     /// - Returns:          The despatched work item.
     public func bindToSocket(_ nanoSocket: NanoSocket,
                              queue:        DispatchQueue,
                              group:        DispatchGroup,
                              failure:      @escaping (Error) -> Void) -> DispatchWorkItem {
-        let workItem = DispatchWorkItem {
-            do {
-                try self.bindToSocket(nanoSocket)
-            } catch {
-                failure(error)
-            }
-        }
-
-        queue.async(group: group, execute: workItem)
-
-        return workItem
+        return _dispatchWorkItem(queue:    queue,
+                                 group:    group,
+                                 funcCall: {
+                                     try self.bindToSocket(nanoSocket)
+                                 },
+                                 failure:  failure)
     }
 
     /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
@@ -497,23 +519,18 @@ extension NanoSocket {
     /// - Parameters:
     ///   - queue:   The dispatch queue to use
     ///   - group:   The dispatch group to use.
-    ///   - failure: The closure to use when the 'loopback' fails.
+    ///   - failure: The closure to use if the 'loopBack()' fails.
     ///
     /// - Returns:          The despatched work item.
     public func loopBack(queue:   DispatchQueue,
                          group:   DispatchGroup,
                          failure: @escaping (Error) -> Void) -> DispatchWorkItem {
-        let workItem = DispatchWorkItem {
-            do {
-                try self.loopBack()
-            } catch {
-                failure(error)
-            }
-        }
-
-        queue.async(group: group, execute: workItem)
-
-        return workItem
+        return _dispatchWorkItem(queue:    queue,
+                                 group:    group,
+                                 funcCall: {
+                                     try self.loopBack()
+                                 },
+                                 failure:  failure)
     }
 }
 
