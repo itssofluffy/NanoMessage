@@ -134,6 +134,28 @@ extension ProtocolSocket where Self: Sender {
 }
 
 extension ProtocolSocket where Self: Sender & ASyncSender {
+    /// Asynchrounous execute a passed sender closure.
+    ///
+    /// - Parameters:
+    ///   - funcCall: The closure to use to perform the send
+    ///   - success:  The closure to use when `funcCall` is succesful.
+    ///   - failure:  The closure to use when `funcCall` fails.
+    private func _asyncSend(funcCall: @escaping () throws -> Int,
+                            success:  @escaping (Int) -> Void,
+                            failure:  @escaping (Error) -> Void) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
+            do {
+                try self._nanoSocket.mutex.lock {
+                    let bytesSent = try funcCall()
+
+                    success(bytesSent)
+                }
+            } catch {
+                failure(error)
+            }
+        }
+    }
+
     /// Asynchronous send a message.
     ///
     /// - Parameters:
@@ -147,17 +169,11 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (Int) -> Void,
                             failure:      @escaping (Error) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let bytesSent = try self.sendMessage(message, blockingMode: blockingMode)
-
-                    success(bytesSent)
-                }
-            } catch {
-                failure(error)
-            }
-        }
+        _asyncSend(funcCall: {
+                       return try self.sendMessage(message, blockingMode: blockingMode)
+                   },
+                   success:  success,
+                   failure:  failure)
     }
 
     /// Asynchronous send a message.
@@ -172,17 +188,11 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
                             timeout:   TimeInterval,
                             success:   @escaping (Int) -> Void,
                             failure:   @escaping (Error) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let bytesSent = try self.sendMessage(message, timeout: timeout)
-
-                    success(bytesSent)
-                }
-            } catch {
-                failure(error)
-            }
-        }
+        _asyncSend(funcCall: {
+                       return try self.sendMessage(message, timeout: timeout)
+                   },
+                   success:  success,
+                   failure:  failure)
     }
 
     /// Asynchronous send a message.
@@ -196,17 +206,11 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
                             timeout:   Timeout,
                             success:   @escaping (Int) -> Void,
                             failure:   @escaping (Error) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let bytesSent = try self.sendMessage(message, timeout: timeout)
-
-                    success(bytesSent)
-                }
-            } catch {
-                failure(error)
-            }
-        }
+        _asyncSend(funcCall: {
+                       return try self.sendMessage(message, timeout: timeout)
+                   },
+                   success:  success,
+                   failure:  failure)
     }
 }
 
@@ -305,6 +309,28 @@ extension ProtocolSocket where Self: Receiver {
 }
 
 extension ProtocolSocket where Self: Receiver & ASyncReceiver {
+    /// Asynchrounous execute a passed receiver closure.
+    ///
+    /// - Parameters:
+    ///   - funcCall: The closure to use to perform the receive
+    ///   - success:  The closure to use when `funcCall` is succesful.
+    ///   - failure:  The closure to use when `funcCall` fails.
+    private func _asyncReceive(funcCall: @escaping () throws -> ReceiveMessage,
+                               success:  @escaping (ReceiveMessage) -> Void,
+                               failure:  @escaping (Error) -> Void) {
+        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
+            do {
+                try self._nanoSocket.mutex.lock {
+                    let received = try funcCall()
+
+                    success(received)
+                }
+            } catch {
+                failure(error)
+            }
+        }
+    }
+
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
@@ -316,17 +342,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking,
                                success:      @escaping (ReceiveMessage) -> Void,
                                failure:      @escaping (Error) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let received = try self.receiveMessage(blockingMode: blockingMode)
-
-                    success(received)
-                }
-            } catch {
-                failure(error)
-            }
-        }
+        _asyncReceive(funcCall: {
+                          return try self.receiveMessage(blockingMode: blockingMode)
+                      },
+                      success:  success,
+                      failure:  failure)
     }
 
     /// Asynchronous receive a message.
@@ -339,17 +359,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     public func receiveMessage(timeout: TimeInterval,
                                success: @escaping (ReceiveMessage) -> Void,
                                failure: @escaping (Error) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let received = try self.receiveMessage(timeout: timeout)
-
-                    success(received)
-                }
-            } catch {
-                failure(error)
-            }
-        }
+        _asyncReceive(funcCall: {
+                          return try self.receiveMessage(timeout: timeout)
+                      },
+                      success:  success,
+                      failure:  failure)
     }
 
     /// Asynchronous receive a message.
@@ -361,17 +375,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     public func receiveMessage(timeout: Timeout,
                                success: @escaping (ReceiveMessage) -> Void,
                                failure: @escaping (Error) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let received = try self.receiveMessage(timeout: timeout)
-
-                    success(received)
-                }
-            } catch {
-                failure(error)
-            }
-        }
+        _asyncReceive(funcCall: {
+                          return try self.receiveMessage(timeout: timeout)
+                      },
+                      success:  success,
+                      failure:  failure)
     }
 }
 
