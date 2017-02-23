@@ -227,14 +227,14 @@ extension SubscriberSocket {
     @discardableResult
     public func subscribeTo(topic: Topic) throws -> Bool {
         /// Check topic length against (any) existing topics is see if it is of equal length.
-        func _validTopicLengths(_ topic: Topic) -> Bool {
-            let topics = _validateTopicLengths()
+        let validTopicLengths = { () -> Bool in
+            let topics = self._validateTopicLengths()
 
             if (!topics.equalLengths) {
                 return false
             } else if (topics.count < 0) {
                 return true
-            } else if (topic.count != topics.count) {
+            } else if (topics.count != topic.count) {
                 return false
             }
 
@@ -247,7 +247,7 @@ extension SubscriberSocket {
             if (!topicSubscribed) {
                 if (subscribedToAllTopics) {
                     try unsubscribeFromAllTopics()
-                } else if (ignoreTopicSeperator && !_validTopicLengths(topic)) {
+                } else if (ignoreTopicSeperator && !validTopicLengths()) {
                     throw NanoMessageError.InvalidTopic
                 }
 

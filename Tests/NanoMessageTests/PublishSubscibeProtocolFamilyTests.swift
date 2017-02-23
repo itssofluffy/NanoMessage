@@ -82,7 +82,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             bytesSent = try node0.sendMessage(payload)
             XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
 
-            try node1.setReceiveTimeout(seconds: .Never)
+            try node1.setReceiveTimeout(seconds: -1)
 
             do {
                 node1Received = try node1.receiveMessage(timeout: TimeInterval(seconds: 0.5))

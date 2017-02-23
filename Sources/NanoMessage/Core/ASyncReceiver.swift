@@ -31,7 +31,4 @@ public protocol ASyncReceiver {
     func receiveMessage(timeout:      TimeInterval,
                         success:      @escaping (ReceiveMessage) -> Void,
                         failure:      @escaping (Error) -> Void)
-    func receiveMessage(timeout:      Timeout,
-                        success:      @escaping (ReceiveMessage) -> Void,
-                        failure:      @escaping (Error) -> Void)
 }

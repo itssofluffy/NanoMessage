@@ -29,8 +29,6 @@ public protocol Sender {
     func sendMessage(_ message: Message, blockingMode: BlockingMode) throws -> Int
     @discardableResult
     func sendMessage(_ message: Message, timeout: TimeInterval) throws -> Int
-    @discardableResult
-    func sendMessage(_ message: Message, timeout: Timeout) throws -> Int
     // socket option functions.
     func getSendBufferSize() throws -> UInt
     @discardableResult
@@ -38,8 +36,6 @@ public protocol Sender {
     func getSendTimeout() throws -> TimeInterval
     @discardableResult
     func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval
-    @discardableResult
-    func setSendTimeout(seconds: Timeout) throws -> TimeInterval
     func getSendPriority() throws -> Priority
     @discardableResult
     func setSendPriority(_ priority: Priority) throws -> Priority

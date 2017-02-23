@@ -33,8 +33,4 @@ public protocol ASyncSender {
                      timeout:      TimeInterval,
                      success:      @escaping (Int) -> Void,
                      failure:      @escaping (Error) -> Void)
-    func sendMessage(_ message:    Message,
-                     timeout:      Timeout,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
 }

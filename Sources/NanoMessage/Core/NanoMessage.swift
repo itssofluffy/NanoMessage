@@ -48,21 +48,21 @@ public func terminate() {
 private var _nanomsgSymbol = Dictionary<String, CInt>()
 /// A dictionary of nanomsg symbol names and values.
 public var nanomsgSymbol: Dictionary<String, CInt> {
-    func _getSymbol(_ index: CInt) -> (name: String, value: CInt)? {
-        var value: CInt = 0
-
-        if let symbolName = nn_symbol(index, &value) {
-            return (name: String(cString: symbolName), value: value)
-        }
-
-        return nil
-    }
-
     if (_nanomsgSymbol.isEmpty) {
         var index: CInt = 0
 
+        let getSymbol = { () -> (name: String, value: CInt)? in
+            var value: CInt = 0
+
+            if let symbolName = nn_symbol(index, &value) {
+                return (name: String(cString: symbolName), value: value)
+            }
+
+            return nil
+        }
+
         while (true) {
-            if let symbol = _getSymbol(index) {
+            if let symbol = getSymbol() {
                 _nanomsgSymbol[symbol.name] = symbol.value
             } else {
                 break     // no more symbols

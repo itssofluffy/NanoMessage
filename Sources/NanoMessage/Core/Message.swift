@@ -60,12 +60,6 @@ extension Message {
     }
 }
 
-extension Message: Hashable {
-    public var hashValue: Int {
-        return fnv1a(data)
-    }
-}
-
 extension Message: Comparable {
     public static func <(lhs: Message, rhs: Message) -> Bool {
         return (compare(lhs: lhs.data, rhs: rhs.data) == .LessThan)

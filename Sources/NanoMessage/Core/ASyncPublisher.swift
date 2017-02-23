@@ -33,8 +33,4 @@ public protocol ASyncPublisher {
                      timeout:      TimeInterval,
                      success:      @escaping (Int) -> Void,
                      failure:      @escaping (Error) -> Void)
-    func sendMessage(payload:      PublisherMessage,
-                     timeout:      Timeout,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
 }

@@ -27,7 +27,6 @@ public protocol Receiver: ASyncReceiver {
     // Input functions.
     func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveMessage
     func receiveMessage(timeout: TimeInterval) throws -> ReceiveMessage
-    func receiveMessage(timeout: Timeout) throws -> ReceiveMessage
     // socket option functions.
     func getReceiveBufferSize() throws -> UInt
     @discardableResult
@@ -38,8 +37,6 @@ public protocol Receiver: ASyncReceiver {
     func getReceiveTimeout() throws -> TimeInterval
     @discardableResult
     func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
-    @discardableResult
-    func setReceiveTimeout(seconds: Timeout) throws -> TimeInterval
     func getReceivePriority() throws -> Priority
     @discardableResult
     func setReceivePriority(_ priority: Priority) throws -> Priority
