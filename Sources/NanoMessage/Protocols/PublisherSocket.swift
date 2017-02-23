@@ -187,7 +187,7 @@ extension PublisherSocket {
                             failure:      @escaping (Error) -> Void) {
         _asyncSend(payload:  payload,
                    funcCall: { message in
-                       return try self.sendMessage(message, blockingMode: blockingMode)
+                       return try self.sendMessage(message)
                    },
                    success:  success,
                    failure:  failure)

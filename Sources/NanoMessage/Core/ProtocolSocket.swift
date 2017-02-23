@@ -88,7 +88,7 @@ extension ProtocolSocket where Self: Sender {
             }
         }
 
-        return try sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
+        return try sendMessage(message)   // chain down the sendMessage signature stack
     }
 }
 
@@ -129,7 +129,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
                             success:      @escaping (Int) -> Void,
                             failure:      @escaping (Error) -> Void) {
         _asyncSend(funcCall: {
-                       return try self.sendMessage(message, blockingMode: blockingMode)
+                       return try self.sendMessage(message)
                    },
                    success:  success,
                    failure:  failure)
@@ -203,7 +203,7 @@ extension ProtocolSocket where Self: Receiver {
             }
         }
 
-        return try receiveMessage(blockingMode: .Blocking)    // chain down the receiveMessage signature stock.
+        return try receiveMessage()    // chain down the receiveMessage signature stock.
     }
 }
 
@@ -242,7 +242,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
                                success:      @escaping (ReceiveMessage) -> Void,
                                failure:      @escaping (Error) -> Void) {
         _asyncReceive(funcCall: {
-                          return try self.receiveMessage(blockingMode: blockingMode)
+                          return try self.receiveMessage()
                       },
                       success:  success,
                       failure:  failure)
