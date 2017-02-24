@@ -93,54 +93,48 @@ extension SubscriberSocket {
     ///
     /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveMessage {
-        /// Does the message/payload contain the specified topic
-        func _messageHasTopic(_ topic: Topic, _ message: Message) -> Bool {
-            if (((ignoreTopicSeperator) ? topic.count : topic.data.count + 1) <= message.count) {
-                if (C7.Data(message.data[0 ..< topic.count]) != topic.data) {
-                    return false
-                } else if (ignoreTopicSeperator || message.data[topic.count] == topicSeperator) {
-                    return true
-                }
-            }
-
-            return false
-        }
-
-        /// Get the topic from the message/payload if it exists using the topic seperator.
-        func _getTopicFromMessage(_ message: Message) -> Topic {
-            if let index = message.data.index(of: topicSeperator) {
-                return Topic(value: C7.Data(message.data[0 ..< index]))
-            }
-
-            return Topic(value: message.data)
-        }
-
         receivedTopic = Topic()
 
         var received = try receivePayloadFromSocket(self, blockingMode)
 
-        if (received.bytes > 0) {                                               // we have a message to process...
-            if (!subscribedToAllTopics || ignoreTopicSeperator) {               // determine how to extract the topic.
+        if (received.bytes > 0) {                                   // we have a message to process...
+            if (!subscribedToAllTopics || ignoreTopicSeperator) {   // determine how to extract the topic.
                 for topic in subscribedTopics {
-                    if (_messageHasTopic(topic, received.message)) {
+                    if ( { () -> Bool in                            // Does the message/payload contain the specified topic
+                             if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= received.message.count) {
+                                 if (C7.Data(received.message.data[0 ..< topic.count]) != topic.data) {
+                                     return false
+                                 } else if (self.ignoreTopicSeperator || received.message.data[topic.count] == self.topicSeperator) {
+                                     return true
+                                 }
+                             }
+
+                             return false
+                         }()) {
                         receivedTopic = topic
 
                         break
                     }
                 }
             } else {
-                let topic = _getTopicFromMessage(received.message)
+                let topic = { () -> Topic in                        // Get the topic from the message/payload if it exists using the topic seperator.
+                    if let index = received.message.data.index(of: self.topicSeperator) {
+                        return Topic(value: C7.Data(received.message.data[0 ..< index]))
+                    }
+
+                    return Topic(value: received.message.data)
+                }()
 
                 if (topic.data != received.message.data) {
                     receivedTopic = topic
                 }
             }
 
-            if (receivedTopic.isEmpty) {                                        // check we've extracted a topic
+            if (receivedTopic.isEmpty) {                            // check we've extracted a topic
                 throw NanoMessageError.NoTopic
             }
 
-            if (removeTopicFromMessage) {                                       // are we removing the topic from the message/payload...
+            if (removeTopicFromMessage) {                           // are we removing the topic from the message/payload...
                 var offset = receivedTopic.count
                 if (subscribedToAllTopics || !ignoreTopicSeperator) {
                     offset += 1
@@ -226,28 +220,26 @@ extension SubscriberSocket {
     /// - Returns: If we managed to subscribed to the topic.
     @discardableResult
     public func subscribeTo(topic: Topic) throws -> Bool {
-        /// Check topic length against (any) existing topics is see if it is of equal length.
-        let validTopicLengths = { () -> Bool in
-            let topics = self._validateTopicLengths()
-
-            if (!topics.equalLengths) {
-                return false
-            } else if (topics.count < 0) {
-                return true
-            } else if (topics.count != topic.count) {
-                return false
-            }
-
-            return true
-        }
-
         if (!topic.isEmpty) {
             let topicSubscribed = isTopicSubscribed(topic)
 
             if (!topicSubscribed) {
                 if (subscribedToAllTopics) {
                     try unsubscribeFromAllTopics()
-                } else if (ignoreTopicSeperator && !validTopicLengths()) {
+                } else if (ignoreTopicSeperator &&
+                           !{ () -> Bool in   // Check topic length against (any) existing topics is see if it is of equal length.
+                                let topics = self._validateTopicLengths()
+
+                                if (!topics.equalLengths) {
+                                    return false
+                                } else if (topics.count < 0) {
+                                    return true
+                                } else if (topics.count != topic.count) {
+                                    return false
+                                }
+
+                                return true
+                            }()) {
                     throw NanoMessageError.InvalidTopic
                 }
 

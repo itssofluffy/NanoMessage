@@ -51,18 +51,16 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
     if (_nanomsgSymbol.isEmpty) {
         var index: CInt = 0
 
-        let getSymbol = { () -> (name: String, value: CInt)? in
-            var value: CInt = 0
-
-            if let symbolName = nn_symbol(index, &value) {
-                return (name: String(cString: symbolName), value: value)
-            }
-
-            return nil
-        }
-
         while (true) {
-            if let symbol = getSymbol() {
+            if let symbol = { () -> (name: String, value: CInt)? in
+                                var value: CInt = 0
+
+                                if let symbolName = nn_symbol(index, &value) {
+                                    return (name: String(cString: symbolName), value: value)
+                                }
+
+                                return nil
+                            }() {
                 _nanomsgSymbol[symbol.name] = symbol.value
             } else {
                 break     // no more symbols
