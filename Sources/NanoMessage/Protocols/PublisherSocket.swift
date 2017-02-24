@@ -111,21 +111,21 @@ extension PublisherSocket {
     /// - Returns: The number of bytes sent.
     @discardableResult
     public func sendMessage(_ message: Message, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        let payload = { () throws -> C7.Data in
-            if (self.prependTopic) {                          // we are prepending the topic to the start of the message.
-                try self._validateTopic(self.sendTopic)       // check that we have a valid topic to send.
+        let bytesSent = try sendPayloadToSocket(self,
+                                                { () throws -> C7.Data in
+                                                    if (self.prependTopic) {                    // we are prepending the topic to the start of the message.
+                                                        try self._validateTopic(self.sendTopic) // check that we have a valid topic to send.
 
-                if (self.ignoreTopicSeperator) {              // check if we are ignoring the topic seperator.
-                    return self.sendTopic.data + message.data
-                } else {
-                    return self.sendTopic.data + [self.topicSeperator] + message.data
-                }
-            }
+                                                        if (self.ignoreTopicSeperator) {        // check if we are ignoring the topic seperator.
+                                                            return self.sendTopic.data + message.data
+                                                        } else {
+                                                            return self.sendTopic.data + [self.topicSeperator] + message.data
+                                                        }
+                                                    }
 
-            return message.data
-        }
-
-        let bytesSent = try sendPayloadToSocket(self, payload(), blockingMode)
+                                                    return message.data
+                                                }(),
+                                                blockingMode)
 
         if (!sendTopic.isEmpty) {                             // check that we have a send topic.
             // remember which topics we've sent and how many.
