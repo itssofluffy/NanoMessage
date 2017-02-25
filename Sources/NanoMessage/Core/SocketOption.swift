@@ -312,7 +312,9 @@ internal func getSocketOption(_ nanoSocket: NanoSocket,
 internal func getSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ level:      CInt = NN_SOL_SOCKET) throws -> TimeInterval {
-    let timeInterval = TimeInterval(milliseconds: try getSocketOption(nanoSocket, option, level))
+    let milliseconds: Int = try getSocketOption(nanoSocket, option, level)
+
+    let timeInterval = TimeInterval(milliseconds: milliseconds)
 
     guard (timeInterval >= 0) else {
         return TimeInterval(seconds: -1)
@@ -334,7 +336,9 @@ internal func getSocketOption(_ nanoSocket: NanoSocket,
 internal func getSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ level:      CInt = NN_SOL_SOCKET) throws -> Priority {
-    return Priority(level: try getSocketOption(nanoSocket, option, level))
+    let returnValue: Int = try getSocketOption(nanoSocket, option, level)
+
+    return Priority(level: returnValue)
 }
 
 /// Get socket option.
@@ -556,11 +560,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ optval:     TimeInterval,
                               _ level:      CInt = NN_SOL_SOCKET) throws {
-    if (optval < 0) {
-        try setSocketOption(nanoSocket, option, CInt(-1), level)
-    } else {
-        try setSocketOption(nanoSocket, option, optval.milliseconds, level)
-    }
+    try setSocketOption(nanoSocket, option, CInt((optval < 0) ? -1 : optval.milliseconds), level)
 }
 
 /// Set socket option.

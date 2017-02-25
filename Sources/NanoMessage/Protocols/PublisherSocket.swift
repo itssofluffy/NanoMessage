@@ -118,9 +118,9 @@ extension PublisherSocket {
 
                                                         if (self.ignoreTopicSeperator) {        // check if we are ignoring the topic seperator.
                                                             return self.sendTopic.data + message.data
-                                                        } else {
-                                                            return self.sendTopic.data + [self.topicSeperator] + message.data
                                                         }
+
+                                                        return self.sendTopic.data + [self.topicSeperator] + message.data
                                                     }
 
                                                     return message.data
