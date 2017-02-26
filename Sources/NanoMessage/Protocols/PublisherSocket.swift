@@ -155,23 +155,22 @@ extension PublisherSocket {
     ///   - payload:  A PublisherMessage to send.
     ///   - funcCall: The closure to use to perform the send
     ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - failure:  The closure to use when `funcCall` fails.
     private func _asyncSend(payload:  PublisherMessage,
                             funcCall: @escaping (Message) throws -> Int,
-                            success:  @escaping (Int) -> Void,
-                            failure:  @escaping (Error) -> Void) {
+                            success:  @escaping (Int) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    try self.setSendTopic(payload.topic)
+            doCatchWrapper(funcCall: { () -> Void in
+                               try self._nanoSocket.mutex.lock {
+                                   try self.setSendTopic(payload.topic)
 
-                    let bytesSent = try funcCall(payload.message)
+                                   let bytesSent = try funcCall(payload.message)
 
-                    success(bytesSent)
-                }
-            } catch {
-                failure(error)
-            }
+                                   success(bytesSent)
+                               }
+                           },
+                           failed:   { failure in
+                               nanoMessageLogger(failure)
+                           })
         }
     }
 
@@ -183,17 +182,14 @@ extension PublisherSocket {
     ///                   If the message cannot be sent straight away, the closureHandler
     ///                   will be passed `NanoMessageError.MessageNotSent`
     ///   - success:      The closure to use when the async functionality completes succesfully.
-    ///   - failure:      The closure to use when the async functionality fails.
     public func sendMessage(payload:      PublisherMessage,
                             blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (Int) -> Void,
-                            failure:      @escaping (Error) -> Void) {
+                            success:      @escaping (Int) -> Void) {
         _asyncSend(payload:  payload,
                    funcCall: { message in
-                       return try self.sendMessage(message)
+                       return try self.sendMessage(message, blockingMode: blockingMode)
                    },
-                   success:  success,
-                   failure:  failure)
+                   success:  success)
     }
 
     /// Asynchronous send a message.
@@ -202,17 +198,14 @@ extension PublisherSocket {
     ///   - payload: The topic and message to send.
     ///   - timeout: The timeout interval to set.
     ///   - success: The closure to use when the async functionality completes succesfully.
-    ///   - failure: The closure to use when the async functionality fails.
     public func sendMessage(payload: PublisherMessage,
                             timeout: TimeInterval,
-                            success: @escaping (Int) -> Void,
-                            failure: @escaping (Error) -> Void) {
+                            success: @escaping (Int) -> Void) {
         _asyncSend(payload:  payload,
                    funcCall: { message in
                        return try self.sendMessage(message, timeout: timeout)
                    },
-                   success:  success,
-                   failure:  failure)
+                   success:  success)
     }
 }
 

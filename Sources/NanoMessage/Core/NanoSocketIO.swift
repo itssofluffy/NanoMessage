@@ -22,6 +22,8 @@
 
 import C7
 import CNanoMessage
+import ISFLibrary
+import Foundation
 
 private let NN_MSG: size_t = -1
 
@@ -41,7 +43,7 @@ private let NN_MSG: size_t = -1
 ///
 /// - Returns: The number of bytes sent.
 internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
-                                  _ payload:      Data,
+                                  _ payload:      C7.Data,
                                   _ blockingMode: BlockingMode) throws -> Int {
     guard (!nanoSocket.socketIsADevice) else {
         throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
@@ -55,7 +57,13 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotSent
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.SendTimedOut(timeout: try! getSocketOption(nanoSocket, .SendTimeout))
+            let timeout = doCatchWrapper(funcCall: { () -> TimeInterval in
+                                             try getSocketOption(nanoSocket, .SendTimeout)
+                                         },
+                                         failed:   { failure in
+                                             nanoMessageLogger(failure)
+                                         })
+            throw NanoMessageError.SendTimedOut(timeout: timeout!)
         }
 
         throw NanoMessageError.SendMessage(code: errno)
@@ -94,7 +102,13 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotAvailable
         } else if (errno == ETIMEDOUT) {
-            throw NanoMessageError.ReceiveTimedOut(timeout: try! getSocketOption(nanoSocket, .ReceiveTimeout))
+            let timeout = doCatchWrapper(funcCall: { () -> TimeInterval in
+                                             try getSocketOption(nanoSocket, .ReceiveTimeout)
+                                         },
+                                         failed:   { failure in
+                                             nanoMessageLogger(failure)
+                                         })
+            throw NanoMessageError.ReceiveTimedOut(timeout: timeout!)
         }
 
         throw NanoMessageError.ReceiveMessage(code: errno)

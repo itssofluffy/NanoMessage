@@ -30,7 +30,12 @@ public struct Message {
         return data.bytes
     }
     public var string: String {
-        return try! String(data: data)
+        return doCatchWrapper(funcCall: {
+                                  return try String(data: self.data)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })!
     }
 
     public init() {

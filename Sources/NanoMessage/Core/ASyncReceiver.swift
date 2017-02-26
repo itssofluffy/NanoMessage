@@ -26,9 +26,7 @@ import Foundation
 public protocol ASyncReceiver {
     // ASync Input functions.
     func receiveMessage(blockingMode: BlockingMode,
-                        success:      @escaping (ReceiveMessage) -> Void,
-                        failure:      @escaping (Error) -> Void)
+                        success:      @escaping (ReceiveMessage) -> Void)
     func receiveMessage(timeout:      TimeInterval,
-                        success:      @escaping (ReceiveMessage) -> Void,
-                        failure:      @escaping (Error) -> Void)
+                        success:      @escaping (ReceiveMessage) -> Void)
 }

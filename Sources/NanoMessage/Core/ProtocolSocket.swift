@@ -80,11 +80,12 @@ extension ProtocolSocket where Self: Sender {
 
         defer {
             if (originalTimeout != timeout) {
-                do {
-                    try setSendTimeout(seconds: originalTimeout)
-                } catch {
-                    print(error, to: &errorStream)
-                }
+                doCatchWrapper(funcCall: { () -> Void in
+                                   try self.setSendTimeout(seconds: originalTimeout)
+                               },
+                               failed:   { failure in
+                                   nanoMessageLogger(failure)
+                               })
             }
         }
 
@@ -98,20 +99,19 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// - Parameters:
     ///   - funcCall: The closure to use to perform the send
     ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - failure:  The closure to use when `funcCall` fails.
     private func _asyncSend(funcCall: @escaping () throws -> Int,
-                            success:  @escaping (Int) -> Void,
-                            failure:  @escaping (Error) -> Void) {
+                            success:  @escaping (Int) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let bytesSent = try funcCall()
+            doCatchWrapper(funcCall: { () -> Void in
+                               try self._nanoSocket.mutex.lock {
+                                   let bytesSent = try funcCall()
 
-                    success(bytesSent)
-                }
-            } catch {
-                failure(error)
-            }
+                                   success(bytesSent)
+                               }
+                           },
+                           failed:   { failure in
+                               nanoMessageLogger(failure)
+                           })
         }
     }
 
@@ -123,16 +123,13 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///                   If the message cannot be sent straight away, the closureHandler
     ///                   will be passed `NanoMessageError.MessageNotSent`
     ///   - success:      The closure to use when the async functionallity is succesful.
-    ///   - failure:      The closure to use when the async functionallity fails.
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (Int) -> Void,
-                            failure:      @escaping (Error) -> Void) {
+                            success:      @escaping (Int) -> Void) {
         _asyncSend(funcCall: {
-                       return try self.sendMessage(message)
+                       return try self.sendMessage(message, blockingMode: blockingMode)
                    },
-                   success:  success,
-                   failure:  failure)
+                   success:  success)
     }
 
     /// Asynchronous send a message.
@@ -142,16 +139,13 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
     ///              If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
     ///   - success: The closure to use when the async functionallity is succesful.
-    ///   - failure: The closure to use when the async functionallity fails.
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
-                            success:   @escaping (Int) -> Void,
-                            failure:   @escaping (Error) -> Void) {
+                            success:   @escaping (Int) -> Void) {
         _asyncSend(funcCall: {
                        return try self.sendMessage(message, timeout: timeout)
                    },
-                   success:  success,
-                   failure:  failure)
+                   success:  success)
     }
 }
 
@@ -195,11 +189,12 @@ extension ProtocolSocket where Self: Receiver {
 
         defer {
             if (originalTimeout != timeout) {
-                do {
-                    try setReceiveTimeout(seconds: originalTimeout)
-                } catch {
-                    print(error, to: &errorStream)
-                }
+                doCatchWrapper(funcCall: { () -> Void in
+                                   try self.setReceiveTimeout(seconds: originalTimeout)
+                               },
+                               failed:   { failure in
+                                   nanoMessageLogger(failure)
+                               })
             }
         }
 
@@ -213,20 +208,19 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// - Parameters:
     ///   - funcCall: The closure to use to perform the receive
     ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - failure:  The closure to use when `funcCall` fails.
     private func _asyncReceive(funcCall: @escaping () throws -> ReceiveMessage,
-                               success:  @escaping (ReceiveMessage) -> Void,
-                               failure:  @escaping (Error) -> Void) {
+                               success:  @escaping (ReceiveMessage) -> Void) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            do {
-                try self._nanoSocket.mutex.lock {
-                    let received = try funcCall()
+            doCatchWrapper(funcCall: { () -> Void in
+                               try self._nanoSocket.mutex.lock {
+                                   let received = try funcCall()
 
-                    success(received)
-                }
-            } catch {
-                failure(error)
-            }
+                                   success(received)
+                               }
+                           },
+                           failed:   { failure in
+                               nanoMessageLogger(failure)
+                           })
         }
     }
 
@@ -237,15 +231,12 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///                   if in non-blocking mode and there is no message to receive the closureHandler
     ///                   will be passed `NanoMessageError.MessageNotReceived`.
     ///   - success:      The closure to use when the async functionallity is succesful.
-    ///   - failure:      The closure to use when the async functionallity fails.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking,
-                               success:      @escaping (ReceiveMessage) -> Void,
-                               failure:      @escaping (Error) -> Void) {
+                               success:      @escaping (ReceiveMessage) -> Void) {
         _asyncReceive(funcCall: {
-                          return try self.receiveMessage()
+                          return try self.receiveMessage(blockingMode: blockingMode)
                       },
-                      success:  success,
-                      failure:  failure)
+                      success:  success)
     }
 
     /// Asynchronous receive a message.
@@ -254,15 +245,12 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
     ///              If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
     ///   - success: The closure to use when the async functionallity is succesful.
-    ///   - failure: The closure to use when the async functionallity fails.
     public func receiveMessage(timeout: TimeInterval,
-                               success: @escaping (ReceiveMessage) -> Void,
-                               failure: @escaping (Error) -> Void) {
+                               success: @escaping (ReceiveMessage) -> Void) {
         _asyncReceive(funcCall: {
                           return try self.receiveMessage(timeout: timeout)
                       },
-                      success:  success,
-                      failure:  failure)
+                      success:  success)
     }
 }
 

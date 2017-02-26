@@ -59,8 +59,13 @@ public class NanoSocket {
     fileprivate var _closeDelay: TimeInterval {
         var delay = TimeInterval(milliseconds: 1000)
 
-        if let linger = try? getLinger() {
-            if (linger > 0) {                               // account for infinate linger timeout.
+        if let linger = doCatchWrapper(funcCall: {
+                                           try self.getLinger()
+                                       },
+                                       failed:   { failure in
+                                           nanoMessageLogger(failure)
+                                       }) {
+            if (linger.milliseconds > 0) {              // account for infinate linger timeout.
                 delay = linger
             }
         }
@@ -150,28 +155,27 @@ public class NanoSocket {
         var terminateLoop = true                        // are we going to terminate the `repeat` loop below.
 
         repeat {
-            do {
-                try _attemptClosure(funcCall: {
-                                        return nn_close(fileDescriptor)
-                                    },
-                                    failure:  { errno in
-                                        return .Close(code: errno)
-                                    })
-            } catch NanoMessageError.Interrupted {
-                let dynamicType = type(of: self)
+            doCatchWrapper(funcCall: { () -> Void in
+                               try self._attemptClosure(funcCall: {
+                                                            return nn_close(self.fileDescriptor)
+                                                        },
+                                                        failure:  { errno in
+                                                            return .Close(code: errno)
+                                                        })
+                           },
+                           failed:   { failure in
+                               switch failure.error {
+                                   case NanoMessageError.Interrupted:
+                                       nanoMessageLogger(failure)
 
-                print("\(dynamicType).\(#function) failed: \(NanoMessageError.Interrupted))", to: &errorStream)
-
-                if (blockTillCloseSuccess) {
-                    terminateLoop = false
-                }
-            } catch let error as NanoMessageError {
-                print(error, to: &errorStream)
-                terminateLoop = true
-            } catch {
-                print("an unexpected error '\(error)' has occured in the library libNanoMessage.", to: &errorStream)
-                terminateLoop = true
-            }
+                                       if (self.blockTillCloseSuccess) {
+                                           terminateLoop = false
+                                       }
+                                   default:
+                                       nanoMessageLogger(failure)
+                                       terminateLoop = true
+                               }
+                           })
         } while (!terminateLoop)
     }
 }
@@ -238,19 +242,18 @@ extension NanoSocket {
     ///   - queue:    The dispatch queue to use
     ///   - group:    The dispatch group to use.
     ///   - funcCall: The closure to call.
-    ///   - failure:  The closure to use if the 'funcCall' fails.
     ///
     /// - Returns:    The despatched work item.
     private func _dispatchWorkItem(queue:    DispatchQueue,
                                    group:    DispatchGroup,
-                                   funcCall: @escaping () throws -> Void,
-                                   failure:  @escaping (Error) -> Void) -> DispatchWorkItem {
+                                   funcCall: @escaping () throws -> Void) -> DispatchWorkItem {
         let workItem = DispatchWorkItem {
-            do {
-                try funcCall()
-            } catch {
-                failure(error)
-            }
+            doCatchWrapper(funcCall: {
+                               try funcCall()
+                           },
+                           failed:   { failure in
+                               nanoMessageLogger(failure)
+                           })
         }
 
         queue.async(group: group, execute: workItem)
@@ -463,7 +466,12 @@ extension NanoSocket {
             let errno = nn_errno()
             var nanoSocketName = String(nanoSocket.fileDescriptor)
 
-            if let socketName = try? nanoSocket.getSocketName() {
+            if let socketName = doCatchWrapper(funcCall: {
+                                                   try nanoSocket.getSocketName()
+                                               },
+                                               failed:   { failure in
+                                                   nanoMessageLogger(failure)
+                                               }) {
                 nanoSocketName = socketName
             }
 
@@ -477,19 +485,16 @@ extension NanoSocket {
     ///   - nanoSocket: The socket to bind too.
     ///   - queue:      The dispatch queue to use
     ///   - group:      The dispatch group to use.
-    ///   - failure:    The closure to use if the 'bindToSocket()' fails.
     ///
     /// - Returns:          The despatched work item.
     public func bindToSocket(_ nanoSocket: NanoSocket,
                              queue:        DispatchQueue,
-                             group:        DispatchGroup,
-                             failure:      @escaping (Error) -> Void) -> DispatchWorkItem {
+                             group:        DispatchGroup) -> DispatchWorkItem {
         return _dispatchWorkItem(queue:    queue,
                                  group:    group,
                                  funcCall: {
                                      try self.bindToSocket(nanoSocket)
-                                 },
-                                 failure:  failure)
+                                 })
     }
 
     /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
@@ -522,15 +527,12 @@ extension NanoSocket {
     ///   - failure: The closure to use if the 'loopBack()' fails.
     ///
     /// - Returns:          The despatched work item.
-    public func loopBack(queue:   DispatchQueue,
-                         group:   DispatchGroup,
-                         failure: @escaping (Error) -> Void) -> DispatchWorkItem {
+    public func loopBack(queue: DispatchQueue, group: DispatchGroup) -> DispatchWorkItem {
         return _dispatchWorkItem(queue:    queue,
                                  group:    group,
                                  funcCall: {
                                      try self.loopBack()
-                                 },
-                                 failure:  failure)
+                                 })
     }
 }
 

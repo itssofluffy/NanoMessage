@@ -29,7 +29,6 @@ import Mutex
 
 class MessageSpeedTests: XCTestCase {
     var asyncErrorMutex: Mutex = try! Mutex()
-    var asyncError: Error?
     var asyncMessagesSent: UInt64 = 0
     var asyncMessagesReceived: UInt64 = 0
     var asyncBytesSent: UInt64 = 0
@@ -38,14 +37,6 @@ class MessageSpeedTests: XCTestCase {
     enum ReceiveType {
         case Serial
         case Asynchronously
-    }
-
-    func setError(_ error: Error) {
-        try! asyncErrorMutex.tryLock {
-            if (asyncError == nil) {
-               asyncError = error
-            }
-        }
     }
 
     func testMessageSpeed(receiveType: ReceiveType, connectAddress: String, bindAddress: String = "") {
@@ -61,7 +52,6 @@ class MessageSpeedTests: XCTestCase {
 
         var completed = false
 
-        asyncError = nil
         asyncMessagesSent = 0
         asyncMessagesReceived = 0
         asyncBytesSent = 0
@@ -92,37 +82,19 @@ class MessageSpeedTests: XCTestCase {
                     case .Asynchronously:
                         node0.sendMessage(messagePayload,
                                           success: { bytesSent in
-                                              if (self.asyncError == nil) {
-                                                  self.asyncMessagesSent += 1
-                                                  self.asyncBytesSent += UInt64(bytesSent)
-                                              }
-                                          },
-                                          failure: { error in
-                                              self.setError(error)
+                                              self.asyncMessagesSent += 1
+                                              self.asyncBytesSent += UInt64(bytesSent)
                                           })
                         node1.receiveMessage(success: { received in
-                                                 if (self.asyncError == nil) {
-                                                     self.asyncMessagesReceived += 1
-                                                     self.asyncBytesReceived += UInt64(received.bytes)
-                                                 }
-                                             },
-                                             failure: { error in
-                                                 self.setError(error)
+                                                 self.asyncMessagesReceived += 1
+                                                 self.asyncBytesReceived += UInt64(received.bytes)
                                              })
-                }
-
-                if let error = asyncError {
-                    throw error
                 }
             }
 
             if (receiveType == .Asynchronously) {
                 node0.aioGroup.wait()
                 node1.aioGroup.wait()
-            }
-
-            if let error = asyncError {
-                throw error
             }
 
             let messagesSent = try node0.getMessagesSent()

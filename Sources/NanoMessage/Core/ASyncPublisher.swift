@@ -27,10 +27,8 @@ public protocol ASyncPublisher {
     // ASync Output functions.
     func sendMessage(payload:      PublisherMessage,
                      blockingMode: BlockingMode,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
+                     success:      @escaping (Int) -> Void)
     func sendMessage(payload:      PublisherMessage,
                      timeout:      TimeInterval,
-                     success:      @escaping (Int) -> Void,
-                     failure:      @escaping (Error) -> Void)
+                     success:      @escaping (Int) -> Void)
 }
