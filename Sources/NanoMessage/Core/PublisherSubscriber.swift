@@ -24,5 +24,8 @@ import C7
 
 /// PublisherSocket/SubscriberSocket protocol.
 public protocol PublisherSubscriber {
+    var topicCounts: Bool { get set }
     var topicSeperator: Byte { get set }
+
+    func resetTopicCounts()
 }

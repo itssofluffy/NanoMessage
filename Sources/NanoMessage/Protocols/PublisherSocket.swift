@@ -34,6 +34,8 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, Publisher, Publi
     public var topicSeperator: Byte = Byte("|")
     /// The topic to send.
     public fileprivate(set) var sendTopic = Topic()
+    /// remember which topics we've sent and how many.
+    public var topicCounts = true
     /// A Dictionary of the topics sent with a count of the times sent.
     public fileprivate(set) var sentTopics = Dictionary<Topic, UInt64>()
     /// Prepend the topic to the start of the message when sending.
@@ -128,12 +130,13 @@ extension PublisherSocket {
                                                 blockingMode)
 
         if (!sendTopic.isEmpty) {                             // check that we have a send topic.
-            // remember which topics we've sent and how many.
-            if var topicCount = sentTopics[sendTopic] {
-                topicCount += 1
-                sentTopics[sendTopic] = topicCount
-            } else {
-                sentTopics[sendTopic] = 1
+            if (topicCounts) {                                // remember which topics we've sent and how many.
+                if var topicCount = sentTopics[sendTopic] {
+                    topicCount += 1
+                    sentTopics[sendTopic] = topicCount
+                } else {
+                    sentTopics[sendTopic] = 1
+                }
             }
 
             if (resetTopicAfterSend) {                        // are we resetting the topic?
@@ -225,5 +228,10 @@ extension PublisherSocket {
         try _validateTopic(topic)               // check that we have a valid topic.
 
         sendTopic = topic
+    }
+
+    /// reset the topic counts.
+    public func resetTopicCounts() {
+        sentTopics = Dictionary<Topic, UInt64>()
     }
 }

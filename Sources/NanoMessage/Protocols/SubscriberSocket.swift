@@ -36,6 +36,8 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, Pub
     public fileprivate(set) var ignoreTopicSeperator = false
     /// The topic last received.
     public fileprivate(set) var receivedTopic = Topic()
+    /// remember which topics we've received and how many.
+    public var topicCounts = true
     /// A dictionary of topics and their count that have been received
     public fileprivate(set) var receivedTopics = Dictionary<Topic, UInt64>()
     /// Remove the topic from the received data.
@@ -144,12 +146,13 @@ extension SubscriberSocket {
                 received.message.data.removeSubrange(range)
             }
 
-            // remember which topics we've received and how many.
-            if var topicCount = receivedTopics[receivedTopic] {
-                topicCount += 1
-                receivedTopics[receivedTopic] = topicCount
-            } else {
-                receivedTopics[receivedTopic] = 1
+            if (topicCounts) {                                      // remember which topics we've received and how many.
+                if var topicCount = receivedTopics[receivedTopic] {
+                    topicCount += 1
+                    receivedTopics[receivedTopic] = topicCount
+                } else {
+                    receivedTopics[receivedTopic] = 1
+                }
             }
         }
 
@@ -325,5 +328,10 @@ extension SubscriberSocket {
         }
 
         subscribedToAllTopics = false
+    }
+
+    /// reset the topic counts.
+    public func resetTopicCounts() {
+        receivedTopics = Dictionary<Topic, UInt64>()
     }
 }
