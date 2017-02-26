@@ -24,14 +24,16 @@ import XCTest
 import Foundation
 import C7
 import Mutex
+import ISFLibrary
 
 @testable import NanoMessage
 
 class MessageSpeedTests: XCTestCase {
-    var asyncErrorMutex: Mutex = try! Mutex()
+    var asyncSendMutex: Mutex = try! Mutex()
     var asyncMessagesSent: UInt64 = 0
-    var asyncMessagesReceived: UInt64 = 0
     var asyncBytesSent: UInt64 = 0
+    var asyncReceiveMutex: Mutex = try! Mutex()
+    var asyncMessagesReceived: UInt64 = 0
     var asyncBytesReceived: UInt64 = 0
 
     enum ReceiveType {
@@ -53,8 +55,8 @@ class MessageSpeedTests: XCTestCase {
         var completed = false
 
         asyncMessagesSent = 0
-        asyncMessagesReceived = 0
         asyncBytesSent = 0
+        asyncMessagesReceived = 0
         asyncBytesReceived = 0
 
         do {
@@ -82,12 +84,26 @@ class MessageSpeedTests: XCTestCase {
                     case .Asynchronously:
                         node0.sendMessage(messagePayload,
                                           success: { bytesSent in
-                                              self.asyncMessagesSent += 1
-                                              self.asyncBytesSent += UInt64(bytesSent)
+                                              doCatchWrapper(funcCall: {
+                                                                 try self.asyncSendMutex.lock {
+                                                                     self.asyncMessagesSent += 1
+                                                                     self.asyncBytesSent += UInt64(bytesSent)
+                                                                 }
+                                                             },
+                                                             failed:   { failure in
+                                                                 nanoMessageLogger(failure)
+                                                             })
                                           })
                         node1.receiveMessage(success: { received in
-                                                 self.asyncMessagesReceived += 1
-                                                 self.asyncBytesReceived += UInt64(received.bytes)
+                                                 doCatchWrapper(funcCall: {
+                                                                    try self.asyncReceiveMutex.lock {
+                                                                        self.asyncMessagesReceived += 1
+                                                                        self.asyncBytesReceived += UInt64(received.bytes)
+                                                                    }
+                                                                },
+                                                                failed:   { failure in
+                                                                    nanoMessageLogger(failure)
+                                                                })
                                              })
                 }
             }
