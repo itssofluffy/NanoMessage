@@ -593,13 +593,7 @@ extension NanoSocket {
     /// - Note:   The underlying nanomsg library no longer supports this feature, linger time is always it's default value.
     @available(*, unavailable, message: "nanomsg library no longer supports this feature")
     @discardableResult
-    public func setLinger(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try getLinger()
-
-        try setSocketOption(self, .Linger, seconds)
-
-        return originalValue
-    }
+    public func setLinger(seconds: TimeInterval) throws -> TimeInterval { fatalError() }
 
     /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
     /// when connection is broken before trying to re-establish it. Note that actual reconnect interval

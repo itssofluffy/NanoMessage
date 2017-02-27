@@ -30,10 +30,36 @@ public protocol ProtocolSocket {
     var _nanoSocket: NanoSocket { get }
 
     init(socketDomain: SocketDomain) throws
-    init(socketDomain: SocketDomain, connectTo url: URL) throws
-    init(socketDomain: SocketDomain, connectTo urls: [URL]) throws
-    init(socketDomain: SocketDomain, bindTo url: URL) throws
-    init(socketDomain: SocketDomain, bindTo urls: [URL]) throws
+}
+
+extension ProtocolSocket {
+    public init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
+        try self.init(socketDomain: socketDomain)
+
+        let _: EndPoint = try _nanoSocket.connectToURL(url)
+    }
+
+    public init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
+        try self.init(socketDomain: socketDomain)
+
+        for url in urls {
+            let _: EndPoint = try _nanoSocket.connectToURL(url)
+        }
+    }
+
+    public init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
+        try self.init(socketDomain: socketDomain)
+
+        let _: EndPoint = try _nanoSocket.bindToURL(url)
+    }
+
+    public init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
+        try self.init(socketDomain: socketDomain)
+
+        for url in urls {
+            let _: EndPoint = try _nanoSocket.bindToURL(url)
+        }
+    }
 }
 
 extension ProtocolSocket where Self: Sender {

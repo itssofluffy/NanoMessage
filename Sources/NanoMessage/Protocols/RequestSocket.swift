@@ -31,34 +31,6 @@ public final class RequestSocket: NanoSocket, ProtocolSocket, Receiver, Sender, 
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .RequestProtocol)
     }
-
-    public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
-        try self.init(socketDomain: socketDomain)
-
-        let _: EndPoint = try connectToURL(url)
-    }
-
-    public convenience init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
-        try self.init(socketDomain: socketDomain)
-
-        for url in urls {
-            let _: EndPoint = try connectToURL(url)
-        }
-    }
-
-    public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
-        try self.init(socketDomain: socketDomain)
-
-        let _: EndPoint = try bindToURL(url)
-    }
-
-    public convenience init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
-        try self.init(socketDomain: socketDomain)
-
-        for url in urls {
-            let _: EndPoint = try bindToURL(url)
-        }
-    }
 }
 
 extension RequestSocket {
