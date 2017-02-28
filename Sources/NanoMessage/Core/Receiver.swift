@@ -42,6 +42,6 @@ public protocol Receiver: ASyncReceiver {
     func setReceivePriority(_ priority: Priority) throws -> Priority
     func getReceiveFd() throws -> Int
     // socket statistics functions.
-    func getMessagesReceived() throws -> UInt64
-    func getBytesReceived() throws -> UInt64
+    var messagesReceived: UInt64? { get }
+    var bytesReceived: UInt64? { get }
 }

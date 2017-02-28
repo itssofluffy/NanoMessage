@@ -75,12 +75,7 @@ class LoopBackTests: XCTestCase {
             XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2.bytes != node2Received.message.count")
             XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
 
-            let messagesSent = try node1.getMessagesSent()
-            let messagesReceived = try node2.getMessagesReceived()
-            let bytesSent = try node1.getBytesSent()
-            let bytesReceived = try node2.getBytesReceived()
-
-            print("Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
+            print("Total Messages (Sent/Received): (\(node1.messagesSent!),\(node2.messagesReceived!)), Total Bytes (Sent/Received): (\(node1.bytesSent!),\(node2.bytesReceived!))")
 
             workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
 

@@ -92,12 +92,7 @@ class BindToSocketTests: XCTestCase {
             XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2Received.bytes != node2Received.message.count")
             XCTAssertEqual(node2Received.message, payload, "node2Received.message != payload")
 
-            let messagesSent = try node2.getMessagesSent()
-            let messagesReceived = try node3.getMessagesReceived()
-            let bytesSent = try node2.getBytesSent()
-            let bytesReceived = try node3.getBytesReceived()
-
-            print("Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
+            print("Total Messages (Sent/Received): (\(node2.messagesSent!),\(node3.messagesReceived!)), Total Bytes (Sent/Received): (\(node2.bytesSent!),\(node3.bytesReceived!))")
 
             workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
 

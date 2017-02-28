@@ -66,15 +66,10 @@ class MessageSizeTests: XCTestCase {
                 messageSize *= 2
             }
 
-            let messagesSent = try node0.getMessagesSent()
-            let messagesReceived = try node1.getMessagesReceived()
-            let bytesSent = try node0.getBytesSent()
-            let bytesReceived = try node1.getBytesReceived()
+            XCTAssertEqual(node0.messagesSent!, node1.messagesReceived!, "node0.messagesSent != node1.messagesReceived")
+            XCTAssertEqual(node0.bytesSent!, node1.bytesReceived!, "node0.bytesSent != node1.bytesReceived")
 
-            XCTAssertEqual(messagesSent, messagesReceived, "messagesSent != messagesReceived")
-            XCTAssertEqual(bytesSent, bytesReceived, "bytesSent != bytesReceived")
-
-            print("Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
+            print("Total Messages (Sent/Received): (\(node0.messagesSent!),\(node1.messagesReceived!)), Total Bytes (Sent/Received): (\(node0.bytesSent!),\(node1.bytesReceived!))")
 
             let node0Removed = try node0.removeEndPoint(node0EndPoint)
             XCTAssertTrue(node0Removed, "node0.removeEndPoint(\(node0EndPoint))")

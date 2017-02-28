@@ -113,22 +113,17 @@ class MessageSpeedTests: XCTestCase {
                 node1.aioGroup.wait()
             }
 
-            let messagesSent = try node0.getMessagesSent()
-            let messagesReceived = try node1.getMessagesReceived()
-            let bytesSent = try node0.getBytesSent()
-            let bytesReceived = try node1.getBytesReceived()
-
-            XCTAssertEqual(messagesSent, messagesReceived, "messagesSent != messagesReceived")
-            XCTAssertEqual(bytesSent, bytesReceived, "bytesSent != bytesReceived")
+            XCTAssertEqual(node0.messagesSent!, node1.messagesReceived!, "node0.messagesSent != node1.messagesReceived")
+            XCTAssertEqual(node0.bytesSent!, node1.bytesReceived!, "node0.bytesSent != node1.bytesReceived")
 
             if (receiveType == .Asynchronously) {
-                XCTAssertEqual(messagesSent, asyncMessagesSent, "messagesSent != asyncMessagesSent")
-                XCTAssertEqual(bytesSent, asyncBytesSent, "bytesSent != asyncBytesSent")
-                XCTAssertEqual(messagesReceived, asyncMessagesReceived, "messagesReceived != asyncMessagesReceived")
-                XCTAssertEqual(bytesReceived, asyncBytesReceived, "bytesReceived != asyncBytesReceived")
+                XCTAssertEqual(node0.messagesSent!, asyncMessagesSent, "node0.messagesSent != asyncMessagesSent")
+                XCTAssertEqual(node0.bytesSent!, asyncBytesSent, "node0.bytesSent != asyncBytesSent")
+                XCTAssertEqual(node1.messagesReceived!, asyncMessagesReceived, "node1.messagesReceived != asyncMessagesReceived")
+                XCTAssertEqual(node1.bytesReceived!, asyncBytesReceived, "node1.bytesReceived != asyncBytesReceived")
             }
 
-            print("Message Size: \(messageSize) Bytes, Total Messages (Sent/Received): (\(messagesSent),\(messagesReceived)), Total Bytes (Sent/Received): (\(bytesSent),\(bytesReceived))")
+            print("Message Size: \(messageSize) Bytes, Total Messages (Sent/Received): (\(node0.messagesSent!),\(node1.messagesReceived!)), Total Bytes (Sent/Received): (\(node0.bytesSent!),\(node1.bytesReceived!))")
 
             let node0Removed = try node0.removeEndPoint(node0EndPoint)
             XCTAssertTrue(node0Removed, "node0.removeEndPoint(\(node0EndPoint))")

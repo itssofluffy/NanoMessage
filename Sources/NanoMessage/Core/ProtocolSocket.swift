@@ -534,50 +534,71 @@ extension ProtocolSocket where Self: Receiver {
 }
 
 extension ProtocolSocket where Self: Sender {
+    @available(*, unavailable, renamed: "messagesSent")
+    public func getMessagesSent() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "bytesSent")
+    public func getBytesSent() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "currentSendPriority")
+    public func getCurrentSendPriority() throws -> Priority { fatalError() }
+}
+
+extension ProtocolSocket where Self: Sender {
     /// The number messages sent by this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getMessagesSent() throws -> UInt64 {
-        return try getSocketStatistic(_nanoSocket, .MessagesSent)
+    public var messagesSent: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self._nanoSocket, .MessagesSent)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of bytes sent by this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getBytesSent() throws -> UInt64 {
-        return try getSocketStatistic(_nanoSocket, .BytesSent)
+    public var bytesSent: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self._nanoSocket, .BytesSent)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The current send priority of the socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getCurrentSendPriority() throws -> Priority {
-        return try getSocketStatistic(_nanoSocket, .CurrentSendPriority)
+    public var currentSendPriority: Priority? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self._nanoSocket, .CurrentSendPriority)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 }
 
 extension ProtocolSocket where Self: Receiver {
+    @available(*, unavailable, renamed: "messagesReceived")
+    public func getMessagesReceived() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "bytesReceived")
+    public func getBytesReceived() throws -> UInt64 { fatalError() }
+}
+
+extension ProtocolSocket where Self: Receiver {
     /// The number messages received by this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getMessagesReceived() throws -> UInt64 {
-        return try getSocketStatistic(_nanoSocket, .MessagesReceived)
+    public var messagesReceived: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self._nanoSocket, .MessagesReceived)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of bytes received by this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getBytesReceived() throws -> UInt64 {
-        return try getSocketStatistic(_nanoSocket, .BytesReceived)
+    public var bytesReceived: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self._nanoSocket, .BytesReceived)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 }

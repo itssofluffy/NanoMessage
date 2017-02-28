@@ -833,100 +833,137 @@ extension NanoSocket {
 }
 
 extension NanoSocket {
+    @available(*, unavailable, renamed: "establishedConnections")
+    public func getEstablishedConnections() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "acceptedConnections")
+    public func getAcceptedConnections() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "droppedConnections")
+    public func getDroppedConnections() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "brokenConnections")
+    public func getBrokenConnections() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "connectErrors")
+    public func getConnectErrors() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "bindErrors")
+    public func getBindErrors() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "acceptErrors")
+    public func getAcceptErrors() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "currentInProgressConnections")
+    public func getCurrentInProgressConnections() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "currentConnections")
+    public func getCurrentConnections() throws -> UInt64 { fatalError() }
+    @available(*, unavailable, renamed: "currentEndPointErrors")
+    public func getCurrentEndPointErrors() throws -> UInt64 { fatalError() }
+}
+
+extension NanoSocket {
     /// The number of connections successfully established that were initiated from this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getEstablishedConnections() throws -> UInt64 {
-        return try getSocketStatistic(self, .EstablishedConnections)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var establishedConnections: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .EstablishedConnections)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of connections successfully established that were accepted by this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getAcceptedConnections() throws -> UInt64 {
-        return try getSocketStatistic(self, .AcceptedConnections)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var acceptedConnections: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .AcceptedConnections)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of established connections that were dropped by this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getDroppedConnections() throws -> UInt64 {
-        return try getSocketStatistic(self, .DroppedConnections)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var droppedConnections: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .DroppedConnections)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of established connections that were closed by this socket, typically due to protocol errors.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getBrokenConnections() throws -> UInt64 {
-        return try getSocketStatistic(self, .BrokenConnections)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var brokenConnections: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .BrokenConnections)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of errors encountered by this socket trying to connect to a remote peer.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getConnectErrors() throws -> UInt64 {
-        return try getSocketStatistic(self, .ConnectErrors)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var connectErrors: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .ConnectErrors)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of errors encountered by this socket trying to bind to a local address.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getBindErrors() throws -> UInt64 {
-        return try getSocketStatistic(self, .BindErrors)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var bindErrors: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .BindErrors)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of errors encountered by this socket trying to accept a a connection from a remote peer.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    public func getAcceptErrors() throws -> UInt64 {
-        return try getSocketStatistic(self, .AcceptErrors)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var acceptErrors: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .AcceptErrors)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of connections currently in progress to this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    ///
-    /// - Note:    This feature is undocumented in the underlying nanomsg library
-    public func getCurrentInProgressConnections() throws -> UInt64 {
-        return try getSocketStatistic(self, .CurrentInProgressConnections)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var currentInProgressConnections: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .CurrentInProgressConnections)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of connections currently estabalished to this socket.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    ///
-    /// - Note:    This feature is undocumented in the underlying nanomsg library
-    public func getCurrentConnections() throws -> UInt64 {
-        return try getSocketStatistic(self, .CurrentConnections)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var currentConnections: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .CurrentConnections)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 
     /// The number of end-point errors.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketStatistic`
-    ///
-    /// - Returns: As per description.
-    ///
-    /// - Note:    This feature is undocumented in the underlying nanomsg library
-    public func getCurrentEndPointErrors() throws -> UInt64 {
-        return try getSocketStatistic(self, .CurrentEndPointErrors)
+    /// - Note: This feature is undocumented in the underlying nanomsg library
+    public var currentEndPointErrors: UInt64? {
+        return doCatchWrapper(funcCall: {
+                                  return try getSocketStatistic(self, .CurrentEndPointErrors)
+                              },
+                              failed:   { failure in
+                                  nanoMessageLogger(failure)
+                              })
     }
 }
 
