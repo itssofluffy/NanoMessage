@@ -62,7 +62,7 @@ extension PublisherSocket {
     fileprivate func _validateTopic(_ topic: Topic) throws {
         if (topic.isEmpty) {
             throw NanoMessageError.NoTopic
-        } else if (topic.data.count > NanoMessage.maximumTopicLength) {
+        } else if (topic.count > NanoMessage.maximumTopicLength) {
             throw NanoMessageError.TopicLength
         }
     }

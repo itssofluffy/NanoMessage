@@ -31,7 +31,7 @@ private let _pollinMask = CShort(NN_POLLIN)
 private let _polloutMask = CShort(NN_POLLOUT)
 
 // nanomsg library has terminated.
-internal var nanomsgTerminated = false
+internal private(set) var nanomsgTerminated = false
 
 /// The underlying nanomsg libraries ABI version.
 public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
