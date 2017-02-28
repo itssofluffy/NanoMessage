@@ -131,9 +131,9 @@ extension PublisherSocket {
     private func _asyncSend(payload:  PublisherMessage,
                             funcCall: @escaping (Message) throws -> Int,
                             success:  @escaping (Int) -> Void,
-                            objects:  @escaping () -> [Any]) {
+                            objFunc:  @escaping () -> [Any]) {
         aioQueue.async(group: aioGroup) {
-            doCatchWrapper(funcCall:    { () -> Void in
+            doCatchWrapper(funcCall: { () -> Void in
                                try self.mutex.lock {
                                    try self.setSendTopic(payload.topic)
 
@@ -142,10 +142,10 @@ extension PublisherSocket {
                                    success(bytesSent)
                                }
                            },
-                           failed:      { failure in
+                           failed:   { failure in
                                nanoMessageLogger(failure)
                            },
-                           objectsFunc: objects)
+                           objFunc:  objFunc)
         }
     }
 
@@ -165,7 +165,7 @@ extension PublisherSocket {
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
                    success:  success,
-                   objects:  {
+                   objFunc:  {
                        return [self, payload, blockingMode, self.aioQueue, self.aioGroup]
                    })
     }
@@ -184,7 +184,7 @@ extension PublisherSocket {
                        return try self.sendMessage(message, timeout: timeout)
                    },
                    success:  success,
-                   objects:  {
+                   objFunc:  {
                        return [self, payload, timeout, self.aioQueue, self.aioGroup]
                    })
     }

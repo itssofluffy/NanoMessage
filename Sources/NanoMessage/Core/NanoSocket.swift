@@ -155,7 +155,7 @@ public class NanoSocket {
         var terminateLoop = true                        // are we going to terminate the `repeat` loop below.
 
         repeat {
-            doCatchWrapper(funcCall:    { () -> Void in
+            doCatchWrapper(funcCall: { () -> Void in
                                try self._attemptClosure(funcCall: {
                                                             return nn_close(self.fileDescriptor)
                                                         },
@@ -163,7 +163,7 @@ public class NanoSocket {
                                                             return .Close(code: errno)
                                                         })
                            },
-                           failed:      { failure in
+                           failed:   { failure in
                                switch failure.error {
                                    case NanoMessageError.Interrupted:
                                        nanoMessageLogger(failure)
@@ -179,7 +179,7 @@ public class NanoSocket {
                                        terminateLoop = true
                                }
                            },
-                           objectsFunc: {
+                           objFunc: {
                                return [self]
                            })
         } while (!terminateLoop)
@@ -252,15 +252,15 @@ extension NanoSocket {
     private func _dispatchTo(queue:    DispatchQueue,
                              group:    DispatchGroup,
                              funcCall: @escaping () throws -> Void,
-                             objects:  @escaping () -> [Any]) {
+                             objFunc:  @escaping () -> [Any]) {
         queue.async(group: group) {
-            doCatchWrapper(funcCall:    {
+            doCatchWrapper(funcCall: {
                                try funcCall()
                            },
-                           failed:      { failure in
+                           failed:   { failure in
                                nanoMessageLogger(failure)
                            },
-                           objectsFunc: objects)
+                           objFunc:  objFunc)
         }
     }
 
@@ -491,7 +491,7 @@ extension NanoSocket {
                     funcCall: {
                         try self.bindToSocket(nanoSocket)
                     },
-                    objects:  {
+                    objFunc:  {
                         return [self, nanoSocket, queue, group]
                     })
     }
@@ -529,7 +529,7 @@ extension NanoSocket {
                     funcCall: {
                         try self.loopBack()
                     },
-                    objects:  {
+                    objFunc:  {
                         return [self, queue, group]
                     })
     }

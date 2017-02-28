@@ -128,19 +128,19 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - objects:  The colsure to use to pass any objects required when an error occurs.
     private func _asyncSend(funcCall: @escaping () throws -> Int,
                             success:  @escaping (Int) -> Void,
-                            objects:  @escaping () -> [Any]) {
+                            objFunc:  @escaping () -> [Any]) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            doCatchWrapper(funcCall:    { () -> Void in
+            doCatchWrapper(funcCall: { () -> Void in
                                try self._nanoSocket.mutex.lock {
                                    let bytesSent = try funcCall()
 
                                    success(bytesSent)
                                }
                            },
-                           failed:      { failure in
+                           failed:   { failure in
                                nanoMessageLogger(failure)
                            },
-                           objectsFunc: objects)
+                           objFunc:  objFunc)
         }
     }
 
@@ -159,7 +159,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
                    success:  success,
-                   objects:  {
+                   objFunc:  {
                        return [self, message, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                    })
     }
@@ -178,7 +178,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
                        return try self.sendMessage(message, timeout: timeout)
                    },
                    success:  success,
-                   objects:  {
+                   objFunc:  {
                        return [self, message, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                    })
     }
@@ -246,7 +246,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - objects:  The colsure to use to pass any objects required when an error occurs.
     private func _asyncReceive(funcCall: @escaping () throws -> ReceiveMessage,
                                success:  @escaping (ReceiveMessage) -> Void,
-                               objects:  @escaping () -> [Any]) {
+                               objFunc:  @escaping () -> [Any]) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             doCatchWrapper(funcCall: { () -> Void in
                                try self._nanoSocket.mutex.lock {
@@ -258,7 +258,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
                            failed:   { failure in
                                nanoMessageLogger(failure)
                            },
-                           objectsFunc: objects)
+                           objFunc:  objFunc)
         }
     }
 
@@ -275,7 +275,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
                           return try self.receiveMessage(blockingMode: blockingMode)
                       },
                       success:  success,
-                      objects:  {
+                      objFunc:  {
                           return [self, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                       })
     }
@@ -292,7 +292,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
                           return try self.receiveMessage(timeout: timeout)
                       },
                       success:  success,
-                      objects:  {
+                      objFunc:  {
                           return [self, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                       })
     }
