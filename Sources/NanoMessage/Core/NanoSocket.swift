@@ -248,6 +248,7 @@ extension NanoSocket {
     ///   - queue:    The dispatch queue to use
     ///   - group:    The dispatch group to use.
     ///   - funcCall: The closure to call.
+    ///   - objects:  The colsure to use to pass any objects required when an error occurs.
     private func _dispatchTo(queue:    DispatchQueue,
                              group:    DispatchGroup,
                              funcCall: @escaping () throws -> Void,

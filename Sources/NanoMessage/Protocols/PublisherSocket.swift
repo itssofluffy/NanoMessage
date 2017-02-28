@@ -127,6 +127,7 @@ extension PublisherSocket {
     ///   - payload:  A PublisherMessage to send.
     ///   - funcCall: The closure to use to perform the send
     ///   - success:  The closure to use when `funcCall` is succesful.
+    ///   - objects:  The colsure to use to pass any objects required when an error occurs.
     private func _asyncSend(payload:  PublisherMessage,
                             funcCall: @escaping (Message) throws -> Int,
                             success:  @escaping (Int) -> Void,
