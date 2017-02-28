@@ -30,6 +30,9 @@ public let maximumTopicLength = 128
 private let _pollinMask = CShort(NN_POLLIN)
 private let _polloutMask = CShort(NN_POLLOUT)
 
+// nanomsg library has terminated.
+internal var nanomsgTerminated = false
+
 /// The underlying nanomsg libraries ABI version.
 public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
     return (current: Int(NN_VERSION_CURRENT), revision: Int(NN_VERSION_REVISION), age: Int(NN_VERSION_AGE))
@@ -42,6 +45,8 @@ public var nanoMessageVersion: (major: Int, minor: Int, release: Int) {
 
 /// Notify all sockets about process termination.
 public func terminate() {
+    nanomsgTerminated = true
+
     nn_term()
 }
 

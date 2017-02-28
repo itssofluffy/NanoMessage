@@ -57,12 +57,7 @@ class BindToSocketTests: XCTestCase {
             let queue = DispatchQueue(label: "com.nanomessage.bindtosocket")
             let group = DispatchGroup()
 
-            /*
-            let workItem = node0.bindToSocket(node1, queue: queue, group: group, failure: { error in
-                 print(error)
-            })
-            */
-            let workItem = node0.bindToSocket(node1, queue: queue, group: group)
+            node0.bindToSocket(node1, queue: queue, group: group)
 
             let node2 = try RequestSocket()
             let node3 = try ReplySocket()
@@ -93,12 +88,6 @@ class BindToSocketTests: XCTestCase {
             XCTAssertEqual(node2Received.message, payload, "node2Received.message != payload")
 
             print("Total Messages (Sent/Received): (\(node2.messagesSent!),\(node3.messagesReceived!)), Total Bytes (Sent/Received): (\(node2.bytesSent!),\(node3.bytesReceived!))")
-
-            workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
-
-            workItem.notify(queue: queue) {
-                print("node0.bindToSocket(): \(workItem.isCancelled)")
-            }
 
             completed = true
         } catch let error as NanoMessageError {

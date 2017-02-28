@@ -172,7 +172,10 @@ public class NanoSocket {
                                            terminateLoop = false
                                        }
                                    default:
-                                       nanoMessageLogger(failure)
+                                       if (!NanoMessage.nanomsgTerminated) {
+                                           nanoMessageLogger(failure)
+                                       }
+
                                        terminateLoop = true
                                }
                            })
@@ -242,12 +245,10 @@ extension NanoSocket {
     ///   - queue:    The dispatch queue to use
     ///   - group:    The dispatch group to use.
     ///   - funcCall: The closure to call.
-    ///
-    /// - Returns:    The despatched work item.
-    private func _dispatchWorkItem(queue:    DispatchQueue,
-                                   group:    DispatchGroup,
-                                   funcCall: @escaping () throws -> Void) -> DispatchWorkItem {
-        let workItem = DispatchWorkItem {
+    private func _dispatchTo(queue:    DispatchQueue,
+                             group:    DispatchGroup,
+                             funcCall: @escaping () throws -> Void) {
+        queue.async(group: group) {
             doCatchWrapper(funcCall: {
                                try funcCall()
                            },
@@ -255,10 +256,6 @@ extension NanoSocket {
                                nanoMessageLogger(failure)
                            })
         }
-
-        queue.async(group: group, execute: workItem)
-
-        return workItem
     }
 
     /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
@@ -462,16 +459,11 @@ extension NanoSocket {
 
         let returnCode = nn_device(fileDescriptor, nanoSocket.fileDescriptor)
 
-        guard (returnCode >= 0) else {
+        guard (NanoMessage.nanomsgTerminated || returnCode >= 0) else {
             let errno = nn_errno()
             var nanoSocketName = String(nanoSocket.fileDescriptor)
 
-            if let socketName = doCatchWrapper(funcCall: {
-                                                   try nanoSocket.getSocketName()
-                                               },
-                                               failed:   { failure in
-                                                   nanoMessageLogger(failure)
-                                               }) {
+            if let socketName = try? nanoSocket.getSocketName() {
                 nanoSocketName = socketName
             }
 
@@ -485,16 +477,14 @@ extension NanoSocket {
     ///   - nanoSocket: The socket to bind too.
     ///   - queue:      The dispatch queue to use
     ///   - group:      The dispatch group to use.
-    ///
-    /// - Returns:          The despatched work item.
     public func bindToSocket(_ nanoSocket: NanoSocket,
                              queue:        DispatchQueue,
-                             group:        DispatchGroup) -> DispatchWorkItem {
-        return _dispatchWorkItem(queue:    queue,
-                                 group:    group,
-                                 funcCall: {
-                                     try self.bindToSocket(nanoSocket)
-                                 })
+                             group:        DispatchGroup) {
+        _dispatchTo(queue:    queue,
+                    group:    group,
+                    funcCall: {
+                        try self.bindToSocket(nanoSocket)
+                    })
     }
 
     /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
@@ -514,7 +504,7 @@ extension NanoSocket {
 
         let returnCode = nn_device(fileDescriptor, -1)
 
-        guard (returnCode >= 0) else {
+        guard (NanoMessage.nanomsgTerminated || returnCode >= 0) else {
             throw NanoMessageError.LoopBack(code: nn_errno())
         }
     }
@@ -524,15 +514,12 @@ extension NanoSocket {
     /// - Parameters:
     ///   - queue:   The dispatch queue to use
     ///   - group:   The dispatch group to use.
-    ///   - failure: The closure to use if the 'loopBack()' fails.
-    ///
-    /// - Returns:          The despatched work item.
-    public func loopBack(queue: DispatchQueue, group: DispatchGroup) -> DispatchWorkItem {
-        return _dispatchWorkItem(queue:    queue,
-                                 group:    group,
-                                 funcCall: {
-                                     try self.loopBack()
-                                 })
+    public func loopBack(queue: DispatchQueue, group: DispatchGroup) {
+        _dispatchTo(queue:    queue,
+                    group:    group,
+                    funcCall: {
+                        try self.loopBack()
+                    })
     }
 }
 

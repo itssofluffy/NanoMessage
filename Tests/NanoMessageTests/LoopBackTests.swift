@@ -49,12 +49,7 @@ class LoopBackTests: XCTestCase {
             let queue = DispatchQueue(label: "com.nanomessage.loopback")
             let group = DispatchGroup()
 
-            /*
-            let workItem = node0.loopBack(queue: queue, group: group, failure: { error in
-                 print(error)
-            })
-            */
-            let workItem = node0.loopBack(queue: queue, group: group)
+            node0.loopBack(queue: queue, group: group)
 
             let node1 = try BusSocket()
             let node2 = try BusSocket()
@@ -76,12 +71,6 @@ class LoopBackTests: XCTestCase {
             XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
 
             print("Total Messages (Sent/Received): (\(node1.messagesSent!),\(node2.messagesReceived!)), Total Bytes (Sent/Received): (\(node1.bytesSent!),\(node2.bytesReceived!))")
-
-            workItem.cancel()                                           // ummm...doesn't seem to cancel the work item.
-
-            workItem.notify(queue: queue) {
-                print("node0.loopBack(): \(workItem.isCancelled)")
-            }
 
             completed = true
         } catch let error as NanoMessageError {
