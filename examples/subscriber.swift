@@ -63,11 +63,8 @@ do {
         }
     }
 
-    let messagesReceived = try node0.getMessagesReceived()
-    let bytesReceived = try node0.getBytesReceived()
-
-    print("messages received: \(messagesReceived)")
-    print("bytes received   : \(bytesReceived)")
+    print("messages received: \(node0.messagesReceived!)")
+    print("bytes received   : \(node0.bytesReceived!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

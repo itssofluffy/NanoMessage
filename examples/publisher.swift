@@ -85,11 +85,8 @@ do {
         try node0.sendMessage(message, timeout: TimeInterval(seconds: 10))
     }
 
-    let messagesSent = try node0.getMessagesSent()
-    let bytesSent = try node0.getBytesSent()
-
-    print("messages sent: \(messagesSent)")
-    print("bytes sent   : \(bytesSent)")
+    print("messages sent: \(node0.messagesSent!)")
+    print("bytes sent   : \(node0.bytesSent!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {
