@@ -129,10 +129,11 @@ extension PublisherSocket {
     ///   - success:  The closure to use when `funcCall` is succesful.
     private func _asyncSend(payload:  PublisherMessage,
                             funcCall: @escaping (Message) throws -> Int,
-                            success:  @escaping (Int) -> Void) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            doCatchWrapper(funcCall: { () -> Void in
-                               try self._nanoSocket.mutex.lock {
+                            success:  @escaping (Int) -> Void,
+                            objects:  @escaping () -> [Any]) {
+        aioQueue.async(group: aioGroup) {
+            doCatchWrapper(funcCall:    { () -> Void in
+                               try self.mutex.lock {
                                    try self.setSendTopic(payload.topic)
 
                                    let bytesSent = try funcCall(payload.message)
@@ -140,9 +141,10 @@ extension PublisherSocket {
                                    success(bytesSent)
                                }
                            },
-                           failed:   { failure in
+                           failed:      { failure in
                                nanoMessageLogger(failure)
-                           })
+                           },
+                           objectsFunc: objects)
         }
     }
 
@@ -161,7 +163,10 @@ extension PublisherSocket {
                    funcCall: { message in
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
-                   success:  success)
+                   success:  success,
+                   objects:  {
+                       return [self, payload, blockingMode, self.aioQueue, self.aioGroup]
+                   })
     }
 
     /// Asynchronous send a message.
@@ -177,7 +182,10 @@ extension PublisherSocket {
                    funcCall: { message in
                        return try self.sendMessage(message, timeout: timeout)
                    },
-                   success:  success)
+                   success:  success,
+                   objects:  {
+                       return [self, payload, timeout, self.aioQueue, self.aioGroup]
+                   })
     }
 }
 

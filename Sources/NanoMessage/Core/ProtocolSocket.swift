@@ -126,18 +126,20 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - funcCall: The closure to use to perform the send
     ///   - success:  The closure to use when `funcCall` is succesful.
     private func _asyncSend(funcCall: @escaping () throws -> Int,
-                            success:  @escaping (Int) -> Void) {
+                            success:  @escaping (Int) -> Void,
+                            objects:  @escaping () -> [Any]) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            doCatchWrapper(funcCall: { () -> Void in
+            doCatchWrapper(funcCall:    { () -> Void in
                                try self._nanoSocket.mutex.lock {
                                    let bytesSent = try funcCall()
 
                                    success(bytesSent)
                                }
                            },
-                           failed:   { failure in
+                           failed:      { failure in
                                nanoMessageLogger(failure)
-                           })
+                           },
+                           objectsFunc: objects)
         }
     }
 
@@ -155,7 +157,10 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         _asyncSend(funcCall: {
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
-                   success:  success)
+                   success:  success,
+                   objects:  {
+                       return [self, message, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                   })
     }
 
     /// Asynchronous send a message.
@@ -171,7 +176,10 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
         _asyncSend(funcCall: {
                        return try self.sendMessage(message, timeout: timeout)
                    },
-                   success:  success)
+                   success:  success,
+                   objects:  {
+                       return [self, message, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                   })
     }
 }
 
@@ -235,7 +243,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - funcCall: The closure to use to perform the receive
     ///   - success:  The closure to use when `funcCall` is succesful.
     private func _asyncReceive(funcCall: @escaping () throws -> ReceiveMessage,
-                               success:  @escaping (ReceiveMessage) -> Void) {
+                               success:  @escaping (ReceiveMessage) -> Void,
+                               objects:  @escaping () -> [Any]) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             doCatchWrapper(funcCall: { () -> Void in
                                try self._nanoSocket.mutex.lock {
@@ -246,7 +255,8 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
                            },
                            failed:   { failure in
                                nanoMessageLogger(failure)
-                           })
+                           },
+                           objectsFunc: objects)
         }
     }
 
@@ -262,7 +272,10 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         _asyncReceive(funcCall: {
                           return try self.receiveMessage(blockingMode: blockingMode)
                       },
-                      success:  success)
+                      success:  success,
+                      objects:  {
+                          return [self, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                      })
     }
 
     /// Asynchronous receive a message.
@@ -276,7 +289,10 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
         _asyncReceive(funcCall: {
                           return try self.receiveMessage(timeout: timeout)
                       },
-                      success:  success)
+                      success:  success,
+                      objects:  {
+                          return [self, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                      })
     }
 }
 

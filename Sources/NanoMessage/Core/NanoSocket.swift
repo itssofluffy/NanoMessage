@@ -155,7 +155,7 @@ public class NanoSocket {
         var terminateLoop = true                        // are we going to terminate the `repeat` loop below.
 
         repeat {
-            doCatchWrapper(funcCall: { () -> Void in
+            doCatchWrapper(funcCall:    { () -> Void in
                                try self._attemptClosure(funcCall: {
                                                             return nn_close(self.fileDescriptor)
                                                         },
@@ -163,7 +163,7 @@ public class NanoSocket {
                                                             return .Close(code: errno)
                                                         })
                            },
-                           failed:   { failure in
+                           failed:      { failure in
                                switch failure.error {
                                    case NanoMessageError.Interrupted:
                                        nanoMessageLogger(failure)
@@ -178,6 +178,9 @@ public class NanoSocket {
 
                                        terminateLoop = true
                                }
+                           },
+                           objectsFunc: {
+                               return [self]
                            })
         } while (!terminateLoop)
     }
@@ -247,14 +250,16 @@ extension NanoSocket {
     ///   - funcCall: The closure to call.
     private func _dispatchTo(queue:    DispatchQueue,
                              group:    DispatchGroup,
-                             funcCall: @escaping () throws -> Void) {
+                             funcCall: @escaping () throws -> Void,
+                             objects:  @escaping () -> [Any]) {
         queue.async(group: group) {
-            doCatchWrapper(funcCall: {
+            doCatchWrapper(funcCall:    {
                                try funcCall()
                            },
-                           failed:   { failure in
+                           failed:      { failure in
                                nanoMessageLogger(failure)
-                           })
+                           },
+                           objectsFunc: objects)
         }
     }
 
@@ -471,7 +476,7 @@ extension NanoSocket {
         }
     }
 
-    /// Starts a device asynchronously to bind the socket to another and forward messages between two sockets
+    /// Starts a device asynchronously to bind the socket to another and forward messages between the two sockets.
     ///
     /// - Parameters:
     ///   - nanoSocket: The socket to bind too.
@@ -484,6 +489,9 @@ extension NanoSocket {
                     group:    group,
                     funcCall: {
                         try self.bindToSocket(nanoSocket)
+                    },
+                    objects:  {
+                        return [self, nanoSocket, queue, group]
                     })
     }
 
@@ -519,6 +527,9 @@ extension NanoSocket {
                     group:    group,
                     funcCall: {
                         try self.loopBack()
+                    },
+                    objects:  {
+                        return [self, queue, group]
                     })
     }
 }
