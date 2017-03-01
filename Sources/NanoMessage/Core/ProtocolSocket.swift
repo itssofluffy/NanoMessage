@@ -125,7 +125,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// - Parameters:
     ///   - funcCall: The closure to use to perform the send
     ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - objects:  The colsure to use to pass any objects required when an error occurs.
+    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
     private func _asyncSend(funcCall: @escaping () throws -> Int,
                             success:  @escaping (Int) -> Void,
                             objFunc:  @escaping () -> [Any]) {
@@ -243,7 +243,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// - Parameters:
     ///   - funcCall: The closure to use to perform the receive
     ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - objects:  The colsure to use to pass any objects required when an error occurs.
+    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
     private func _asyncReceive(funcCall: @escaping () throws -> ReceiveMessage,
                                success:  @escaping (ReceiveMessage) -> Void,
                                objFunc:  @escaping () -> [Any]) {

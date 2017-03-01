@@ -1,0 +1,4 @@
+- Check for memory leaks when calling ISFLibrary.doCatchWrapper using the objFunc parameter, i.e. weak self etc.
+- Look more into changing get/setSocketOption() calling functions like getSendBuffer() into properties like the statistic properties as initial test produced some code work arounds in [ProtocolSocket.swift](https://github.com/itssofluffy/NanoMessage/blob/master/Sources/NanoMessage/Core/ProtocolSocket.swift) that i was not happy with.
+- Find out how to implement a `(uint64_t)-1` for use in [SocketStatistic.swift](https://github.com/itssofluffy/NanoMessage/blob/master/Sources/NanoMessage/Core/SocketStatistic.swift).
+- Add Asynchrounous send/receive tests for the Publisher/Subscriber socket types.

@@ -112,6 +112,8 @@ extension SocketStatistic: CustomStringConvertible {
     }
 }
 
+//private let failedReturnCode: uint64_t = -1
+
 /// Retrieves the value of a statistic from the socket. Not all statistics are relevant to all transports.
 /// For example, the nn_inproc(7) transport does not maintain any of the connection related statistics.
 ///
@@ -130,6 +132,7 @@ extension SocketStatistic: CustomStringConvertible {
 internal func getSocketStatistic(_ nanoSocket: NanoSocket, _ option: SocketStatistic) throws -> UInt64 {
     let statistic = nn_get_statistic(nanoSocket.fileDescriptor, option.rawValue)
 
+    //guard (statistic != failedReturnCode) else {
     guard (statistic >= 0) else {
         throw NanoMessageError.GetSocketStatistic(code: nn_errno(), option: option)
     }
