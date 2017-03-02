@@ -568,6 +568,9 @@ extension ProtocolSocket where Self: Sender {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -578,6 +581,9 @@ extension ProtocolSocket where Self: Sender {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -588,6 +594,9 @@ extension ProtocolSocket where Self: Sender {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 }
@@ -607,6 +616,9 @@ extension ProtocolSocket where Self: Receiver {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -617,6 +629,9 @@ extension ProtocolSocket where Self: Receiver {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 }

@@ -59,33 +59,6 @@ public enum SocketProtocol {
                 return NN_BUS
         }
     }
-
-    public init?(rawValue: CInt) {
-        switch rawValue {
-            case NN_PAIR:
-                self = .PairProtocol
-            case NN_PUB:
-                self = .PublisherProtocol
-            case NN_SUB:
-                self = .SubscriberProtocol
-            case NN_REQ:
-                self = .RequestProtocol
-            case NN_REP:
-                self = .ReplyProtocol
-            case NN_PUSH:
-                self = .PushProtocol
-            case NN_PULL:
-                self = .PullProtocol
-            case NN_SURVEYOR:
-                self = .SurveyorProtocol
-            case NN_RESPONDENT:
-                self = .RespondentProtocol
-            case NN_BUS:
-                self = .BusProtocol
-            default:
-                return nil
-        }
-    }
 }
 
 extension SocketProtocol: CustomStringConvertible {

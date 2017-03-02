@@ -32,12 +32,10 @@ class SocketOptionTests: XCTestCase {
         do {
             let node0 = try PairSocket()
 
-            let socketDomain = try node0.getSocketDomain()
-            XCTAssertEqual(socketDomain, SocketDomain.StandardSocket, "getSocketDomain(): \(socketDomain)")
-            let socketProtocol = try node0.getSocketProtocol()
-            XCTAssertEqual(socketProtocol, SocketProtocol.PairProtocol, "getSocketProtocol(): \(socketProtocol)")
-            let socketProtocolFamily = try node0.getSocketProtocolFamily()
-            XCTAssertEqual(socketProtocolFamily, ProtocolFamily.OneToOne, "getSocketProtocolFamily(): \(socketProtocolFamily)")
+            XCTAssertEqual(node0.socketDomain, SocketDomain.StandardSocket, "node0.socketDomain: \(node0.socketDomain)")
+            XCTAssertEqual(node0.socketProtocol, SocketProtocol.PairProtocol, "node0.socketProtocol: \(node0.socketProtocol)")
+            XCTAssertEqual(node0.socketProtocolFamily, ProtocolFamily.OneToOne, "node0.socketProtocolFamily: \(node0.socketProtocolFamily)")
+
             let linger = try node0.getLinger()
             XCTAssertEqual(linger, 1, "getLinger(): \(linger)")
             var sendBufferSize = try node0.getSendBufferSize()

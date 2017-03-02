@@ -35,17 +35,6 @@ public enum SocketDomain: CInt {
                 return AF_SP_RAW
         }
     }
-
-    public init?(rawValue: CInt) {
-        switch rawValue {
-            case AF_SP:
-                self = .StandardSocket
-            case AF_SP_RAW:
-                self = .RawSocket
-            default:
-                return nil
-        }
-    }
 }
 
 extension SocketDomain: CustomStringConvertible {

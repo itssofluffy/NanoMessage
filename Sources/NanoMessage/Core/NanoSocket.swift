@@ -23,10 +23,8 @@
 import Foundation
 import CNanoMessage
 import ISFLibrary
-import C7
 import Dispatch
 import Mutex
-import FNVHashValue
 
 /// A NanoMessage base socket.
 public class NanoSocket {
@@ -34,6 +32,15 @@ public class NanoSocket {
     public let socketFd: CInt = -1
     /// The raw nanomsg socket file descriptor.
     public let fileDescriptor: CInt
+    /// The domain of the socket as it was created with.
+    public let socketDomain: SocketDomain
+    /// The protocol of the socket as it was created with.
+    public let socketProtocol: SocketProtocol
+    /// The protocol family of the socket as it was created with.
+    public var socketProtocolFamily: ProtocolFamily {
+        return ProtocolFamily(socketProtocol: socketProtocol)
+    }
+
     /// Is the socket capable of receiving.
     public let receiverSocket: Bool
     /// Is the socket capable of sending.
@@ -134,6 +141,9 @@ public class NanoSocket {
         guard (fileDescriptor >= 0) else {
             throw NanoMessageError.NanoSocket(code: nn_errno())
         }
+
+        self.socketDomain = socketDomain
+        self.socketProtocol = socketProtocol
 
         // rely on the fact that getting the receive/send file descriptor for a socket type from
         // the underlying library that does not support receive/send will throw a nil to determine
@@ -536,32 +546,12 @@ extension NanoSocket {
 }
 
 extension NanoSocket {
-    /// Get the domain of the socket as it was created with.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: The sockets domain.
-    public func getSocketDomain() throws -> SocketDomain {
-        return SocketDomain(rawValue: try getSocketOption(self, .Domain))!
-    }
-
-    /// Get the protocol of the socket as it was created with.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: The sockets protocol.
-    public func getSocketProtocol() throws -> SocketProtocol {
-        return SocketProtocol(rawValue: try getSocketOption(self, .Protocol))!
-    }
-
-    /// Get the protocol family of the socket as it was created with.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: The sockets protocol family.
-    public func getSocketProtocolFamily() throws -> ProtocolFamily {
-        return ProtocolFamily(socketProtocol: try getSocketProtocol())
-    }
+    @available(*, unavailable, renamed: "socketDomain")
+    public func getSocketDomain() throws -> SocketDomain { fatalError() }
+    @available(*, unavailable, renamed: "socketProtocol")
+    public func getSocketProtocol() throws -> SocketProtocol { fatalError() }
+    @available(*, unavailable, renamed: "socketProtocolFamily")
+    public func getSocketProtocolFamily() throws -> ProtocolFamily { fatalError() }
 
     /// Specifies how long the socket should try to send pending outbound messages after the socket
     /// has been de-referenced, in milliseconds. A Negative value means infinite linger.
@@ -726,7 +716,7 @@ extension NanoSocket {
         return originalValue
     }
 
-    @available(*, unavailable, renamed: "getMaximumTTL")
+    @available(*, unavailable, renamed: "getMaximumTTL()")
     public func getMaxTTL() throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
     /// message is received (for example via the `bindToSocket()` function) counts as a single hop.
@@ -739,7 +729,7 @@ extension NanoSocket {
         return try getSocketOption(self, .MaximumTTL)
     }
 
-    @available(*, unavailable, renamed: "setMaximumTTL")
+    @available(*, unavailable, renamed: "setMaximumTTL()")
     @discardableResult
     public func setMaxTTL(hops: Int) throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
@@ -863,6 +853,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -874,6 +867,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -885,6 +881,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -896,6 +895,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -907,6 +909,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -918,6 +923,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -929,6 +937,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -940,6 +951,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -951,6 +965,9 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 
@@ -962,13 +979,16 @@ extension NanoSocket {
                               },
                               failed:   { failure in
                                   nanoMessageLogger(failure)
+                              },
+                              objFunc:  {
+                                  return [self]
                               })
     }
 }
 
 extension NanoSocket: Hashable {
     public var hashValue: Int {
-        return fnv1a(fileDescriptor)
+        return Int(fileDescriptor)
     }
 }
 

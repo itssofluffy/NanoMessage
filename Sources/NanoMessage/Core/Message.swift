@@ -21,7 +21,6 @@
 */
 
 import C7
-import FNVHashValue
 import ISFLibrary
 
 public struct Message {
