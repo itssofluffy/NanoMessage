@@ -49,8 +49,8 @@ class MessageSizeTests: XCTestCase {
             try node0.setSendTimeout(seconds: timeout)
             try node1.setReceiveTimeout(seconds: timeout)
 
-            let node0EndPoint: EndPoint = try node0.connectToURL(connectURL)
-            let node1EndPoint: EndPoint = try node1.bindToURL(bindURL)
+            let node0EndPoint: EndPoint = try node0.createEndPoint(url: connectURL, type: .Connect)
+            let node1EndPoint: EndPoint = try node1.createEndPoint(url: bindURL, type: .Bind)
 
             pauseForBind()
 

@@ -68,7 +68,8 @@ do {
     messages.insert(DataSet(topic: "interesting", message: "this is message #4"))
 
     let node0 = try PublisherSocket()
-    let endPoint: EndPoint = try node0.connectToURL(url)
+
+    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Connect)
 
     usleep(TimeInterval(seconds: 0.25))
 

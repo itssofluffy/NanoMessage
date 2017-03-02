@@ -40,8 +40,8 @@ class PairProtocolFamilyTests: XCTestCase {
         var completed = false
 
         do {
-            let node0 = try PairSocket(connectTo: connectURL)
-            let node1 = try PairSocket(bindTo: bindURL)
+            let node0 = try PairSocket(url: connectURL, type: .Connect)
+            let node1 = try PairSocket(url: bindURL, type: .Bind)
 
             try node0.setSendTimeout(seconds: 1)
             try node0.setReceiveTimeout(seconds: 1)

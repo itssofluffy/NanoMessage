@@ -82,11 +82,11 @@ class SocketStatisticTests: XCTestCase {
             XCTAssertEqual(node1.currentSendPriority!, Priority(level: 0), "node1.currentSendPriority != Priority(level: 0)")
             XCTAssertEqual(node1.currentEndPointErrors!, 0, "node1.currentEndPointErrors != 0")
 
-            let node0EndPointId: Int = try node0.connectToURL(connectURL)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
+            let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
+            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.createEndPoint('\(connectURL)', .Connect) < 0")
 
-            let node1EndPointId: Int = try node1.bindToURL(bindURL)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL)') < 0")
+            let node1EndPointId: Int = try node1.createEndPoint(url: bindURL, type: .Bind)
+            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.createEndPoint('\(bindURL)', .Bind) < 0")
 
             pauseForBind()
 

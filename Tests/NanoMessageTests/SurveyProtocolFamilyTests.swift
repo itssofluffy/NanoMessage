@@ -51,12 +51,12 @@ class SurveyProtocolFamilyTests: XCTestCase {
             try node1.setSendTimeout(seconds: 1)          // set send timeout to 1 seconds.
             try node1.setReceiveTimeout(seconds: 1)       // set receive timeout to 1 seconds.
 
-            let node0EndPointId: Int = try node0.connectToURL(connectURL)
+            let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') < 0")
 
             try node0.setDeadline(seconds: 0.5)           // set the suryeyor deadline to 1/2 second.
 
-            let node1EndPointId: Int = try node1.bindToURL(bindURL)
+            let node1EndPointId: Int = try node1.createEndPoint(url: bindURL, type: .Bind)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.bindToURL('\(bindURL)') < 0")
 
             pauseForBind()

@@ -48,10 +48,10 @@ public var nanomsgError: Dictionary<CInt, String> {
 /// NanoMessage Error Domain.
 public enum NanoMessageError: Error {
     case NanoSocket(code: CInt)
-    case Close(code: CInt)
+    case CloseFailed(code: CInt)
     case Interrupted
-    case BindToURL(code: CInt, url: URL)
-    case ConnectToURL(code: CInt, url: URL)
+    case BindToEndPoint(code: CInt, url: URL)
+    case ConnectToEndPoint(code: CInt, url: URL)
     case RemoveEndPoint(code: CInt, url: URL, endPointId: Int)
     case BindToSocket(code: CInt, nanoSocketName: String)
     case LoopBack(code: CInt)
@@ -88,14 +88,14 @@ extension NanoMessageError: CustomStringConvertible {
         switch self {
             case .NanoSocket(let code):
                 return "nn_socket() failed: " + errorString(code)
-            case .Close(let code):
+            case .CloseFailed(let code):
                 return "nn_close() failed: " + errorString(code)
             case .Interrupted:
                 return "operation was interrupted"
-            case .BindToURL(let code, let url):
-                return "bindToURL('\(url.absoluteString)') failed: " + errorString(code)
-            case .ConnectToURL(let code, let url):
-                return "connectToURL('\(url.absoluteString)') failed: " + errorString(code)
+            case .BindToEndPoint(let code, let url):
+                return "createEndPoint('\(url.absoluteString)', .Bind) failed: " + errorString(code)
+            case .ConnectToEndPoint(let code, let url):
+                return "createEndPoint('\(url.absoluteString)', .Connect) failed: " + errorString(code)
             case .RemoveEndPoint(let code, let url, let endPointId):
                 return "removeEndPoint('\(url.absoluteString)' #(\(endPointId))) failed: " + errorString(code)
             case .BindToSocket(let code, let nanoSocketName):

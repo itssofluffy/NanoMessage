@@ -170,7 +170,7 @@ public class NanoSocket {
                                                             return nn_close(self.fileDescriptor)
                                                         },
                                                         failure:  { errno in
-                                                            return .Close(code: errno)
+                                                            return .CloseFailed(code: errno)
                                                         })
                            },
                            failed:   { failure in
@@ -197,26 +197,57 @@ public class NanoSocket {
 }
 
 extension NanoSocket {
-    /// Establish an endpoint on the socket.
+    /// Dispatch a call asynchronously
     ///
     /// - Parameters:
-    ///   - url:      Consists of two parts as follows: transport://address. The transport specifies the
-    ///               underlying transport protocol to use. The meaning of the address part is specific
-    ///               to the underlying transport protocol.
-    ///   - name:     An optional endpoint name.
-    ///   - type:     The connection type used to establish the endpoint.
-    ///   - funcCall: Closure used to establish the endpoint.
-    ///   - failure:  The error should the `funcCall` fail.
+    ///   - queue:    The dispatch queue to use
+    ///   - group:    The dispatch group to use.
+    ///   - funcCall: The closure to call.
+    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
+    private func _dispatchTo(queue:    DispatchQueue,
+                             group:    DispatchGroup,
+                             funcCall: @escaping () throws -> Void,
+                             objFunc:  @escaping () -> [Any]) {
+        queue.async(group: group) {
+            doCatchWrapper(funcCall: {
+                               try funcCall()
+                           },
+                           failed:   { failure in
+                               nanoMessageLogger(failure)
+                           },
+                           objFunc:  objFunc)
+        }
+    }
+
+    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
+    public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint { fatalError() }
+    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
+    public func bindToURL(_ url: URL, name: String = "") throws -> Int { fatalError() }
+    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
+    public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint { fatalError() }
+    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
+    public func connectToURL(_ url: URL, name: String = "") throws -> Int { fatalError() }
+
+    /// Adds a local or remote endpoint to the socket. The library would then try to bind or connect to the specified endpoint.
     ///
-    /// - Throws:  `NanoMessageError.GetSocketOption`
+    /// - Parameters:
+    ///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
+    ///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
+    ///   - type: The connection type used to establish the endpoint.
+    ///   - name: An optional endpoint name.
     ///
-    /// - Returns: An endpoint that has just been established. The endpoint can be later used to remove the
-    ///            endpoint from the socket via `removeEndPoint()` function.
-    private func _establishEndPoint(url:      URL,
-                                    name:     String,
-                                    type:     ConnectionType,
-                                    funcCall: (UnsafePointer<Int8>) -> CInt,
-                                    failure:  (CInt) -> NanoMessageError) throws -> EndPoint {
+    /// - Throws:  `NanoMessageError.BindToURL` if there was a problem connecting the socket to the url.
+    ///            `NanoMessageError.ConnectToURL` if there was a problem binding the socket to the url.
+    ///            `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from the
+    ///            socket via the `removeEndPoint()` function.
+    ///
+    /// - Note:    Note that `createEndPoint()` may be called multiple times on the same socket thus allowing the
+    ///            socket to communicate with multiple heterogeneous endpoints.
+    public func createEndPoint(url:  URL,
+                               type: ConnectionType,
+                               name: String = "") throws -> EndPoint {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
@@ -228,6 +259,13 @@ extension NanoSocket {
         }
 
         let ipv4Only = try getIPv4Only()
+
+        let funcCall: (UnsafePointer<Int8>) -> CInt = { address in
+            return (type == .Bind) ? nn_bind(self.fileDescriptor, address) : nn_connect(self.fileDescriptor, address)
+        }
+        let failure: (CInt) -> NanoMessageError = { errno in
+            return (type == .Bind) ? .BindToEndPoint(code: errno, url: url) : .ConnectToEndPoint(code: errno, url: url)
+        }
 
         let endPointId = try url.absoluteString.withCString { address -> Int in
             let returnCode = funcCall(address)
@@ -252,120 +290,27 @@ extension NanoSocket {
         return endPoint
     }
 
-    /// Dispatch a call asynchronously
-    ///
-    /// - Parameters:
-    ///   - queue:    The dispatch queue to use
-    ///   - group:    The dispatch group to use.
-    ///   - funcCall: The closure to call.
-    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
-    private func _dispatchTo(queue:    DispatchQueue,
-                             group:    DispatchGroup,
-                             funcCall: @escaping () throws -> Void,
-                             objFunc:  @escaping () -> [Any]) {
-        queue.async(group: group) {
-            doCatchWrapper(funcCall: {
-                               try funcCall()
-                           },
-                           failed:   { failure in
-                               nanoMessageLogger(failure)
-                           },
-                           objFunc:  objFunc)
-        }
-    }
-
-    /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
+    /// Adds a local or remote endpoint to the socket. The library would then try to bind or connect to the specified endpoint.
     ///
     /// - Parameters:
     ///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
     ///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
+    ///   - type: The connection type used to establish the endpoint.
     ///   - name: An optional endpoint name.
     ///
-    /// - Throws:  `NanoMessageError.BindToURL` if there was a problem binding the socket to the address.
-    ///            `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: An endpoint that has just been binded too. The endpoint can be later used to remove the
-    ///            endpoint from the socket via `removeEndPoint()` function.
-    ///
-    /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
-    ///            socket to communicate with multiple heterogeneous endpoints.
-    public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try _establishEndPoint(url:      url,
-                                      name:     name,
-                                      type:     .Bind,
-                                      funcCall: { address in
-                                          return nn_bind(fileDescriptor, address)
-                                      },
-                                      failure:  { errno in
-                                          return .BindToURL(code: errno, url: url)
-                                      })
-    }
-
-    /// Adds a local endpoint to the socket. The endpoint can be then used by other applications to connect to.
-    ///
-    /// - Parameters:
-    ///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
-    ///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
-    ///   - name: An optional endpoint name.
-    ///
-    /// - Throws:  `NanoMessageError.BindToURL` if there was a problem binding the socket to the address.
-    ///            `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from
-    ///            the socket via `removeEndPoint()` function.
-    ///
-    /// - Note:    Note that `bindToURL()` may be called multiple times on the same socket thus allowing the
-    ///            socket to communicate with multiple heterogeneous endpoints.
-    public func bindToURL(_ url: URL, name: String = "") throws -> Int {
-        let endPoint: EndPoint = try bindToURL(url, name: name)
-
-        return endPoint.id
-    }
-
-    /// Adds a remote endpoint to the socket. The library would then try to connect to the specified remote endpoint.
-    ///
-    /// - Parameters:
-    ///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
-    ///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
-    ///   - name: An optional endpoint name.
-    ///
-    /// - Throws:  `NanoMessageError.ConnectToURL` if there was a problem binding the socket to the address.
-    ///            `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: The endpoint that has just been connected too. The endpoint can be later used to remove the
-    ///            endpoint from the socket via `removeEndPoint()` function.
-    ///
-    /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
-    ///            socket to communicate with multiple heterogeneous endpoints.
-    public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint {
-        return try _establishEndPoint(url:      url,
-                                      name:     name,
-                                      type:     .Connect,
-                                      funcCall: { address in
-                                          return nn_connect(fileDescriptor, address)
-                                      },
-                                      failure:  { errno in
-                                          return .ConnectToURL(code: errno, url: url)
-                                      })
-    }
-
-    /// Adds a remote endpoint to the socket. The library would then try to connect to the specified remote endpoint.
-    ///
-    /// - Parameters:
-    ///   - url:  Consists of two parts as follows: transport://address. The transport specifies the underlying
-    ///           transport protocol to use. The meaning of the address part is specific to the underlying transport protocol.
-    ///   - name: An optional endpoint name.
-    ///
-    /// - Throws:  `NanoMessageError.ConnectToURL` if there was a problem binding the socket to the address.
+    /// - Throws:  `NanoMessageError.BindToURL` if there was a problem connecting the socket to the url.
+    ///            `NanoMessageError.ConnectToURL` if there was a problem binding the socket to the url.
     ///            `NanoMessageError.GetSocketOption`
     ///
     /// - Returns: An endpoint ID is returned. The endpoint ID can be later used to remove the endpoint from the
     ///            socket via the `removeEndPoint()` function.
     ///
-    /// - Note:    Note that `connectToURL()` may be called multiple times on the same socket thus allowing the
+    /// - Note:    Note that `createEndPoint()` may be called multiple times on the same socket thus allowing the
     ///            socket to communicate with multiple heterogeneous endpoints.
-    public func connectToURL(_ url: URL, name: String = "") throws -> Int {
-        let endPoint: EndPoint = try connectToURL(url, name: name)
+    public func createEndPoint(url:  URL,
+                               type: ConnectionType,
+                               name: String = "") throws -> Int {
+        let endPoint: EndPoint = try createEndPoint(url: url, type: type, name: name)
 
         return endPoint.id
     }
@@ -729,7 +674,7 @@ extension NanoSocket {
         return try getSocketOption(self, .MaximumTTL)
     }
 
-    @available(*, unavailable, renamed: "setMaximumTTL()")
+    @available(*, unavailable, renamed: "setMaximumTTL(hops:)")
     @discardableResult
     public func setMaxTTL(hops: Int) throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the

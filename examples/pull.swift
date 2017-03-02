@@ -41,7 +41,8 @@ guard let url = URL(string: urlToUse) else {
 
 do {
     let node0 = try PullSocket()
-    let endPoint: EndPoint = try node0.bindToURL(url, name: "receive end-point")
+
+    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Bind, name: "receive end-point")
 
     print(endPoint)
 
@@ -63,6 +64,10 @@ do {
 
     print("messages: \(node0.messagesReceived!)")
     print("bytes   : \(node0.bytesReceived!)")
+
+    if (try node0.removeEndPoint(endPoint)) {
+        print("end-point removed")
+    }
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

@@ -59,13 +59,14 @@ if (messageSize < 1) {
 
 do {
     let node0 = try PushSocket()
-    let endPoint: EndPoint = try node0.connectToURL(url, name: "send end-point")
+
+    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Connect, name: "send end-point")
 
     usleep(TimeInterval(milliseconds: 200))
 
     print(endPoint)
 
-    let messagePayload = Message(value: [UInt8](repeating: 0xff, count: messageSize))
+    let messagePayload = Message(value: [Byte](repeating: 0xff, count: messageSize))
 
     for _ in 1 ... sendCount {
         try node0.sendMessage(messagePayload, timeout: TimeInterval(seconds: 10))

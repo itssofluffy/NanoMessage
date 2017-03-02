@@ -51,8 +51,8 @@ class BindToSocketTests: XCTestCase {
         var completed = false
 
         do {
-            let node0 = try ReplySocket(socketDomain: .RawSocket, bindTo: bindURL1)
-            let node1 = try RequestSocket(socketDomain: .RawSocket, bindTo: bindURL2)
+            let node0 = try ReplySocket(socketDomain: .RawSocket, url: bindURL1, type: .Bind)
+            let node1 = try RequestSocket(socketDomain: .RawSocket, url: bindURL2, type: .Bind)
 
             let queue = DispatchQueue(label: "com.nanomessage.bindtosocket")
             let group = DispatchGroup()
@@ -67,10 +67,10 @@ class BindToSocketTests: XCTestCase {
             try node3.setSendTimeout(seconds: 1)
             try node3.setReceiveTimeout(seconds: 1)
 
-            let node2EndPointId: Int = try node2.connectToURL(connectURL1)
+            let node2EndPointId: Int = try node2.createEndPoint(url: connectURL1, type: .Connect)
             XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.connectToURL('\(connectURL1)') < 0")
 
-            let node3EndPointId: Int = try node3.connectToURL(connectURL2)
+            let node3EndPointId: Int = try node3.createEndPoint(url: connectURL2, type: .Connect)
             XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.connectToURL('\(connectURL2)') < 0")
 
             let node2bytesSent = try node2.sendMessage(payload)

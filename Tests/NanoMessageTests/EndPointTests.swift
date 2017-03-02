@@ -49,10 +49,10 @@ class EndPointTests: XCTestCase {
             XCTAssertEqual(node0.endPoints.count, 0, "node0.endPoints.count != 0")
             XCTAssertEqual(node1.endPoints.count, 0, "node1.endPoints.count != 0")
 
-            let node0EndPointId: Int = try node0.connectToURL(connectURL)
+            let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') != 0")
 
-            let node1EndPoint: EndPoint = try node1.bindToURL(bindURL)
+            let node1EndPoint: EndPoint = try node1.createEndPoint(url: bindURL, type: .Bind)
             XCTAssertGreaterThanOrEqual(node1EndPoint.id, 0, "node1.bindToURL('\(bindURL)') != 0")
 
             pauseForBind()
@@ -70,7 +70,7 @@ class EndPointTests: XCTestCase {
 
             try node0.setSendPriority(Priority(level: 2))
 
-            let node0EndPoint: EndPoint = try node0.connectToURL(connectURL, name: endPointName)
+            let node0EndPoint: EndPoint = try node0.createEndPoint(url: connectURL, type: .Connect, name: endPointName)
 
             XCTAssertGreaterThanOrEqual(node0EndPoint.id, 0, "node0EndPoint.id != 0")
             XCTAssertEqual(node0EndPoint.url.absoluteString, connectURL.absoluteString, "node0EndPoint.url.absoluteString != '\(connectURL)'")

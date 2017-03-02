@@ -33,32 +33,18 @@ public protocol ProtocolSocket {
 }
 
 extension ProtocolSocket {
-    public init(socketDomain: SocketDomain = .StandardSocket, connectTo url: URL) throws {
-        try self.init(socketDomain: socketDomain)
-
-        let _: EndPoint = try _nanoSocket.connectToURL(url)
-    }
-
-    public init(socketDomain: SocketDomain = .StandardSocket, connectTo urls: [URL]) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket, urls: [URL], type: ConnectionType) throws {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
-            let _: EndPoint = try _nanoSocket.connectToURL(url)
+            let _: EndPoint = try _nanoSocket.createEndPoint(url: url, type: type)
         }
     }
 
-    public init(socketDomain: SocketDomain = .StandardSocket, bindTo url: URL) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket, url: URL, type: ConnectionType) throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try _nanoSocket.bindToURL(url)
-    }
-
-    public init(socketDomain: SocketDomain = .StandardSocket, bindTo urls: [URL]) throws {
-        try self.init(socketDomain: socketDomain)
-
-        for url in urls {
-            let _: EndPoint = try _nanoSocket.bindToURL(url)
-        }
+        let _: EndPoint = try _nanoSocket.createEndPoint(url: url, type: type)
     }
 }
 
