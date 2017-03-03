@@ -61,6 +61,7 @@ extension SubscriberSocket {
     ///                   will throw `NanoMessageError.MessageNotReceived`.
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
     ///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
     ///            `NanoMessageError.MessageNotReceived` in non-blocking mode there was no message to receive.
     ///            `NanoMessageError.TimedOut` the receive timedout.

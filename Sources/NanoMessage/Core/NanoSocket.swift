@@ -400,15 +400,12 @@ extension NanoSocket {
     ///   - nanoSocket: The socket to bind too.
     ///
     /// - Throws: `NanoMessageError.SocketIsADevice`
+    ///           `NanoMessageError.NoEndPoint`
     ///           `NanoMessageError.BindToSocket` if a problem has been encountered.
     public func bindToSocket(_ nanoSocket: NanoSocket) throws {
-        guard (!socketIsADevice) else {
-            throw NanoMessageError.SocketIsADevice(socket: self)
-        }
+        try validateNanoSocket(self)
 
-        guard (!nanoSocket.socketIsADevice) else {
-            throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
-        }
+        try validateNanoSocket(nanoSocket)
 
         socketIsADevice = true
         nanoSocket.socketIsADevice = true
@@ -454,11 +451,10 @@ extension NanoSocket {
     /// Starts a 'loopback' on the socket, it loops and sends any messages received from the socket back to itself.
     ///
     /// - Throws: `NanoMessageError.SocketIsADevice`
+    ///           `NanoMessageError.NoEndPoint`
     ///           `NanoMessageError.LoopBack` if a problem has been encountered.
     public func loopBack() throws {
-        guard (!socketIsADevice) else {                                    // guard against socket already being a device socket.
-            throw NanoMessageError.SocketIsADevice(socket: self)
-        }
+        try validateNanoSocket(self)
 
         socketIsADevice = true
 

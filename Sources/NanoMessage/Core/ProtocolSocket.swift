@@ -33,7 +33,9 @@ public protocol ProtocolSocket {
 }
 
 extension ProtocolSocket {
-    public init(socketDomain: SocketDomain = .StandardSocket, urls: [URL], type: ConnectionType) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket,
+                urls:         [URL],
+                type:         ConnectionType) throws {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
@@ -41,10 +43,13 @@ extension ProtocolSocket {
         }
     }
 
-    public init(socketDomain: SocketDomain = .StandardSocket, url: URL, type: ConnectionType) throws {
+    public init(socketDomain: SocketDomain = .StandardSocket,
+                url:          URL,
+                type:         ConnectionType,
+                name:         String = "") throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try _nanoSocket.createEndPoint(url: url, type: type)
+        let _: EndPoint = try _nanoSocket.createEndPoint(url: url, type: type, name: name)
     }
 }
 
@@ -58,6 +63,7 @@ extension ProtocolSocket where Self: Sender {
     ///                   `NanoMessageError.MessageNotSent`
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
     ///            `NanoMessageError.SendMessage` there was a problem sending the message.
     ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
     ///            `NanoMessageError.SendTimedOut` the send timedout.
@@ -76,6 +82,7 @@ extension ProtocolSocket where Self: Sender {
     ///              If the message cannot be sent straight away, the function will throw `NanoMessageError.MessageNotSent`
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
     ///            `NanoMessageError.GetSocketOption`
     ///            `NanoMessageError.SetSocketOption`
     ///            `NanoMessageError.SendMessage` there was a problem sending the message.
@@ -179,6 +186,7 @@ extension ProtocolSocket where Self: Receiver {
     ///                   will throw `NanoMessageError.MessageNotReceived`.
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
     ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
     ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
@@ -195,6 +203,7 @@ extension ProtocolSocket where Self: Receiver {
     ///              If there is no message to receive the function will throw `NanoMessageError.MessageNotReceived`.
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
     ///            `NanoMessageError.GetSocketOption`
     ///            `NanoMessageError.SetSocketOption`
     ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.

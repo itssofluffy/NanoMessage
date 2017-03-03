@@ -76,6 +76,7 @@ extension PublisherSocket {
     ///                   `NanoMessageError.MessageNotSent`
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
     ///            `NanoMessageError.SendMessage` there was a problem sending the message.
     ///            `NanoMessageError.NoTopic` if there was no topic defined to send.
     ///            `NanoMessageError.TopicLength` if the topic length too large.

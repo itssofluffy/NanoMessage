@@ -34,7 +34,7 @@ private let NN_MSG: size_t = -1
 ///
 /// - Throws:  `NanoMessageError.SocketIsADevice`
 ///            `NanoMessageError.NoEndPoint`
-private func _validateNanoSocket(_ nanoSocket: NanoSocket) throws {
+internal func validateNanoSocket(_ nanoSocket: NanoSocket) throws {
     guard (!nanoSocket.socketIsADevice) else {
         throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }
@@ -63,7 +63,7 @@ private func _validateNanoSocket(_ nanoSocket: NanoSocket) throws {
 internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
                                   _ payload:      C7.Data,
                                   _ blockingMode: BlockingMode) throws -> Int {
-    try _validateNanoSocket(nanoSocket)
+    try validateNanoSocket(nanoSocket)
 
     let bytesSent = Int(nn_send(nanoSocket.fileDescriptor, payload.bytes, payload.count, blockingMode.rawValue))
 
@@ -105,11 +105,18 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
 /// - Returns: The number of bytes received and the received message
 internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
                                        _ blockingMode: BlockingMode) throws -> ReceiveMessage {
-    try _validateNanoSocket(nanoSocket)
+    try validateNanoSocket(nanoSocket)
 
     var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)
 
     let bytesReceived = Int(nn_recv(nanoSocket.fileDescriptor, &buffer, NN_MSG, blockingMode.rawValue))
+
+    defer {
+        // not sure if this needed because of the deallocation using nn_freemsg() but does seem to hurt
+        // when we complete succesfully, but call it just in case we `throw` prior to doing the `nn_freemsg()`
+        // underlying library documentation says that `buffer` is unallocated if `nn_recv` fails.
+        buffer.deinitialize(count: (bytesReceived < 0) ? 0 : bytesReceived)
+    }
 
     guard (bytesReceived >= 0) else {
         let errno = nn_errno()
@@ -136,8 +143,6 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
     guard (returnCode >= 0) else {
         throw NanoMessageError.ReceiveMessage(code: nn_errno())
     }
-
-    buffer.deinitialize(count: bytesReceived)   // not sure if this needed because of the deallocation using nn_freemsg() but does seem to hurt.
 
     return ReceiveMessage(bytes: bytesReceived, message: Message(value: payload))
 }
