@@ -21,11 +21,6 @@
 */
 
 public struct ReceiveMessage {
-    public private(set) var bytes: Int
+    public let bytes: Int
     public internal(set) var message: Message
-
-    public init(bytes: Int, message: Message) {
-        self.bytes = bytes
-        self.message = message
-    }
 }

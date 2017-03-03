@@ -23,11 +23,6 @@
 public struct SocketPriorities {
     public let receive: Priority?
     public let send: Priority?
-
-    public init(receivePriority: Priority?, sendPriority: Priority?) {
-        self.receive = receivePriority
-        self.send = sendPriority
-    }
 }
 
 extension SocketPriorities: CustomStringConvertible {

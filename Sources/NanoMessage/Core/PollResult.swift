@@ -20,4 +20,13 @@
     IN THE SOFTWARE.
 */
 
-public typealias PollResult = (messageIsWaiting: Bool, sendIsBlocked: Bool)
+public struct PollResult {
+    public let messageIsWaiting: Bool
+    public let sendIsBlocked: Bool
+}
+
+extension PollResult: CustomStringConvertible {
+    public var description: String {
+        return "message waiting: \(messageIsWaiting), send blocked: \(sendIsBlocked)"
+    }
+}

@@ -40,7 +40,6 @@ public class NanoSocket {
     public var socketProtocolFamily: ProtocolFamily {
         return ProtocolFamily(socketProtocol: socketProtocol)
     }
-
     /// Is the socket capable of receiving.
     public let receiverSocket: Bool
     /// Is the socket capable of sending.
@@ -50,10 +49,6 @@ public class NanoSocket {
 
     private var _closeAttempts: Int = 20
     /// The number of attempts to close down a socket or endpoint, this is clamped to between 1 and 1000.
-    ///
-    /// - Note:  The `getLinger()` function is called to determine the number of milliseconds to
-    ///          wait for a socket/endpoint to clear and close, this is divided by `closeAttempts`
-    ///          to determine the minimum pause between each attempt.
     public var closeAttempts: Int {
         get {
             return _closeAttempts
@@ -63,6 +58,10 @@ public class NanoSocket {
         }
     }
     /// The socket/end-point close time in timeinterval.
+    ///
+    /// - Note:  The `getLinger()` function is called to determine the number of milliseconds to
+    ///          wait for a socket/endpoint to clear and close, this is divided by `closeAttempts`
+    ///          to determine the minimum pause between each attempt.
     fileprivate var _closeDelay: TimeInterval {
         var delay = TimeInterval(milliseconds: 1000)
 
@@ -280,8 +279,8 @@ extension NanoSocket {
         let endPoint = EndPoint(id:         endPointId,
                                 url:        url,
                                 type:       type,
-                                priorities: SocketPriorities(receivePriority: receivePriority,
-                                                             sendPriority:    sendPriority),
+                                priorities: SocketPriorities(receive: receivePriority,
+                                                             send:    sendPriority),
                                 ipv4Only:   ipv4Only,
                                 name:       name)
 

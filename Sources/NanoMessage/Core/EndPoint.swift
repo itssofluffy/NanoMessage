@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import FNVHashValue
 import Foundation
 
 /// Endpoint.
@@ -52,7 +51,7 @@ public struct EndPoint {
 
 extension EndPoint: Hashable {
     public var hashValue: Int {
-        return fnv1a(id)
+        return id
     }
 }
 

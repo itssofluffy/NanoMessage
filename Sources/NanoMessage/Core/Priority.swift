@@ -23,7 +23,7 @@
 import ISFLibrary
 
 public struct Priority {
-    let level: Int
+    public let level: Int
 
     public init(level: Int) {
         self.level = clamp(value: level, lower: 1, upper: 16)
