@@ -112,7 +112,7 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
     let bytesReceived = Int(nn_recv(nanoSocket.fileDescriptor, &buffer, NN_MSG, blockingMode.rawValue))
 
     defer {
-        // not sure if this needed because of the deallocation using nn_freemsg() but does seem to hurt
+        // not sure if this needed because of the deallocation using nn_freemsg() but doesn't seem to hurt
         // when we complete succesfully, but call it just in case we `throw` prior to doing the `nn_freemsg()`
         // underlying library documentation says that `buffer` is unallocated if `nn_recv` fails.
         buffer.deinitialize(count: (bytesReceived < 0) ? 0 : bytesReceived)

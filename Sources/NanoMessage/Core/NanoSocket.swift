@@ -947,6 +947,6 @@ extension NanoSocket: Equatable {
 
 extension NanoSocket: CustomStringConvertible {
     public var description: String {
-        return "fileDescriptor: \(fileDescriptor)"
+        return "file descriptor: \(fileDescriptor), domain: \(socketDomain), protocol: \(socketProtocol), protocol family: \(socketProtocolFamily), close attempts: \(closeAttempts)"
     }
 }

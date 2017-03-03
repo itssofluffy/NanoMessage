@@ -50,10 +50,10 @@ class EndPointTests: XCTestCase {
             XCTAssertEqual(node1.endPoints.count, 0, "node1.endPoints.count != 0")
 
             let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
-            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.connectToURL('\(connectURL)') != 0")
+            XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0EndPointId != 0")
 
             let node1EndPoint: EndPoint = try node1.createEndPoint(url: bindURL, type: .Bind)
-            XCTAssertGreaterThanOrEqual(node1EndPoint.id, 0, "node1.bindToURL('\(bindURL)') != 0")
+            XCTAssertGreaterThanOrEqual(node1EndPoint.id, 0, "node1EndPoint.id) != 0")
 
             pauseForBind()
 

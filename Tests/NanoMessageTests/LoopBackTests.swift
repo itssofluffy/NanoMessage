@@ -58,10 +58,10 @@ class LoopBackTests: XCTestCase {
             try node2.setReceiveTimeout(seconds: 1)
 
             let node1EndPointId: Int = try node1.createEndPoint(url: connectURL, type: .Connect)
-            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.connectToURL('\(connectURL)') < 0")
+            XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.createEndPoint('\(connectURL)', .Connect) < 0")
 
             let node2EndPointId: Int = try node2.createEndPoint(url: connectURL, type: .Connect)
-            XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.connectToURL('\(connectURL)') < 0")
+            XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.createEndPoint('\(connectURL)', .Connect) < 0")
 
             let node1bytesSent = try node1.sendMessage(payload)
             XCTAssertEqual(node1bytesSent, payload.count, "node1bytesSent != payload.count")

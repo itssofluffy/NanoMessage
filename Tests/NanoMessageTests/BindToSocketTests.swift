@@ -68,16 +68,16 @@ class BindToSocketTests: XCTestCase {
             try node3.setReceiveTimeout(seconds: 1)
 
             let node2EndPointId: Int = try node2.createEndPoint(url: connectURL1, type: .Connect)
-            XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.connectToURL('\(connectURL1)') < 0")
+            XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.createEndPoint('\(connectURL1)', .Connect) < 0")
 
             let node3EndPointId: Int = try node3.createEndPoint(url: connectURL2, type: .Connect)
-            XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.connectToURL('\(connectURL2)') < 0")
+            XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.createEndPoint('\(connectURL2)', .Connect) < 0")
 
             let node2bytesSent = try node2.sendMessage(payload)
             XCTAssertEqual(node2bytesSent, payload.count, "node2bytesSent != payload.count")
 
             let node3Received = try node3.receiveMessage()
-            XCTAssertEqual(node3Received.bytes, node3Received.message.count, "node3.bytes != node3Received.message.count")
+            XCTAssertEqual(node3Received.bytes, node3Received.message.count, "node3Received.bytes != node3Received.message.count")
             XCTAssertEqual(node3Received.message, payload, "node3Received.message != payload")
 
             let node3bytesSent = try node3.sendMessage(payload)
