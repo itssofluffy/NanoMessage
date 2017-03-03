@@ -60,6 +60,7 @@ public enum NanoMessageError: Error {
     case GetSocketStatistic(code: CInt, option: SocketStatistic)
     case PollSocket(code: CInt)
     case SocketIsADevice(socket: NanoSocket)
+    case NoEndPoint(socket: NanoSocket)
     case SendMessage(code: CInt)
     case MessageNotSent
     case SendTimedOut(timeout: TimeInterval)
@@ -112,6 +113,8 @@ extension NanoMessageError: CustomStringConvertible {
                 return "pollSocket() failed: " + errorString(code)
             case .SocketIsADevice(let socket):
                 return "NanoSocket \(socket.fileDescriptor) Is A Device"
+            case .NoEndPoint(let socket):
+                return "NanoSocket \(socket.fileDescriptor) Has No EndPoint(s)"
             case .SendMessage(let code):
                 return "sendMessage() failed: " + errorString(code)
             case .MessageNotSent:

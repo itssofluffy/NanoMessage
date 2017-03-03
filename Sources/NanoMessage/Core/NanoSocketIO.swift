@@ -27,6 +27,23 @@ import Foundation
 
 private let NN_MSG: size_t = -1
 
+/// Is it valid to send or receive on the socket.
+///
+/// - Parameters:
+///   - nanoSocket:   The nano socket to use.
+///
+/// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.NoEndPoint`
+private func _validateNanoSocket(_ nanoSocket: NanoSocket) throws {
+    guard (!nanoSocket.socketIsADevice) else {
+        throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
+    }
+
+    guard (nanoSocket.endPoints.count > 0) else {
+        throw NanoMessageError.NoEndPoint(socket: nanoSocket)
+    }
+}
+
 /// The low-level send a message function.
 ///
 /// - Parameters:
@@ -37,6 +54,7 @@ private let NN_MSG: size_t = -1
 ///                   `NanoMessageError.MessageNotSent`
 ///
 /// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.NoEndPoint`
 ///            `NanoMessageError.sendMessage` there was a problem sending the message.
 ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
 ///            `NanoMessageError.SendTimedOut` the send timedout.
@@ -45,9 +63,7 @@ private let NN_MSG: size_t = -1
 internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
                                   _ payload:      C7.Data,
                                   _ blockingMode: BlockingMode) throws -> Int {
-    guard (!nanoSocket.socketIsADevice) else {
-        throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
-    }
+    try _validateNanoSocket(nanoSocket)
 
     let bytesSent = Int(nn_send(nanoSocket.fileDescriptor, payload.bytes, payload.count, blockingMode.rawValue))
 
@@ -81,6 +97,7 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
 ///                   will throw `NanoMessageError.MessageNotReceived`.
 ///
 /// - Throws:  `NanoMessageError.SocketIsADevice`
+///            `NanoMessageError.NoEndPoint`
 ///            `NanoMessageError.receiveMessage` there was an issue when receiving the message.
 ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
 ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
@@ -88,9 +105,7 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
 /// - Returns: The number of bytes received and the received message
 internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
                                        _ blockingMode: BlockingMode) throws -> ReceiveMessage {
-    guard (!nanoSocket.socketIsADevice) else {
-        throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
-    }
+    try _validateNanoSocket(nanoSocket)
 
     var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)
 
