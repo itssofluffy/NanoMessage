@@ -125,28 +125,28 @@ extension PublisherSocket {
     /// Asynchrounous execute a passed sender closure.
     ///
     /// - Parameters:
-    ///   - payload:  A PublisherMessage to send.
-    ///   - funcCall: The closure to use to perform the send
-    ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
-    private func _asyncSend(payload:  PublisherMessage,
-                            funcCall: @escaping (Message) throws -> Int,
-                            success:  @escaping (Int) -> Void,
-                            objFunc:  @escaping () -> [Any]) {
+    ///   - payload: A PublisherMessage to send.
+    ///   - closure: The closure to use to perform the send
+    ///   - success: The closure to use when `closure()` is succesful.
+    ///   - capture: The closure to use to pass any objects required when an error occurs.
+    private func _asyncSend(payload: PublisherMessage,
+                            closure: @escaping (Message) throws -> Int,
+                            success: @escaping (Int) -> Void,
+                            capture: @escaping () -> [Any]) {
         aioQueue.async(group: aioGroup) {
-            doCatchWrapper(funcCall: { () -> Void in
-                               try self.mutex.lock {
-                                   try self.setSendTopic(payload.topic)
+            wrapper(do: { () -> Void in
+                        try self.mutex.lock {
+                            try self.setSendTopic(payload.topic)
 
-                                   let bytesSent = try funcCall(payload.message)
+                            let bytesSent = try closure(payload.message)
 
-                                   success(bytesSent)
-                               }
-                           },
-                           failed:   { failure in
-                               nanoMessageLogger(failure)
-                           },
-                           objFunc:  objFunc)
+                            success(bytesSent)
+                        }
+                    },
+                    catch: { failure in
+                        nanoMessageLogger(failure)
+                    },
+                    capture: capture)
         }
     }
 
@@ -161,12 +161,12 @@ extension PublisherSocket {
     public func sendMessage(payload:      PublisherMessage,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (Int) -> Void) {
-        _asyncSend(payload:  payload,
-                   funcCall: { message in
+        _asyncSend(payload: payload,
+                   closure: { message in
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
-                   success:  success,
-                   objFunc:  {
+                   success: success,
+                   capture: {
                        return [self, payload, blockingMode, self.aioQueue, self.aioGroup]
                    })
     }
@@ -180,12 +180,12 @@ extension PublisherSocket {
     public func sendMessage(payload: PublisherMessage,
                             timeout: TimeInterval,
                             success: @escaping (Int) -> Void) {
-        _asyncSend(payload:  payload,
-                   funcCall: { message in
+        _asyncSend(payload: payload,
+                   closure: { message in
                        return try self.sendMessage(message, timeout: timeout)
                    },
-                   success:  success,
-                   objFunc:  {
+                   success: success,
+                   capture: {
                        return [self, payload, timeout, self.aioQueue, self.aioGroup]
                    })
     }

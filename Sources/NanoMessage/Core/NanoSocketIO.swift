@@ -73,12 +73,12 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotSent
         } else if (errno == ETIMEDOUT) {
-            let timeout = doCatchWrapper(funcCall: { () -> TimeInterval in
-                                             try getSocketOption(nanoSocket, .SendTimeout)
-                                         },
-                                         failed:   { failure in
-                                             nanoMessageLogger(failure)
-                                         })
+            let timeout = wrapper(do: { () -> TimeInterval in
+                                      try getSocketOption(nanoSocket, .SendTimeout)
+                                  },
+                                  catch: { failure in
+                                      nanoMessageLogger(failure)
+                                  })
             throw NanoMessageError.SendTimedOut(timeout: timeout!)
         }
 
@@ -124,12 +124,12 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
         if (blockingMode == .NonBlocking && errno == EAGAIN) {
             throw NanoMessageError.MessageNotAvailable
         } else if (errno == ETIMEDOUT) {
-            let timeout = doCatchWrapper(funcCall: { () -> TimeInterval in
-                                             try getSocketOption(nanoSocket, .ReceiveTimeout)
-                                         },
-                                         failed:   { failure in
-                                             nanoMessageLogger(failure)
-                                         })
+            let timeout = wrapper(do: { () -> TimeInterval in
+                                      try getSocketOption(nanoSocket, .ReceiveTimeout)
+                                  },
+                                  catch: { failure in
+                                      nanoMessageLogger(failure)
+                                  })
             throw NanoMessageError.ReceiveTimedOut(timeout: timeout!)
         }
 

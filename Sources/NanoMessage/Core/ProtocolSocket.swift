@@ -99,12 +99,12 @@ extension ProtocolSocket where Self: Sender {
 
         defer {
             if (originalTimeout != timeout) {
-                doCatchWrapper(funcCall: { () -> Void in
-                                   try self.setSendTimeout(seconds: originalTimeout)
-                               },
-                               failed:   { failure in
-                                   nanoMessageLogger(failure)
-                               })
+                wrapper(do: { () -> Void in
+                            try self.setSendTimeout(seconds: originalTimeout)
+                        },
+                        catch: { failure in
+                            nanoMessageLogger(failure)
+                        })
             }
         }
 
@@ -116,24 +116,24 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     /// Asynchrounous execute a passed sender closure.
     ///
     /// - Parameters:
-    ///   - funcCall: The closure to use to perform the send
-    ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
-    private func _asyncSend(funcCall: @escaping () throws -> Int,
-                            success:  @escaping (Int) -> Void,
-                            objFunc:  @escaping () -> [Any]) {
+    ///   - closure: The closure to use to perform the send
+    ///   - success: The closure to use when `closure()` is succesful.
+    ///   - capture: The closure to use to pass any objects required when an error occurs.
+    private func _asyncSend(closure: @escaping () throws -> Int,
+                            success: @escaping (Int) -> Void,
+                            capture: @escaping () -> [Any]) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            doCatchWrapper(funcCall: { () -> Void in
-                               try self._nanoSocket.mutex.lock {
-                                   let bytesSent = try funcCall()
+            wrapper(do: { () -> Void in
+                        try self._nanoSocket.mutex.lock {
+                            let bytesSent = try closure()
 
-                                   success(bytesSent)
-                               }
-                           },
-                           failed:   { failure in
-                               nanoMessageLogger(failure)
-                           },
-                           objFunc:  objFunc)
+                            success(bytesSent)
+                        }
+                    },
+                    catch: { failure in
+                        nanoMessageLogger(failure)
+                    },
+                    capture: capture)
         }
     }
 
@@ -148,11 +148,11 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (Int) -> Void) {
-        _asyncSend(funcCall: {
+        _asyncSend(closure: {
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
-                   success:  success,
-                   objFunc:  {
+                   success: success,
+                   capture: {
                        return [self, message, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                    })
     }
@@ -167,11 +167,11 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
                             success:   @escaping (Int) -> Void) {
-        _asyncSend(funcCall: {
+        _asyncSend(closure: {
                        return try self.sendMessage(message, timeout: timeout)
                    },
-                   success:  success,
-                   objFunc:  {
+                   success: success,
+                   capture: {
                        return [self, message, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                    })
     }
@@ -219,12 +219,12 @@ extension ProtocolSocket where Self: Receiver {
 
         defer {
             if (originalTimeout != timeout) {
-                doCatchWrapper(funcCall: { () -> Void in
-                                   try self.setReceiveTimeout(seconds: originalTimeout)
-                               },
-                               failed:   { failure in
-                                   nanoMessageLogger(failure)
-                               })
+                wrapper(do: { () -> Void in
+                            try self.setReceiveTimeout(seconds: originalTimeout)
+                        },
+                        catch: { failure in
+                            nanoMessageLogger(failure)
+                        })
             }
         }
 
@@ -236,24 +236,24 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     /// Asynchrounous execute a passed receiver closure.
     ///
     /// - Parameters:
-    ///   - funcCall: The closure to use to perform the receive
-    ///   - success:  The closure to use when `funcCall` is succesful.
-    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
-    private func _asyncReceive(funcCall: @escaping () throws -> ReceiveMessage,
-                               success:  @escaping (ReceiveMessage) -> Void,
-                               objFunc:  @escaping () -> [Any]) {
+    ///   - closure: The closure to use to perform the receive
+    ///   - success: The closure to use when `closure()` is succesful.
+    ///   - capture: The closure to use to pass any objects required when an error occurs.
+    private func _asyncReceive(closure: @escaping () throws -> ReceiveMessage,
+                               success: @escaping (ReceiveMessage) -> Void,
+                               capture: @escaping () -> [Any]) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            doCatchWrapper(funcCall: { () -> Void in
-                               try self._nanoSocket.mutex.lock {
-                                   let received = try funcCall()
+            wrapper(do: { () -> Void in
+                        try self._nanoSocket.mutex.lock {
+                            let received = try closure()
 
-                                   success(received)
-                               }
-                           },
-                           failed:   { failure in
-                               nanoMessageLogger(failure)
-                           },
-                           objFunc:  objFunc)
+                            success(received)
+                        }
+                    },
+                    catch: { failure in
+                        nanoMessageLogger(failure)
+                    },
+                    capture: capture)
         }
     }
 
@@ -266,11 +266,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - success:      The closure to use when the async functionallity is succesful.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking,
                                success:      @escaping (ReceiveMessage) -> Void) {
-        _asyncReceive(funcCall: {
+        _asyncReceive(closure: {
                           return try self.receiveMessage(blockingMode: blockingMode)
                       },
-                      success:  success,
-                      objFunc:  {
+                      success: success,
+                      capture: {
                           return [self, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                       })
     }
@@ -283,11 +283,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - success: The closure to use when the async functionallity is succesful.
     public func receiveMessage(timeout: TimeInterval,
                                success: @escaping (ReceiveMessage) -> Void) {
-        _asyncReceive(funcCall: {
+        _asyncReceive(closure: {
                           return try self.receiveMessage(timeout: timeout)
                       },
-                      success:  success,
-                      objFunc:  {
+                      success: success,
+                      capture: {
                           return [self, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
                       })
     }
@@ -558,41 +558,41 @@ extension ProtocolSocket where Self: Sender {
 extension ProtocolSocket where Self: Sender {
     /// The number messages sent by this socket.
     public var messagesSent: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self._nanoSocket, .MessagesSent)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self._nanoSocket, .MessagesSent)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of bytes sent by this socket.
     public var bytesSent: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self._nanoSocket, .BytesSent)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self._nanoSocket, .BytesSent)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The current send priority of the socket.
     public var currentSendPriority: Priority? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self._nanoSocket, .CurrentSendPriority)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self._nanoSocket, .CurrentSendPriority)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 }
 
@@ -606,27 +606,27 @@ extension ProtocolSocket where Self: Receiver {
 extension ProtocolSocket where Self: Receiver {
     /// The number messages received by this socket.
     public var messagesReceived: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self._nanoSocket, .MessagesReceived)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self._nanoSocket, .MessagesReceived)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of bytes received by this socket.
     public var bytesReceived: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self._nanoSocket, .BytesReceived)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self._nanoSocket, .BytesReceived)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 }

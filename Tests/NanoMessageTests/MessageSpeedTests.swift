@@ -84,26 +84,26 @@ class MessageSpeedTests: XCTestCase {
                     case .Asynchronously:
                         node0.sendMessage(messagePayload,
                                           success: { bytesSent in
-                                              doCatchWrapper(funcCall: {
-                                                                 try self.asyncSendMutex.lock {
-                                                                     self.asyncMessagesSent += 1
-                                                                     self.asyncBytesSent += UInt64(bytesSent)
-                                                                 }
-                                                             },
-                                                             failed:   { failure in
-                                                                 nanoMessageLogger(failure)
-                                                             })
+                                              wrapper(do: {
+                                                          try self.asyncSendMutex.lock {
+                                                              self.asyncMessagesSent += 1
+                                                              self.asyncBytesSent += UInt64(bytesSent)
+                                                          }
+                                                      },
+                                                      catch: { failure in
+                                                          nanoMessageLogger(failure)
+                                                      })
                                           })
                         node1.receiveMessage(success: { received in
-                                                 doCatchWrapper(funcCall: {
-                                                                    try self.asyncReceiveMutex.lock {
-                                                                        self.asyncMessagesReceived += 1
-                                                                        self.asyncBytesReceived += UInt64(received.bytes)
-                                                                    }
-                                                                },
-                                                                failed:   { failure in
-                                                                    nanoMessageLogger(failure)
-                                                                })
+                                                 wrapper(do: {
+                                                             try self.asyncReceiveMutex.lock {
+                                                                 self.asyncMessagesReceived += 1
+                                                                 self.asyncBytesReceived += UInt64(received.bytes)
+                                                             }
+                                                         },
+                                                         catch: { failure in
+                                                             nanoMessageLogger(failure)
+                                                         })
                                              })
                 }
             }

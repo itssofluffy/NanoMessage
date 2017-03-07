@@ -65,12 +65,12 @@ public class NanoSocket {
     fileprivate var _closeDelay: TimeInterval {
         var delay = TimeInterval(milliseconds: 1000)
 
-        if let linger = doCatchWrapper(funcCall: {
-                                           try self.getLinger()
-                                       },
-                                       failed:   { failure in
-                                           nanoMessageLogger(failure)
-                                       }) {
+        if let linger = wrapper(do: {
+                                    try self.getLinger()
+                                },
+                                catch: { failure in
+                                    nanoMessageLogger(failure)
+                                }) {
             if (linger.milliseconds > 0) {              // account for infinate linger timeout.
                 delay = linger
             }
@@ -94,17 +94,17 @@ public class NanoSocket {
     /// Attempt a call to the underlying library within a loop with a delay.
     ///
     /// - Parameters:
-    ///   - funcCall: nanomsg 'c' function to call.
-    ///   - failure:  error associated with the parameter `funcCall`.
+    ///   - closure: nanomsg 'c' function to call.
+    ///   - failure: error associated with the parameter `closure`.
     ///
     /// - Throws: `NanoMessageError.Interrupted`
     ///           whatever was passed as the closure `failure`
-    fileprivate func _attemptClosure(funcCall: () -> CInt,
-                                     failure:  (CInt) -> NanoMessageError) throws {
+    fileprivate func _attemptClosure(closure: () -> CInt,
+                                     failure: (CInt) -> NanoMessageError) throws {
         var loopCount = 0
 
         while (true) {
-            if (funcCall() < 0) {                             // call the passed underlying library.
+            if (closure() < 0) {                              // call the passed underlying library.
                 let errno = nn_errno()
 
                 if (errno == EINTR) {                         // if we were interrupted by a signal, reattempt is allowed by the native library
@@ -164,33 +164,33 @@ public class NanoSocket {
         var terminateLoop = true                        // are we going to terminate the `repeat` loop below.
 
         repeat {
-            doCatchWrapper(funcCall: { () -> Void in
-                               try self._attemptClosure(funcCall: {
-                                                            return nn_close(self.fileDescriptor)
-                                                        },
-                                                        failure:  { errno in
-                                                            return .CloseFailed(code: errno)
-                                                        })
-                           },
-                           failed:   { failure in
-                               switch failure.error {
-                                   case NanoMessageError.Interrupted:
-                                       nanoMessageLogger(failure)
+            wrapper(do: { () -> Void in
+                        try self._attemptClosure(closure: {
+                                                     return nn_close(self.fileDescriptor)
+                                                 },
+                                                 failure: { errno in
+                                                     return .CloseFailed(code: errno)
+                                                 })
+                    },
+                    catch: { failure in
+                        switch failure.error {
+                            case NanoMessageError.Interrupted:
+                                nanoMessageLogger(failure)
 
-                                       if (self.blockTillCloseSuccess) {
-                                           terminateLoop = false
-                                       }
-                                   default:
-                                       if (!NanoMessage.nanomsgTerminated) {
-                                           nanoMessageLogger(failure)
-                                       }
+                                if (self.blockTillCloseSuccess) {
+                                    terminateLoop = false
+                                }
+                            default:
+                                if (!NanoMessage.nanomsgTerminated) {
+                                    nanoMessageLogger(failure)
+                                }
 
-                                       terminateLoop = true
-                               }
-                           },
-                           objFunc: {
-                               return [self]
-                           })
+                                terminateLoop = true
+                        }
+                    },
+                    capture: {
+                        return [self]
+                    })
         } while (!terminateLoop)
     }
 }
@@ -199,22 +199,22 @@ extension NanoSocket {
     /// Dispatch a call asynchronously
     ///
     /// - Parameters:
-    ///   - queue:    The dispatch queue to use
-    ///   - group:    The dispatch group to use.
-    ///   - funcCall: The closure to call.
-    ///   - objFunc:  The closure to use to pass any objects required when an error occurs.
-    private func _dispatchTo(queue:    DispatchQueue,
-                             group:    DispatchGroup,
-                             funcCall: @escaping () throws -> Void,
-                             objFunc:  @escaping () -> [Any]) {
+    ///   - queue:   The dispatch queue to use
+    ///   - group:   The dispatch group to use.
+    ///   - closure: The closure to call.
+    ///   - capture: The closure to use to pass any objects required when an error occurs.
+    private func _dispatchTo(queue:   DispatchQueue,
+                             group:   DispatchGroup,
+                             closure: @escaping () throws -> Void,
+                             capture: @escaping () -> [Any]) {
         queue.async(group: group) {
-            doCatchWrapper(funcCall: {
-                               try funcCall()
-                           },
-                           failed:   { failure in
-                               nanoMessageLogger(failure)
-                           },
-                           objFunc:  objFunc)
+            wrapper(do: {
+                        try closure()
+                    },
+                    catch: { failure in
+                        nanoMessageLogger(failure)
+                    },
+                    capture: capture)
         }
     }
 
@@ -259,7 +259,7 @@ extension NanoSocket {
 
         let ipv4Only = try getIPv4Only()
 
-        let funcCall: (UnsafePointer<Int8>) -> CInt = { address in
+        let closure: (UnsafePointer<Int8>) -> CInt = { address in
             return (type == .Bind) ? nn_bind(self.fileDescriptor, address) : nn_connect(self.fileDescriptor, address)
         }
         let failure: (CInt) -> NanoMessageError = { errno in
@@ -267,7 +267,7 @@ extension NanoSocket {
         }
 
         let endPointId = try url.absoluteString.withCString { address -> Int in
-            let returnCode = funcCall(address)
+            let returnCode = closure(address)
 
             guard (returnCode >= 0) else {
                 throw failure(nn_errno())
@@ -326,10 +326,10 @@ extension NanoSocket {
     @discardableResult
     public func removeEndPoint(_ endPoint: EndPoint) throws -> Bool {
         if (endPoints.contains(endPoint)) {
-            try _attemptClosure(funcCall: {
+            try _attemptClosure(closure: {
                                     return nn_shutdown(fileDescriptor, CInt(endPoint.id))
                                 },
-                                failure:  { errno in
+                                failure: { errno in
                                     return .RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
                                 })
 
@@ -437,12 +437,12 @@ extension NanoSocket {
     public func bindToSocket(_ nanoSocket: NanoSocket,
                              queue:        DispatchQueue,
                              group:        DispatchGroup) {
-        _dispatchTo(queue:    queue,
-                    group:    group,
-                    funcCall: {
+        _dispatchTo(queue: queue,
+                    group: group,
+                    closure: {
                         try self.bindToSocket(nanoSocket)
                     },
-                    objFunc:  {
+                    capture: {
                         return [self, nanoSocket, queue, group]
                     })
     }
@@ -474,12 +474,12 @@ extension NanoSocket {
     ///   - queue:   The dispatch queue to use
     ///   - group:   The dispatch group to use.
     public func loopBack(queue: DispatchQueue, group: DispatchGroup) {
-        _dispatchTo(queue:    queue,
-                    group:    group,
-                    funcCall: {
+        _dispatchTo(queue: queue,
+                    group: group,
+                    closure: {
                         try self.loopBack()
                     },
-                    objFunc:  {
+                    capture: {
                         return [self, queue, group]
                     })
     }
@@ -788,141 +788,141 @@ extension NanoSocket {
     /// The number of connections successfully established that were initiated from this socket.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var establishedConnections: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .EstablishedConnections)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .EstablishedConnections)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of connections successfully established that were accepted by this socket.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var acceptedConnections: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .AcceptedConnections)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .AcceptedConnections)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of established connections that were dropped by this socket.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var droppedConnections: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .DroppedConnections)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .DroppedConnections)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of established connections that were closed by this socket, typically due to protocol errors.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var brokenConnections: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .BrokenConnections)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .BrokenConnections)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of errors encountered by this socket trying to connect to a remote peer.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var connectErrors: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .ConnectErrors)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .ConnectErrors)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of errors encountered by this socket trying to bind to a local address.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var bindErrors: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .BindErrors)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .BindErrors)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of errors encountered by this socket trying to accept a a connection from a remote peer.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var acceptErrors: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .AcceptErrors)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .AcceptErrors)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of connections currently in progress to this socket.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var currentInProgressConnections: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .CurrentInProgressConnections)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .CurrentInProgressConnections)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of connections currently estabalished to this socket.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var currentConnections: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .CurrentConnections)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .CurrentConnections)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 
     /// The number of end-point errors.
     /// - Note: This feature is undocumented in the underlying nanomsg library
     public var currentEndPointErrors: UInt64? {
-        return doCatchWrapper(funcCall: {
-                                  return try getSocketStatistic(self, .CurrentEndPointErrors)
-                              },
-                              failed:   { failure in
-                                  nanoMessageLogger(failure)
-                              },
-                              objFunc:  {
-                                  return [self]
-                              })
+        return wrapper(do: {
+                           return try getSocketStatistic(self, .CurrentEndPointErrors)
+                       },
+                       catch: { failure in
+                           nanoMessageLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
     }
 }
 
