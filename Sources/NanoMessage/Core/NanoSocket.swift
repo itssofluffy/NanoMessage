@@ -95,16 +95,18 @@ public class NanoSocket {
     ///
     /// - Parameters:
     ///   - closure: nanomsg 'c' function to call.
-    ///   - failure: error associated with the parameter `closure`.
+    ///   - error:   the error associated with the parameter `closure`.
     ///
     /// - Throws: `NanoMessageError.Interrupted`
     ///           whatever was passed as the closure `failure`
     fileprivate func _attemptClosure(closure: () -> CInt,
-                                     failure: (CInt) -> NanoMessageError) throws {
+                                     error:   (CInt) -> NanoMessageError) throws {
         var loopCount = 0
 
         while (true) {
-            if (closure() < 0) {                              // call the passed underlying library.
+            let returnCode = closure()                        // call the passed underlying library...
+
+            if (returnCode < 0) {                             // ...and check if it failed.
                 let errno = nn_errno()
 
                 if (errno == EINTR) {                         // if we were interrupted by a signal, reattempt is allowed by the native library
@@ -116,7 +118,7 @@ public class NanoSocket {
 
                     loopCount += 1
                 } else {
-                    throw failure(errno)                      // throw the passed error
+                    throw error(errno)                        // throw the passed error
                 }
             } else {
                 break                                         // we've closed the endpoint succesfully
@@ -168,7 +170,7 @@ public class NanoSocket {
                         try self._attemptClosure(closure: {
                                                      return nn_close(self.fileDescriptor)
                                                  },
-                                                 failure: { errno in
+                                                 error: { errno in
                                                      return .CloseFailed(code: errno)
                                                  })
                     },
@@ -262,7 +264,7 @@ extension NanoSocket {
         let closure: (UnsafePointer<Int8>) -> CInt = { address in
             return (type == .Bind) ? nn_bind(self.fileDescriptor, address) : nn_connect(self.fileDescriptor, address)
         }
-        let failure: (CInt) -> NanoMessageError = { errno in
+        let error: (CInt) -> NanoMessageError = { errno in
             return (type == .Bind) ? .BindToEndPoint(code: errno, url: url) : .ConnectToEndPoint(code: errno, url: url)
         }
 
@@ -270,7 +272,7 @@ extension NanoSocket {
             let returnCode = closure(address)
 
             guard (returnCode >= 0) else {
-                throw failure(nn_errno())
+                throw error(nn_errno())
             }
 
             return Int(returnCode)
@@ -329,7 +331,7 @@ extension NanoSocket {
             try _attemptClosure(closure: {
                                     return nn_shutdown(fileDescriptor, CInt(endPoint.id))
                                 },
-                                failure: { errno in
+                                error: { errno in
                                     return .RemoveEndPoint(code: errno, url: endPoint.url, endPointId: endPoint.id)
                                 })
 
