@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-import C7
+import ISFLibrary
 
 /// PublisherSocket/SubscriberSocket protocol.
 public protocol PublisherSubscriber {

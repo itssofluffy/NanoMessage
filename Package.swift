@@ -26,10 +26,6 @@ let package = Package (
     name:    "NanoMessage",
     dependencies: [
         .Package (
-            url:          "https://github.com/open-swift/C7.git",
-            majorVersion: 0
-        ),
-        .Package (
             url:          "https://github.com/itssofluffy/FNVHashValue.git",
             majorVersion: 0
         ),

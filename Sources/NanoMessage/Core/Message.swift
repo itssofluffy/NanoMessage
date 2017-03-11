@@ -20,21 +20,14 @@
     IN THE SOFTWARE.
 */
 
-import C7
+import Foundation
 import ISFLibrary
 
 public struct Message {
-    public internal(set) var data = Data()
-    public var bytes: [Byte] {
-        return data.bytes
-    }
+    public internal(set) var data: Data
+    public var encoding: String.Encoding = NanoMessage.stringEncoding
     public var string: String {
-        return wrapper(do: {
-                           return try String(data: self.data)
-                       },
-                       catch: { failure in
-                           nanoMessageLogger(failure)
-                       })!
+        return (data.count == 0) ? "" : String(data: data, encoding: encoding)!
     }
 
     public init() {
@@ -45,12 +38,17 @@ public struct Message {
         data = value
     }
 
-    public init(value: [Byte]) {
-        data.bytes = value
+    public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
+        self.encoding = encoding
+        data = value.data(using: encoding)!
     }
 
-    public init(value: String) {
-        data = Data(value)
+    public init(value: [Byte]) {
+        data = Data(bytes: value)
+    }
+
+    internal init(value: UnsafeMutableBufferPointer<Byte>) {
+        data = Data(bytes: Array(value))
     }
 }
 

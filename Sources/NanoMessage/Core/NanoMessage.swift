@@ -43,6 +43,8 @@ public var nanoMessageVersion: (major: Int, minor: Int, release: Int) {
     return (major: 0, minor: 2, release: 1)
 }
 
+public var stringEncoding: String.Encoding = .utf8
+
 /// Notify all sockets about process termination.
 public func terminate() {
     nanomsgTerminated = true

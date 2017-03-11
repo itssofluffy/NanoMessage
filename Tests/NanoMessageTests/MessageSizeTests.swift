@@ -22,7 +22,7 @@
 
 import XCTest
 import Foundation
-import C7
+import ISFLibrary
 
 @testable import NanoMessage
 

@@ -21,7 +21,6 @@
 */
 
 import Foundation
-import C7
 import ISFLibrary
 
 /// Publisher socket.
@@ -87,7 +86,7 @@ extension PublisherSocket {
     @discardableResult
     public func sendMessage(_ message: Message, blockingMode: BlockingMode = .Blocking) throws -> Int {
         let bytesSent = try sendPayloadToSocket(self,
-                                                { () throws -> C7.Data in
+                                                { () throws -> Data in
                                                     if (self.prependTopic) {                    // we are prepending the topic to the start of the message.
                                                         try self._validateTopic(self.sendTopic) // check that we have a valid topic to send.
 

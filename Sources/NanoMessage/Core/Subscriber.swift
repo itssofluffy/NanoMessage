@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import C7
-
 protocol Subscriber: Receiver {
     var receivedTopic: Topic { get }                      // implement private set
     var receivedTopics: Dictionary<Topic, UInt64> { get } // implement private set

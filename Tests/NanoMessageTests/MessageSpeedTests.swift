@@ -22,9 +22,8 @@
 
 import XCTest
 import Foundation
-import C7
-import Mutex
 import ISFLibrary
+import Mutex
 
 @testable import NanoMessage
 

@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import C7
 import CNanoMessage
 import ISFLibrary
 import Foundation
@@ -61,7 +60,7 @@ internal func validateNanoSocket(_ nanoSocket: NanoSocket) throws {
 ///
 /// - Returns: The number of bytes sent.
 internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
-                                  _ payload:      C7.Data,
+                                  _ payload:      Data,
                                   _ blockingMode: BlockingMode) throws -> Int {
     try validateNanoSocket(nanoSocket)
 
@@ -138,7 +137,7 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.ReceiveMessage(code: errno)
     }
 
-    let payload: [Byte] = Array(UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
+    let message = Message(value: UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
 
     let returnCode = nn_freemsg(buffer)
 
@@ -146,5 +145,5 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.ReceiveMessage(code: nn_errno())
     }
 
-    return ReceiveMessage(bytes: bytesReceived, message: Message(value: payload))
+    return ReceiveMessage(bytes: bytesReceived, message: message)
 }

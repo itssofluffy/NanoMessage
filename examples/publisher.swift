@@ -20,10 +20,9 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
 import NanoMessage
+import Foundation
 import ISFLibrary
-import C7
 import FNVHashValue
 
 struct DataSet: Hashable {

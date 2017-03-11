@@ -20,9 +20,8 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-import C7
 import CNanoMessage
+import Foundation
 import ISFLibrary
 
 public enum SocketOption: CInt {
@@ -164,7 +163,7 @@ extension SocketOption: CustomStringConvertible {
 /// - Throws:  `NanoMessageError.GetSocketOption` if an issue is encountered.
 ///
 /// - Returns: The result as a `CInt` type.
-internal func getSocketOption(_ fileDescriptor: CInt, _ option: SocketOption) throws -> CInt {
+internal func getSocketOption(_ fileDescriptor: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> CInt {
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 
@@ -190,6 +189,9 @@ internal func getSocketOption(_ fileDescriptor: CInt, _ option: SocketOption) th
 internal func getSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ level:      CInt = NN_SOL_SOCKET) throws -> CInt {
+    /*
+    return try getSocketOption(nanoSocket.fileDescriptor, option, level)
+    */
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 
@@ -214,17 +216,21 @@ internal func getSocketOption(_ nanoSocket: NanoSocket,
 /// - Returns: The result as a `Data` type.
 internal func getSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
-                              _ level:      CInt = NN_SOL_SOCKET) throws -> C7.Data {
+                              _ level:      CInt = NN_SOL_SOCKET) throws -> Data {
     var optvallen = maximumTopicLength
-    var optval = C7.Data.buffer(with: optvallen)
+    let optval = UnsafeMutablePointer<Byte>.allocate(capacity: optvallen)
 
-    let returnCode = nn_getsockopt(nanoSocket.fileDescriptor, level, option.rawValue, &optval.bytes, &optvallen)
+    defer {
+        optval.deallocate(capacity: optvallen)
+    }
+
+    let returnCode = nn_getsockopt(nanoSocket.fileDescriptor, level, option.rawValue, optval, &optvallen)
 
     guard (returnCode >= 0) else {
         throw NanoMessageError.GetSocketOption(code: nn_errno(), option: option)
     }
 
-    return C7.Data(optval[0 ..< optvallen])
+    return Data(buffer: UnsafeMutableBufferPointer(start: optval, count: Int(optvallen)))
 }
 
 /// Get socket option.
@@ -240,9 +246,9 @@ internal func getSocketOption(_ nanoSocket: NanoSocket,
 internal func getSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ level:      CInt = NN_SOL_SOCKET) throws -> String {
-    let returnValue: C7.Data = try getSocketOption(nanoSocket, option, level)
+    let returnValue: Data = try getSocketOption(nanoSocket, option, level)
 
-    return try String(data: returnValue)
+    return String(data: returnValue, encoding: .utf8)!
 }
 
 /// Get socket option.
@@ -474,7 +480,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
-                              _ optval:     C7.Data,
+                              _ optval:     Data,
                               _ level:      CInt = NN_SOL_SOCKET) throws {
     let returnCode = nn_setsockopt(nanoSocket.fileDescriptor, level, option.rawValue, optval.bytes, optval.count)
 
@@ -496,7 +502,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ optval:     String,
                               _ level:      CInt = NN_SOL_SOCKET) throws {
-    try setSocketOption(nanoSocket, option, C7.Data(optval), level)
+    try setSocketOption(nanoSocket, option, (optval.utf8.count == 0) ? Data() : optval.data(using: .utf8)!, level)
 }
 
 /// Set socket option.
@@ -590,7 +596,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
 /// - Throws: `NanoMessageError.SetSocketOption` if an issue is encountered.
 internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
-                              _ optval:     C7.Data,
+                              _ optval:     Data,
                               _ level:      SocketProtocol) throws {
     try setSocketOption(nanoSocket, option, optval, level.rawValue)
 }
@@ -608,7 +614,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ optval:     String,
                               _ level:      SocketProtocol) throws {
-    try setSocketOption(nanoSocket, option, C7.Data(optval), level.rawValue)
+    try setSocketOption(nanoSocket, option, (optval.utf8.count == 0) ? Data() : optval.data(using: .utf8)!, level.rawValue)
 }
 
 /// Set socket option.

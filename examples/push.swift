@@ -23,7 +23,6 @@
 import Foundation
 import NanoMessage
 import ISFLibrary
-import C7
 
 var urlToUse = "tcp://localhost:5555"
 var sendCount = 1

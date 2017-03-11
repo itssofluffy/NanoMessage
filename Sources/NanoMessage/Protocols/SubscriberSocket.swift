@@ -21,7 +21,7 @@
 */
 
 import Foundation
-import C7
+import ISFLibrary
 
 /// Subscriber socket.
 public final class SubscriberSocket: NanoSocket, ProtocolSocket, Subscriber, PublisherSubscriber {
@@ -77,7 +77,7 @@ extension SubscriberSocket {
                 for topic in subscribedTopics {
                     if ( { () -> Bool in                            // Does the message/payload contain the specified topic
                              if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= received.message.count) {
-                                 if (C7.Data(received.message.data[0 ..< topic.count]) != topic.data) {
+                                 if (Data(received.message.data[0 ..< topic.count]) != topic.data) {
                                      return false
                                  } else if (self.ignoreTopicSeperator || received.message.data[topic.count] == self.topicSeperator) {
                                      return true
@@ -94,7 +94,7 @@ extension SubscriberSocket {
             } else {
                 let topic = { () -> Topic in                        // Get the topic from the message/payload if it exists using the topic seperator.
                     if let index = received.message.data.index(of: self.topicSeperator) {
-                        return Topic(value: C7.Data(received.message.data[0 ..< index]))
+                        return Topic(value: Data(received.message.data[0 ..< index]))
                     }
 
                     return Topic(value: received.message.data)
