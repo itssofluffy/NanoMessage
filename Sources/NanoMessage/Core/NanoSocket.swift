@@ -104,9 +104,7 @@ public class NanoSocket {
         var loopCount = 0
 
         while (true) {
-            let returnCode = closure()                        // call the passed underlying library...
-
-            if (returnCode < 0) {                             // ...and check if it failed.
+            if (closure() < 0) {                              // call the passed underlying library function...and check if it failed.
                 let errno = nn_errno()
 
                 if (errno == EINTR) {                         // if we were interrupted by a signal, reattempt is allowed by the native library
@@ -166,7 +164,7 @@ public class NanoSocket {
         var terminateLoop = true                        // are we going to terminate the `repeat` loop below.
 
         repeat {
-            wrapper(do: { () -> Void in
+            wrapper(do: {
                         try self._attemptClosure(closure: {
                                                      return nn_close(self.fileDescriptor)
                                                  },
@@ -208,7 +206,7 @@ extension NanoSocket {
     private func _dispatchTo(queue:   DispatchQueue,
                              group:   DispatchGroup,
                              closure: @escaping () throws -> Void,
-                             capture: @escaping () -> [Any]) {
+                             capture: @escaping () -> Array<Any>) {
         queue.async(group: group) {
             wrapper(do: {
                         try closure()

@@ -43,6 +43,7 @@ public var nanoMessageVersion: (major: Int, minor: Int, release: Int) {
     return (major: 0, minor: 2, release: 1)
 }
 
+/// The string encoding to use by default for topics and messages.
 public var stringEncoding: String.Encoding = .utf8
 
 /// Notify all sockets about process termination.
@@ -119,7 +120,7 @@ public var symbolProperty: Set<SymbolProperty> {
 ///           `NanoMessageError.PollSocket` if polling the socket fails.
 ///
 /// - Returns: Message waiting and send queue blocked as a tuple of bools.
-public func poll(sockets: [NanoSocket], timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> [PollResult] {
+public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> Array<PollResult> {
     var pollFds = [nn_pollfd]()
     var pollResults = [PollResult]()
 

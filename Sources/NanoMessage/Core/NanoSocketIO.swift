@@ -139,9 +139,7 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
 
     let message = Message(value: UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
 
-    let returnCode = nn_freemsg(buffer)
-
-    guard (returnCode >= 0) else {
+    guard (nn_freemsg(buffer) >= 0) else {
         throw NanoMessageError.ReceiveMessage(code: nn_errno())
     }
 

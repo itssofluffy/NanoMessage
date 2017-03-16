@@ -131,15 +131,13 @@ extension PublisherSocket {
     private func _asyncSend(payload: PublisherMessage,
                             closure: @escaping (Message) throws -> Int,
                             success: @escaping (Int) -> Void,
-                            capture: @escaping () -> [Any]) {
+                            capture: @escaping () -> Array<Any>) {
         aioQueue.async(group: aioGroup) {
-            wrapper(do: { () -> Void in
+            wrapper(do: {
                         try self.mutex.lock {
                             try self.setSendTopic(payload.topic)
 
-                            let bytesSent = try closure(payload.message)
-
-                            success(bytesSent)
+                            success(try closure(payload.message))
                         }
                     },
                     catch: { failure in

@@ -33,7 +33,7 @@ public protocol ProtocolSocket {
 
 extension ProtocolSocket {
     public init(socketDomain: SocketDomain = .StandardSocket,
-                urls:         [URL],
+                urls:         Array<URL>,
                 type:         ConnectionType) throws {
         try self.init(socketDomain: socketDomain)
 
@@ -120,13 +120,11 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     ///   - capture: The closure to use to pass any objects required when an error occurs.
     private func _asyncSend(closure: @escaping () throws -> Int,
                             success: @escaping (Int) -> Void,
-                            capture: @escaping () -> [Any]) {
+                            capture: @escaping () -> Array<Any>) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            wrapper(do: { () -> Void in
+            wrapper(do: {
                         try self._nanoSocket.mutex.lock {
-                            let bytesSent = try closure()
-
-                            success(bytesSent)
+                            success(try closure())
                         }
                     },
                     catch: { failure in
@@ -240,13 +238,11 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     ///   - capture: The closure to use to pass any objects required when an error occurs.
     private func _asyncReceive(closure: @escaping () throws -> ReceiveMessage,
                                success: @escaping (ReceiveMessage) -> Void,
-                               capture: @escaping () -> [Any]) {
+                               capture: @escaping () -> Array<Any>) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            wrapper(do: { () -> Void in
+            wrapper(do: {
                         try self._nanoSocket.mutex.lock {
-                            let received = try closure()
-
-                            success(received)
+                            success(try closure())
                         }
                     },
                     catch: { failure in

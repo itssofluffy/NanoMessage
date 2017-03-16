@@ -167,9 +167,7 @@ internal func getSocketOption(_ fileDescriptor: CInt, _ option: SocketOption, _ 
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 
-    let returnCode = nn_getsockopt(fileDescriptor, NN_SOL_SOCKET, option.rawValue, &optval, &optvallen)
-
-    guard (returnCode >= 0) else {
+    guard (nn_getsockopt(fileDescriptor, NN_SOL_SOCKET, option.rawValue, &optval, &optvallen) >= 0) else {
         throw NanoMessageError.GetSocketOption(code: nn_errno(), option: option)
     }
 
@@ -195,9 +193,7 @@ internal func getSocketOption(_ nanoSocket: NanoSocket,
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 
-    let returnCode = nn_getsockopt(nanoSocket.fileDescriptor, level, option.rawValue, &optval, &optvallen)
-
-    guard (returnCode >= 0) else {
+    guard (nn_getsockopt(nanoSocket.fileDescriptor, level, option.rawValue, &optval, &optvallen) >= 0) else {
         throw NanoMessageError.GetSocketOption(code: nn_errno(), option: option)
     }
 
@@ -224,9 +220,7 @@ internal func getSocketOption(_ nanoSocket: NanoSocket,
         optval.deallocate(capacity: optvallen)
     }
 
-    let returnCode = nn_getsockopt(nanoSocket.fileDescriptor, level, option.rawValue, optval, &optvallen)
-
-    guard (returnCode >= 0) else {
+    guard (nn_getsockopt(nanoSocket.fileDescriptor, level, option.rawValue, optval, &optvallen) >= 0) else {
         throw NanoMessageError.GetSocketOption(code: nn_errno(), option: option)
     }
 
@@ -462,9 +456,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ level:      CInt = NN_SOL_SOCKET) throws {
     var value = optval
 
-    let returnCode = nn_setsockopt(nanoSocket.fileDescriptor, level, option.rawValue, &value, MemoryLayout<CInt>.size)
-
-    guard (returnCode >= 0) else {
+    guard (nn_setsockopt(nanoSocket.fileDescriptor, level, option.rawValue, &value, MemoryLayout<CInt>.size) >= 0) else {
         throw NanoMessageError.SetSocketOption(code: nn_errno(), option: option)
     }
 }
@@ -482,9 +474,7 @@ internal func setSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ optval:     Data,
                               _ level:      CInt = NN_SOL_SOCKET) throws {
-    let returnCode = nn_setsockopt(nanoSocket.fileDescriptor, level, option.rawValue, optval.bytes, optval.count)
-
-    guard (returnCode >= 0) else {
+    guard(nn_setsockopt(nanoSocket.fileDescriptor, level, option.rawValue, optval.bytes, optval.count) >= 0) else {
         throw NanoMessageError.SetSocketOption(code: nn_errno(), option: option)
     }
 }

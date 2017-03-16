@@ -43,7 +43,7 @@ public struct Message {
         data = value.data(using: encoding)!
     }
 
-    public init(value: [Byte]) {
+    public init(value: Array<Byte>) {
         data = Data(bytes: value)
     }
 
