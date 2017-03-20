@@ -25,29 +25,24 @@ import PackageDescription
 let package = Package (
     name:    "NanoMessage",
     dependencies: [
-        .Package (
-            url:          "https://github.com/itssofluffy/FNVHashValue.git",
-            majorVersion: 0
-        ),
-        .Package (
-            url:          "https://github.com/itssofluffy/ISFLibrary.git",
-            majorVersion: 0
-        ),
-        .Package (
-            url:          "https://github.com/itssofluffy/Mutex.git",
-            majorVersion: 0
-        ),
-        .Package (
-            url:          "https://github.com/itssofluffy/CNanoMessage.git",
-            majorVersion: 0
-        )
+        .Package (url: "https://github.com/itssofluffy/FNVHashValue.git", majorVersion: 0),
+        .Package (url: "https://github.com/itssofluffy/ISFLibrary.git", majorVersion: 0),
+        .Package (url: "https://github.com/itssofluffy/Mutex.git", majorVersion: 0),
+        .Package (url: "https://github.com/itssofluffy/CNanoMessage.git", majorVersion: 0)
     ]
 )
 
-let sharedObject = Product (
+let staticLibrary = Product (
     name:    "NanoMessage",
-    type:    .Library(.Dynamic),
-    modules: "NanoMessage"
+    type:    .Library(.Static),
+    modules: ["NanoMessage"]
 )
 
-products.append(sharedObject)
+let dynamicLibrary = Product (
+    name:    "NanoMessage",
+    type:    .Library(.Dynamic),
+    modules: ["NanoMessage"]
+)
+
+products.append(staticLibrary)
+products.append(dynamicLibrary)

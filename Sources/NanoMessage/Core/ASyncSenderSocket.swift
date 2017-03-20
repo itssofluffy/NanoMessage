@@ -1,5 +1,5 @@
 /*
-    ASyncSender.swift
+    ASyncSenderSocket.swift
 
     Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
 
@@ -23,7 +23,7 @@
 import Foundation
 
 /// ASync Sender socket protocol.
-public protocol ASyncSender {
+public protocol ASyncSenderSocket {
     // ASync Output functions.
     func sendMessage(_ message:    Message,
                      blockingMode: BlockingMode,

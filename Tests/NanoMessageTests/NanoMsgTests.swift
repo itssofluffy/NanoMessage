@@ -26,6 +26,16 @@ import XCTest
 @testable import NanoMessage
 
 class NanoMsgTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+    }
+
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        super.tearDown()
+    }
+
     func testNanoMsgSymbols() {
         // test socket protocol values that we hard coded and imported from CNanoMessage and used in NanoMessage
         XCTAssertEqual(nanomsgSymbol["NN_PAIR"], SocketProtocol.PairProtocol.rawValue, "nanomsg symbol value for NN_PAIR is different than expected.")

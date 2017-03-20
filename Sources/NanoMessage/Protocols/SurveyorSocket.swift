@@ -23,7 +23,7 @@
 import Foundation
 
 /// Surveyor socket.
-public final class SurveyorSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
+public final class SurveyorSocket: NanoSocket, ProtocolSocket, SenderReceiverSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

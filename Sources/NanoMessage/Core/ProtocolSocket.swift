@@ -52,7 +52,7 @@ extension ProtocolSocket {
     }
 }
 
-extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: SenderSocket {
     /// Send a message.
     ///
     /// - Parameters:
@@ -111,7 +111,7 @@ extension ProtocolSocket where Self: Sender {
     }
 }
 
-extension ProtocolSocket where Self: Sender & ASyncSender {
+extension ProtocolSocket where Self: SenderSocket & ASyncSenderSocket {
     /// Asynchrounous execute a passed sender closure.
     ///
     /// - Parameters:
@@ -174,7 +174,7 @@ extension ProtocolSocket where Self: Sender & ASyncSender {
     }
 }
 
-extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: ReceiverSocket {
     /// Receive a message.
     ///
     /// - Parameters:
@@ -229,7 +229,7 @@ extension ProtocolSocket where Self: Receiver {
     }
 }
 
-extension ProtocolSocket where Self: Receiver & ASyncReceiver {
+extension ProtocolSocket where Self: ReceiverSocket & ASyncReceiverSocket {
     /// Asynchrounous execute a passed receiver closure.
     ///
     /// - Parameters:
@@ -288,7 +288,7 @@ extension ProtocolSocket where Self: Receiver & ASyncReceiver {
     }
 }
 
-extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: SenderSocket {
     /// Size of the send buffer, in bytes. To prevent blocking for messages larger than the buffer,
     /// exactly one message may be buffered in addition to the data in the send buffer.
     ///
@@ -399,7 +399,7 @@ extension ProtocolSocket where Self: Sender {
     }
 }
 
-extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: ReceiverSocket {
     /// Size of the receive buffer, in bytes. To prevent blocking for messages larger than the buffer,
     /// exactly one message may be buffered in addition to the data in the receive buffer.
     ///
@@ -541,7 +541,7 @@ extension ProtocolSocket where Self: Receiver {
     }
 }
 
-extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: SenderSocket {
     @available(*, unavailable, renamed: "messagesSent")
     public func getMessagesSent() throws -> UInt64 { fatalError() }
     @available(*, unavailable, renamed: "bytesSent")
@@ -550,7 +550,7 @@ extension ProtocolSocket where Self: Sender {
     public func getCurrentSendPriority() throws -> Priority { fatalError() }
 }
 
-extension ProtocolSocket where Self: Sender {
+extension ProtocolSocket where Self: SenderSocket {
     /// The number messages sent by this socket.
     public var messagesSent: UInt64? {
         return wrapper(do: {
@@ -591,14 +591,14 @@ extension ProtocolSocket where Self: Sender {
     }
 }
 
-extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: ReceiverSocket {
     @available(*, unavailable, renamed: "messagesReceived")
     public func getMessagesReceived() throws -> UInt64 { fatalError() }
     @available(*, unavailable, renamed: "bytesReceived")
     public func getBytesReceived() throws -> UInt64 { fatalError() }
 }
 
-extension ProtocolSocket where Self: Receiver {
+extension ProtocolSocket where Self: ReceiverSocket {
     /// The number messages received by this socket.
     public var messagesReceived: UInt64? {
         return wrapper(do: {

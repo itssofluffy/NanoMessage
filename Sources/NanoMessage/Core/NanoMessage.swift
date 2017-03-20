@@ -22,6 +22,7 @@
 
 import CNanoMessage
 import Foundation
+import ISFLibrary
 
 /// On publish/subscribe sockets the maximum size of a topic
 public let maximumTopicLength = 128
@@ -34,13 +35,13 @@ private let _polloutMask = CShort(NN_POLLOUT)
 internal private(set) var nanomsgTerminated = false
 
 /// The underlying nanomsg libraries ABI version.
-public var nanoMsgABIVersion: (current: Int, revision: Int, age: Int) {
-    return (current: Int(NN_VERSION_CURRENT), revision: Int(NN_VERSION_REVISION), age: Int(NN_VERSION_AGE))
+public var nanoMsgABIVersion: ABIVersion {
+    return ABIVersion(current: UInt(NN_VERSION_CURRENT), revision: UInt(NN_VERSION_REVISION), age: UInt(NN_VERSION_AGE))
 }
 
 /// NanoMessage library version.
-public var nanoMessageVersion: (major: Int, minor: Int, release: Int) {
-    return (major: 0, minor: 2, release: 1)
+public var nanoMessageVersion: SemanticVersion {
+    return SemanticVersion(major: 0, minor: 2, patch: 1)
 }
 
 /// The string encoding to use by default for topics and messages.

@@ -27,6 +27,16 @@ import Dispatch
 @testable import NanoMessage
 
 class BindToSocketTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+    }
+
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        super.tearDown()
+    }
+
     func testBindToSocket(connectAddress: String, bindAddress: String = "") {
         guard let connectURL1 = URL(string: connectAddress + "5") else {
             XCTAssert(false, "connectURL is invalid")

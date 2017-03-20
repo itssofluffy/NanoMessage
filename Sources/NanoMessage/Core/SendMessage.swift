@@ -1,7 +1,7 @@
 /*
-    ASyncReceiver.swift
+    SendMessage.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,13 +20,7 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
-/// Async Receiver socket protocol.
-public protocol ASyncReceiver {
-    // ASync Input functions.
-    func receiveMessage(blockingMode: BlockingMode,
-                        success:      @escaping (ReceiveMessage) -> Void)
-    func receiveMessage(timeout:      TimeInterval,
-                        success:      @escaping (ReceiveMessage) -> Void)
+public struct SendMessage {
+    public let bytes: Int
+    public let message: Message
 }

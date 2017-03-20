@@ -23,7 +23,7 @@
 import Foundation
 
 /// Pair (one-to-one) socket
-public final class PairSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
+public final class PairSocket: NanoSocket, ProtocolSocket, ReceiverSocket, SenderSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

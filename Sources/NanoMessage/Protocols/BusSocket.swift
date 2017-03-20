@@ -23,7 +23,7 @@
 import Foundation
 
 /// Bus socket.
-public final class BusSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
+public final class BusSocket: NanoSocket, ProtocolSocket, ReceiverSocket, SenderSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

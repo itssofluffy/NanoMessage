@@ -23,7 +23,7 @@
 import Foundation
 
 /// Push socket.
-public final class PushSocket: NanoSocket, ProtocolSocket, Sender, ASyncSender {
+public final class PushSocket: NanoSocket, ProtocolSocket, SenderSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

@@ -23,7 +23,7 @@
 import Foundation
 
 /// Reply socket.
-public final class ReplySocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
+public final class ReplySocket: NanoSocket, ProtocolSocket, ReceiverSenderSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

@@ -23,7 +23,7 @@
 import Foundation
 
 /// Request socket.
-public final class RequestSocket: NanoSocket, ProtocolSocket, Receiver, Sender, ASyncSender {
+public final class RequestSocket: NanoSocket, ProtocolSocket, SenderReceiverSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

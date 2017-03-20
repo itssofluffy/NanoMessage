@@ -1,5 +1,5 @@
 /*
-    Publisher.swift
+    ReceiverSocket.swift
 
     Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
 
@@ -20,12 +20,28 @@
     IN THE SOFTWARE.
 */
 
-protocol Publisher: SenderSocket {
-    var sendTopic: Topic { get }                       // implement private set.
-    var sentTopics: Dictionary<Topic, UInt64> { get }  // implement private set.
-    var prependTopic: Bool { get set }
-    var ignoreTopicSeperator: Bool { get set }
-    var resetTopicAfterSend: Bool { get set }
+import Foundation
 
-    func setSendTopic(_ topic: Topic) throws
+/// Receiver socket protocol.
+public protocol ReceiverSocket: ASyncReceiverSocket {
+    // Input functions.
+    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveMessage
+    func receiveMessage(timeout: TimeInterval) throws -> ReceiveMessage
+    // socket option functions.
+    func getReceiveBufferSize() throws -> UInt
+    @discardableResult
+    func setReceiveBufferSize(bytes: UInt) throws -> UInt
+    func getMaximumMessageSize() throws -> Int
+    @discardableResult
+    func setMaximumMessageSize(bytes: Int) throws -> Int
+    func getReceiveTimeout() throws -> TimeInterval
+    @discardableResult
+    func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
+    func getReceivePriority() throws -> Priority
+    @discardableResult
+    func setReceivePriority(_ priority: Priority) throws -> Priority
+    func getReceiveFd() throws -> Int
+    // socket statistics functions.
+    var messagesReceived: UInt64? { get }
+    var bytesReceived: UInt64? { get }
 }

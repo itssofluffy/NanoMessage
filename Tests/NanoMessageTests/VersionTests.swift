@@ -25,20 +25,30 @@ import XCTest
 @testable import NanoMessage
 
 class VersionTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+    }
+
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        super.tearDown()
+    }
+
     func testNanoMsgABIVersion() {
-         XCTAssertEqual(nanoMsgABIVersion.current, 5, "nanomsg ABI current not as expected")
-         XCTAssertEqual(nanoMsgABIVersion.revision, 0, "nanomsg ABI revision not as expected")
-         XCTAssertEqual(nanoMsgABIVersion.age, 0, "nanomsg ABI age not as expected")
+         XCTAssertEqual(nanoMsgABIVersion.current, 5, "nanomsg ABI current of \(nanoMsgABIVersion.current) not as expected!")
+         XCTAssertEqual(nanoMsgABIVersion.revision, 0, "nanomsg ABI revision of \(nanoMsgABIVersion.revision) not as expected!")
+         XCTAssertEqual(nanoMsgABIVersion.age, 0, "nanomsg ABI age of \(nanoMsgABIVersion.age) not as expected!")
 
          print("current: \(nanoMsgABIVersion.current), revision: \(nanoMsgABIVersion.revision), age: \(nanoMsgABIVersion.age)")
     }
 
     func testNanoMessageVersion() {
-         XCTAssertEqual(nanoMessageVersion.major, 0, "NanoMessage major not as expected")
-         XCTAssertEqual(nanoMessageVersion.minor, 2, "NanoMessage minor not as expected")
-         XCTAssertGreaterThanOrEqual(nanoMessageVersion.release, 1, "NanoMessage release not as expected")
+         XCTAssertEqual(nanoMessageVersion.major, 0, "NanoMessage major of \(nanoMessageVersion.major) not as expected!")
+         XCTAssertEqual(nanoMessageVersion.minor, 2, "NanoMessage minor of \(nanoMessageVersion.minor) not as expected!")
+         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 1, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
 
-         print("major: \(nanoMessageVersion.major), minor: \(nanoMessageVersion.minor), release: \(nanoMessageVersion.release)")
+         print("major: \(nanoMessageVersion.major), minor: \(nanoMessageVersion.minor), patch: \(nanoMessageVersion.patch)")
     }
 
 #if !os(OSX)

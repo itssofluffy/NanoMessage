@@ -1,5 +1,5 @@
 /*
-    Receiver.swift
+    Sender.swift
 
     Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
 
@@ -22,26 +22,26 @@
 
 import Foundation
 
-/// Receiver socket protocol.
-public protocol Receiver: ASyncReceiver {
-    // Input functions.
-    func receiveMessage(blockingMode: BlockingMode) throws -> ReceiveMessage
-    func receiveMessage(timeout: TimeInterval) throws -> ReceiveMessage
+/// Sender socket protocol.
+public protocol SenderSocket: ASyncSenderSocket {
+    // Output functions.
+    @discardableResult
+    func sendMessage(_ message: Message, blockingMode: BlockingMode) throws -> Int
+    @discardableResult
+    func sendMessage(_ message: Message, timeout: TimeInterval) throws -> Int
     // socket option functions.
-    func getReceiveBufferSize() throws -> UInt
+    func getSendBufferSize() throws -> UInt
     @discardableResult
-    func setReceiveBufferSize(bytes: UInt) throws -> UInt
-    func getMaximumMessageSize() throws -> Int
+    func setSendBufferSize(bytes: UInt) throws -> UInt
+    func getSendTimeout() throws -> TimeInterval
     @discardableResult
-    func setMaximumMessageSize(bytes: Int) throws -> Int
-    func getReceiveTimeout() throws -> TimeInterval
+    func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval
+    func getSendPriority() throws -> Priority
     @discardableResult
-    func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
-    func getReceivePriority() throws -> Priority
-    @discardableResult
-    func setReceivePriority(_ priority: Priority) throws -> Priority
-    func getReceiveFd() throws -> Int
+    func setSendPriority(_ priority: Priority) throws -> Priority
+    func getSendFd() throws -> Int
     // socket statistics functions.
-    var messagesReceived: UInt64? { get }
-    var bytesReceived: UInt64? { get }
+    var messagesSent: UInt64? { get }
+    var bytesSent: UInt64? { get }
+    var currentSendPriority: Priority? { get }
 }

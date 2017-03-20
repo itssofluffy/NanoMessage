@@ -6,4 +6,6 @@
 /examples/publisher
 /examples/pull
 /examples/push
+/examples/reply
+/examples/request
 /examples/subscriber

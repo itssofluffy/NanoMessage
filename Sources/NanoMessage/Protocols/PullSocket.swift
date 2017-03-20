@@ -23,7 +23,7 @@
 import Foundation
 
 /// Pull socket.
-public final class PullSocket: NanoSocket, ProtocolSocket, Receiver {
+public final class PullSocket: NanoSocket, ProtocolSocket, ReceiverSocket {
     public var _nanoSocket: NanoSocket {
         return self
     }

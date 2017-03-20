@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-protocol Subscriber: Receiver {
+protocol Subscriber: ReceiverSocket {
     var receivedTopic: Topic { get }                      // implement private set
     var receivedTopics: Dictionary<Topic, UInt64> { get } // implement private set
     var removeTopicFromMessage: Bool { get set }

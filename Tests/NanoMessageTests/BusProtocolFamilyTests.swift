@@ -26,6 +26,16 @@ import Foundation
 @testable import NanoMessage
 
 class BusProtocolFamilyTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+    }
+
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        super.tearDown()
+    }
+
     func testBus(address1: String, address2: String) {
         guard let address1URL = URL(string: address1) else {
             XCTAssert(false, "address1URL is invalid")
