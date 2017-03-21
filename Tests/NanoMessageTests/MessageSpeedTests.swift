@@ -100,7 +100,7 @@ class MessageSpeedTests: XCTestCase {
                                                           }
                                                       },
                                                       catch: { failure in
-                                                          nanoMessageLogger(failure)
+                                                          nanoMessageErrorLogger(failure)
                                                       })
                                           })
                         node1.receiveMessage(success: { received in
@@ -111,7 +111,7 @@ class MessageSpeedTests: XCTestCase {
                                                              }
                                                          },
                                                          catch: { failure in
-                                                             nanoMessageLogger(failure)
+                                                             nanoMessageErrorLogger(failure)
                                                          })
                                              })
                 }

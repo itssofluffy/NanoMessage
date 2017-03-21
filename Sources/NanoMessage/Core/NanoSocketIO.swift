@@ -76,7 +76,7 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
                                       try getSocketOption(nanoSocket, .SendTimeout)
                                   },
                                   catch: { failure in
-                                      nanoMessageLogger(failure)
+                                      nanoMessageErrorLogger(failure)
                                   })
 
             throw NanoMessageError.SendTimedOut(timeout: timeout!)
@@ -128,7 +128,7 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
                                       try getSocketOption(nanoSocket, .ReceiveTimeout)
                                   },
                                   catch: { failure in
-                                      nanoMessageLogger(failure)
+                                      nanoMessageErrorLogger(failure)
                                   })
 
             throw NanoMessageError.ReceiveTimedOut(timeout: timeout!)

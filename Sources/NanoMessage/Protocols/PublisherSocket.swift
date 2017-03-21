@@ -141,7 +141,7 @@ extension PublisherSocket {
                         }
                     },
                     catch: { failure in
-                        nanoMessageLogger(failure)
+                        nanoMessageErrorLogger(failure)
                     },
                     capture: capture)
         }

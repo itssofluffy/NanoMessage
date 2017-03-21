@@ -69,7 +69,7 @@ public class NanoSocket {
                                     try self.getLinger()
                                 },
                                 catch: { failure in
-                                    nanoMessageLogger(failure)
+                                    nanoMessageErrorLogger(failure)
                                 }) {
             if (linger.milliseconds > 0) {              // account for infinate linger timeout.
                 delay = linger
@@ -175,14 +175,14 @@ public class NanoSocket {
                     catch: { failure in
                         switch failure.error {
                             case NanoMessageError.Interrupted:
-                                nanoMessageLogger(failure)
+                                nanoMessageErrorLogger(failure)
 
                                 if (self.blockTillCloseSuccess) {
                                     terminateLoop = false
                                 }
                             default:
                                 if (!NanoMessage.nanomsgTerminated) {
-                                    nanoMessageLogger(failure)
+                                    nanoMessageErrorLogger(failure)
                                 }
 
                                 terminateLoop = true
@@ -212,7 +212,7 @@ extension NanoSocket {
                         try closure()
                     },
                     catch: { failure in
-                        nanoMessageLogger(failure)
+                        nanoMessageErrorLogger(failure)
                     },
                     capture: capture)
         }
@@ -788,7 +788,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .EstablishedConnections)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -802,7 +802,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .AcceptedConnections)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -816,7 +816,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .DroppedConnections)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -830,7 +830,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .BrokenConnections)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -844,7 +844,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .ConnectErrors)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -858,7 +858,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .BindErrors)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -872,7 +872,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .AcceptErrors)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -886,7 +886,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .CurrentInProgressConnections)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -900,7 +900,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .CurrentConnections)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -914,7 +914,7 @@ extension NanoSocket {
                            return try getSocketStatistic(self, .CurrentEndPointErrors)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]

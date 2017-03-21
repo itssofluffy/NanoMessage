@@ -102,7 +102,7 @@ extension ProtocolSocket where Self: SenderSocket {
                             try self.setSendTimeout(seconds: originalTimeout)
                         },
                         catch: { failure in
-                            nanoMessageLogger(failure)
+                            nanoMessageErrorLogger(failure)
                         })
             }
         }
@@ -128,7 +128,7 @@ extension ProtocolSocket where Self: SenderSocket & ASyncSenderSocket {
                         }
                     },
                     catch: { failure in
-                        nanoMessageLogger(failure)
+                        nanoMessageErrorLogger(failure)
                     },
                     capture: capture)
         }
@@ -220,7 +220,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
                             try self.setReceiveTimeout(seconds: originalTimeout)
                         },
                         catch: { failure in
-                            nanoMessageLogger(failure)
+                            nanoMessageErrorLogger(failure)
                         })
             }
         }
@@ -246,7 +246,7 @@ extension ProtocolSocket where Self: ReceiverSocket & ASyncReceiverSocket {
                         }
                     },
                     catch: { failure in
-                        nanoMessageLogger(failure)
+                        nanoMessageErrorLogger(failure)
                     },
                     capture: capture)
         }
@@ -557,7 +557,7 @@ extension ProtocolSocket where Self: SenderSocket {
                            return try getSocketStatistic(self._nanoSocket, .MessagesSent)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -570,7 +570,7 @@ extension ProtocolSocket where Self: SenderSocket {
                            return try getSocketStatistic(self._nanoSocket, .BytesSent)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -583,7 +583,7 @@ extension ProtocolSocket where Self: SenderSocket {
                            return try getSocketStatistic(self._nanoSocket, .CurrentSendPriority)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -605,7 +605,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
                            return try getSocketStatistic(self._nanoSocket, .MessagesReceived)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
@@ -618,7 +618,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
                            return try getSocketStatistic(self._nanoSocket, .BytesReceived)
                        },
                        catch: { failure in
-                           nanoMessageLogger(failure)
+                           nanoMessageErrorLogger(failure)
                        },
                        capture: {
                            return [self]
