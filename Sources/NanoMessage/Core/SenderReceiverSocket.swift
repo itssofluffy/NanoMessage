@@ -22,7 +22,7 @@
 
 import Foundation
 
-public protocol SenderReceiverSocket: ProtocolSocket, SenderSocket, ReceiverSocket {
+public protocol SenderReceiverSocket: SenderSocket, ReceiverSocket {
     func sendMessage(_ message:      Message,
                      sendMode:       BlockingMode,
                      receiveMode:    BlockingMode,

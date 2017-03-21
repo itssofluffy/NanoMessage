@@ -91,9 +91,7 @@ public var symbolProperty: Set<SymbolProperty> {
         var index: CInt = 0
 
         while (true) {
-            let returnCode = nn_symbol_info(index, &buffer, bufferLength)
-
-            if (returnCode == 0) {    // no more symbol properties
+            if (nn_symbol_info(index, &buffer, bufferLength) == 0) {  // no more symbol properties.
                 break
             }
 
@@ -122,8 +120,8 @@ public var symbolProperty: Set<SymbolProperty> {
 ///
 /// - Returns: Message waiting and send queue blocked as a tuple of bools.
 public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> Array<PollResult> {
-    var pollFds = [nn_pollfd]()
-    var pollResults = [PollResult]()
+    var pollFds = Array<nn_pollfd>()
+    var pollResults = Array<PollResult>()
 
     for socket in sockets {
         guard (!socket.socketIsADevice) else {                                        // guard against polling a device socket.
@@ -142,9 +140,7 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
     }
 
     try pollFds.withUnsafeMutableBufferPointer { fileDescriptors in                   // poll the list of nano sockets.
-        let returnCode = nn_poll(fileDescriptors.baseAddress, CInt(sockets.count), CInt(timeout.milliseconds))
-
-        guard (returnCode >= 0) else {
+        guard (nn_poll(fileDescriptors.baseAddress, CInt(sockets.count), CInt(timeout.milliseconds)) >= 0) else {
             throw NanoMessageError.PollSocket(code: nn_errno())
         }
     }

@@ -414,9 +414,7 @@ extension NanoSocket {
             nanoSocket.socketIsADevice = false
         }
 
-        let returnCode = nn_device(fileDescriptor, nanoSocket.fileDescriptor)
-
-        guard (NanoMessage.nanomsgTerminated || returnCode >= 0) else {
+        guard (NanoMessage.nanomsgTerminated || nn_device(fileDescriptor, nanoSocket.fileDescriptor) >= 0) else {
             let errno = nn_errno()
             var nanoSocketName = String(nanoSocket.fileDescriptor)
 
@@ -461,9 +459,7 @@ extension NanoSocket {
             socketIsADevice = false
         }
 
-        let returnCode = nn_device(fileDescriptor, -1)
-
-        guard (NanoMessage.nanomsgTerminated || returnCode >= 0) else {
+        guard (NanoMessage.nanomsgTerminated || nn_device(fileDescriptor, -1) >= 0) else {
             throw NanoMessageError.LoopBack(code: nn_errno())
         }
     }

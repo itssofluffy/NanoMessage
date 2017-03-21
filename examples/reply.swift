@@ -50,16 +50,22 @@ do {
 
     let timeout = TimeInterval(seconds: 10)
 
+    print("waiting for a request...")
+
     let sent = try node0.receiveMessage(receiveTimeout: timeout,
                                         sendTimeout: timeout,
                                         { received -> Message in
                                             print("received \(received.bytes) bytes as message '\(received.message.string)'...")
 
+                                            var message = ""
+
                                             if (received.message.string == "ping") {
-                                                return Message(value: "pong")
+                                                message = "pong"
+                                            } else {
+                                                message = "i don't like wiff wafe"
                                             }
 
-                                            return Message(value: "i don't like wiff wafe")
+                                            return Message(value: message)
                                         })
 
     print("...and sent \(sent.bytes) bytes as a message of '\(sent.message.string)'")

@@ -48,14 +48,14 @@ do {
 
     print(endPoint)
 
-    let messagePayload = Message(value: "ping")
     let timeout = TimeInterval(seconds: 10)
 
-    let received = try node0.sendMessage(messagePayload,
+    let received = try node0.sendMessage(Message(value: "ping"),
                                          sendTimeout: timeout,
                                          receiveTimeout: timeout,
                                          { sent in
                                              print("sent a message of '\(sent.message.string)' as \(sent.bytes) bytes sent...")
+                                             print("waiting for a response...")
                                          })
 
     print("...and recieved \(received.bytes) bytes as a message of '\(received.message.string)'")
