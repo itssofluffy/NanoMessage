@@ -26,11 +26,11 @@ public protocol SenderReceiverSocket: ProtocolSocket, SenderSocket, ReceiverSock
     func sendMessage(_ message:      Message,
                      sendMode:       BlockingMode,
                      receiveMode:    BlockingMode,
-                     _ closure:      (Int, Message) throws -> Void) throws -> ReceiveMessage
+                     _ closure:      @escaping (SendMessage) throws -> Void) throws -> ReceiveMessage
     func sendMessage(_ message:      Message,
                      sendTimeout:    TimeInterval,
                      receiveTimeout: TimeInterval,
-                     _ closure:      (Int, Message) throws -> Void) throws -> ReceiveMessage
+                     _ closure:      @escaping (SendMessage) throws -> Void) throws -> ReceiveMessage
 }
 
 extension SenderReceiverSocket {
@@ -55,10 +55,12 @@ extension SenderReceiverSocket {
     public func sendMessage(_ message:   Message,
                             sendMode:    BlockingMode = .Blocking,
                             receiveMode: BlockingMode = .Blocking,
-                            _ closure:   (Int, Message) throws -> Void) throws -> ReceiveMessage {
-        try closure(self.sendMessage(message, blockingMode: sendMode), message)
+                            _ closure:   @escaping (SendMessage) throws -> Void) throws -> ReceiveMessage {
+        let bytes = try sendMessage(message, blockingMode: sendMode)
 
-        return try self.receiveMessage(blockingMode: receiveMode)
+        try closure(SendMessage(bytes: bytes, message: message))
+
+        return try receiveMessage(blockingMode: receiveMode)
     }
 
     /// Send a message and pass that sent message to a closure, the receive a message.
@@ -82,9 +84,11 @@ extension SenderReceiverSocket {
     public func sendMessage(_ message:      Message,
                             sendTimeout:    TimeInterval,
                             receiveTimeout: TimeInterval,
-                            _ closure:      (Int, Message) throws -> Void) throws -> ReceiveMessage {
-        try closure(self.sendMessage(message, timeout: sendTimeout), message)
+                            _ closure:      @escaping (SendMessage) throws -> Void) throws -> ReceiveMessage {
+        let bytes = try sendMessage(message, timeout: sendTimeout)
 
-        return try self.receiveMessage(timeout: receiveTimeout)
+        try closure(SendMessage(bytes: bytes, message: message))
+
+        return try receiveMessage(timeout: receiveTimeout)
     }
 }

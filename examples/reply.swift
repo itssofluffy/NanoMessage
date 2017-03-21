@@ -52,7 +52,7 @@ do {
 
     let sent = try node0.receiveMessage(receiveTimeout: timeout,
                                         sendTimeout: timeout,
-                                        { (received) -> Message in
+                                        { received -> Message in
                                             print("received \(received.bytes) bytes as message '\(received.message.string)'...")
 
                                             if (received.message.string == "ping") {

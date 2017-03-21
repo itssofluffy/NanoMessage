@@ -54,8 +54,8 @@ do {
     let received = try node0.sendMessage(messagePayload,
                                          sendTimeout: timeout,
                                          receiveTimeout: timeout,
-                                         { (bytes, message) in
-                                             print("sent a message of '\(message.string)' as \(bytes) bytes sent...")
+                                         { sent in
+                                             print("sent a message of '\(sent.message.string)' as \(sent.bytes) bytes sent...")
                                          })
 
     print("...and recieved \(received.bytes) bytes as a message of '\(received.message.string)'")
