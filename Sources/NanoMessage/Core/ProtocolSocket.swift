@@ -187,6 +187,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
     ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
     ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
     /// - Returns: the number of bytes received and the received message
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveMessage {
@@ -206,6 +207,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
     ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
     ///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
     /// - Returns: the number of bytes received and the received message
     ///

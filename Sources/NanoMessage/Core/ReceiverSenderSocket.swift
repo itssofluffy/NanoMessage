@@ -44,6 +44,7 @@ extension ReceiverSenderSocket {
     ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
     ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///            `NanoMessageError.SendMessage` there was a problem sending the message.
     ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
     ///            `NanoMessageError.SendTimedOut` the send timedout.
@@ -69,6 +70,7 @@ extension ReceiverSenderSocket {
     ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
     ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///            `NanoMessageError.SendMessage` there was a problem sending the message.
     ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
     ///            `NanoMessageError.SendTimedOut` the send timedout.
