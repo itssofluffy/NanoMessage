@@ -414,7 +414,9 @@ extension NanoSocket {
             nanoSocket.socketIsADevice = false
         }
 
-        guard (NanoMessage.nanomsgTerminated || nn_device(fileDescriptor, nanoSocket.fileDescriptor) >= 0) else {
+        let returnCode = nn_device(fileDescriptor, nanoSocket.fileDescriptor)
+
+        guard (NanoMessage.nanomsgTerminated || (!NanoMessage.nanomsgTerminated && returnCode >= 0)) else {
             let errno = nn_errno()
             var nanoSocketName = String(nanoSocket.fileDescriptor)
 
@@ -434,7 +436,7 @@ extension NanoSocket {
     ///   - group:      The dispatch group to use.
     public func bindToSocket(_ nanoSocket: NanoSocket,
                              queue:        DispatchQueue,
-                             group:        DispatchGroup) {
+                             group:        DispatchGroup = DispatchGroup()) {
         _dispatchTo(queue: queue,
                     group: group,
                     closure: {
@@ -459,7 +461,9 @@ extension NanoSocket {
             socketIsADevice = false
         }
 
-        guard (NanoMessage.nanomsgTerminated || nn_device(fileDescriptor, -1) >= 0) else {
+        let returnCode = nn_device(fileDescriptor, -1)
+
+        guard (NanoMessage.nanomsgTerminated || (!NanoMessage.nanomsgTerminated && returnCode >= 0)) else {
             throw NanoMessageError.LoopBack(code: nn_errno())
         }
     }
@@ -469,7 +473,8 @@ extension NanoSocket {
     /// - Parameters:
     ///   - queue:   The dispatch queue to use
     ///   - group:   The dispatch group to use.
-    public func loopBack(queue: DispatchQueue, group: DispatchGroup) {
+    public func loopBack(queue: DispatchQueue,
+                         group: DispatchGroup = DispatchGroup()) {
         _dispatchTo(queue: queue,
                     group: group,
                     closure: {

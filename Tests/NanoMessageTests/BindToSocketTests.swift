@@ -64,10 +64,7 @@ class BindToSocketTests: XCTestCase {
             let node0 = try ReplySocket(socketDomain: .RawSocket, url: bindURL1, type: .Bind)
             let node1 = try RequestSocket(socketDomain: .RawSocket, url: bindURL2, type: .Bind)
 
-            let queue = DispatchQueue(label: "com.nanomessage.bindtosocket")
-            let group = DispatchGroup()
-
-            node0.bindToSocket(node1, queue: queue, group: group)
+            node0.bindToSocket(node1, queue: DispatchQueue(label: "com.nanomessage.bindtosocket"))
 
             let node2 = try RequestSocket()
             let node3 = try ReplySocket()
@@ -83,19 +80,22 @@ class BindToSocketTests: XCTestCase {
             let node3EndPointId: Int = try node3.createEndPoint(url: connectURL2, type: .Connect)
             XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.createEndPoint('\(connectURL2)', .Connect) < 0")
 
-            let node2bytesSent = try node2.sendMessage(payload)
-            XCTAssertEqual(node2bytesSent, payload.count, "node2bytesSent != payload.count")
+            for _ in 0 ..< 10_000 {
+                let node2bytesSent = try node2.sendMessage(payload)
+                XCTAssertEqual(node2bytesSent, payload.count, "node2bytesSent != payload.count")
 
-            let node3Received = try node3.receiveMessage()
-            XCTAssertEqual(node3Received.bytes, node3Received.message.count, "node3Received.bytes != node3Received.message.count")
-            XCTAssertEqual(node3Received.message, payload, "node3Received.message != payload")
+                let sent: SendMessage = try node3.receiveMessage { received in
+                    XCTAssertEqual(received.bytes, received.message.count, "received.bytes != received.message.count")
+                    XCTAssertEqual(received.message, payload, "received.message != payload")
 
-            let node3bytesSent = try node3.sendMessage(payload)
-            XCTAssertEqual(node3bytesSent, payload.count, "node3bytesSent != payload.count")
+                    return payload
+                }
+                XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
-            let node2Received = try node2.receiveMessage()
-            XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2Received.bytes != node2Received.message.count")
-            XCTAssertEqual(node2Received.message, payload, "node2Received.message != payload")
+                let node2Received = try node2.receiveMessage()
+                XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2Received.bytes != node2Received.message.count")
+                XCTAssertEqual(node2Received.message, payload, "node2Received.message != payload")
+            }
 
             print("Total Messages (Sent/Received): (\(node2.messagesSent!),\(node3.messagesReceived!)), Total Bytes (Sent/Received): (\(node2.bytesSent!),\(node3.bytesReceived!))")
 

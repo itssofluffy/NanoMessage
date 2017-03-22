@@ -56,10 +56,7 @@ class LoopBackTests: XCTestCase {
             let node0EndPointId: Int = try node0.createEndPoint(url: bindURL, type: .Bind)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.createEndPoint('\(bindURL)', .Bind) < 0")
 
-            let queue = DispatchQueue(label: "com.nanomessage.loopback")
-            let group = DispatchGroup()
-
-            node0.loopBack(queue: queue, group: group)
+            node0.loopBack(queue: DispatchQueue(label: "com.nanomessage.loopback"))
 
             let node1 = try BusSocket()
             let node2 = try BusSocket()
@@ -73,12 +70,14 @@ class LoopBackTests: XCTestCase {
             let node2EndPointId: Int = try node2.createEndPoint(url: connectURL, type: .Connect)
             XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.createEndPoint('\(connectURL)', .Connect) < 0")
 
-            let node1bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(node1bytesSent, payload.count, "node1bytesSent != payload.count")
+            for _ in 0 ..< 10_000 {
+                let node1bytesSent = try node1.sendMessage(payload)
+                XCTAssertEqual(node1bytesSent, payload.count, "node1bytesSent != payload.count")
 
-            let node2Received = try node2.receiveMessage()
-            XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2.bytes != node2Received.message.count")
-            XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
+                let node2Received = try node2.receiveMessage()
+                XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2.bytes != node2Received.message.count")
+                XCTAssertEqual(node2Received.message, payload, "node2.message != payload")
+            }
 
             print("Total Messages (Sent/Received): (\(node1.messagesSent!),\(node2.messagesReceived!)), Total Bytes (Sent/Received): (\(node1.bytesSent!),\(node2.bytesReceived!))")
 

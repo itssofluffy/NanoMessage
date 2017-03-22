@@ -68,7 +68,7 @@ class MessageSizeTests: XCTestCase {
             let maximumMessageSize = try node1.getMaximumMessageSize()
 
             while (messageSize <= maximumMessageSize) {
-                let messagePayload = Message(value: [Byte](repeating: 0xff, count: messageSize))
+                let messagePayload = Message(value: Array<Byte>(repeating: 0xff, count: messageSize))
 
                 let _ = try node0.sendMessage(messagePayload)
                 let _ = try node1.receiveMessage()

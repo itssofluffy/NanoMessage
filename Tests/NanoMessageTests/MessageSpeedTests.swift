@@ -83,7 +83,7 @@ class MessageSpeedTests: XCTestCase {
             pauseForBind()
 
             let messageSize = 128
-            let messagePayload = Message(value: [Byte](repeating: 0xff, count: messageSize))
+            let messagePayload = Message(value: Array<Byte>(repeating: 0xff, count: messageSize))
 
             for _ in 1 ... 100_000 {
                 switch (receiveType) {
