@@ -67,6 +67,7 @@ public enum NanoMessageError: Error {
     case ReceiveMessage(code: CInt)
     case MessageNotAvailable
     case ReceiveTimedOut(timeout: TimeInterval)
+    case FreeMessage(code: CInt)
     case NoTopic
     case TopicLength
     case InvalidTopic
@@ -125,6 +126,8 @@ extension NanoMessageError: CustomStringConvertible {
                 return "no message received"
             case .SendTimedOut(let timeout), .ReceiveTimedOut(let timeout):
                 return "operation has timed out " + ((timeout < 0) ? "with an infinite timeout!" : "in \(timeout) second(s)")
+            case .FreeMessage(let code):
+                return "nn_freemsg() failed: " + errorString(code)
             case .NoTopic:
                 return "topic undefined"
             case .TopicLength:
