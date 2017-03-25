@@ -88,7 +88,7 @@ class BindToSocketTests: XCTestCase {
                     XCTAssertEqual(received.bytes, received.message.count, "received.bytes != received.message.count")
                     XCTAssertEqual(received.message, payload, "received.message != payload")
 
-                    return payload
+                    return received.message
                 }
                 XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
