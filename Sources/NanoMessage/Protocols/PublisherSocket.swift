@@ -158,7 +158,9 @@ extension PublisherSocket {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (MessagePayload) -> Void) {
-        _asyncSend(payload: Message(topic: sendTopic, value: message.data),
+        let payload = Message(topic: sendTopic, value: message.data)
+
+        _asyncSend(payload: payload,
                    closure: { message in
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
@@ -179,7 +181,7 @@ extension PublisherSocket {
                             success:   @escaping (MessagePayload) -> Void) {
         let payload = Message(topic: sendTopic, value: message.data)
 
-        _asyncSend(payload: Message(topic: sendTopic, value: message.data),
+        _asyncSend(payload: payload,
                    closure: { message in
                        return try self.sendMessage(message, timeout: timeout)
                    },
