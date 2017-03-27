@@ -60,15 +60,15 @@ class PairProtocolFamilyTests: XCTestCase {
 
             pauseForBind()
 
-            var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "node0.bytesSent != payload.count")
+            var node0Sent = try node0.sendMessage(payload)
+            XCTAssertEqual(node0Sent.bytes, payload.count, "node0Sent.bytes != payload.count")
 
             let node1Received = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.count, "node1.bytes != node1Received.message.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
 
-            bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "node1.bytesSent != payload.count")
+            node0Sent = try node1.sendMessage(payload)
+            XCTAssertEqual(node0Sent.bytes, payload.count, "node0Sent.bytes != payload.count")
 
             let node0Received = try node0.receiveMessage()
             XCTAssertEqual(node0Received.bytes, node0Received.message.count, "node0.bytes != node0Received.message.count")

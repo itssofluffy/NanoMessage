@@ -74,8 +74,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1.isTopicSubscribed(node0.sendTopic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
 
-            var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
+            var node0Sent = try node0.sendMessage(payload)
+            XCTAssertEqual(node0Sent.bytes, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
 
             var node1Received = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1.receivedTopic.count + 1 + node1Received.message.count, "node1.bytes != node1.receivedTopic.count + 1 + node1Received.message.count")
@@ -89,8 +89,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.subscribeTo(topic: Topic(value: "xxxx"))
             XCTAssertEqual(node1.subscribedTopics.count, 1, "node1.subscribedTopics.count != 0")
 
-            bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
+            node0Sent = try node0.sendMessage(payload)
+            XCTAssertEqual(node0Sent.bytes, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
 
             try node1.setReceiveTimeout(seconds: -1)
 
@@ -115,8 +115,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node0.setSendTopic(Topic(value: "planet"))
 
             for planet in planets {
-                let bytesSent = try node0.sendMessage(Message(value: planet))
-                XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + planet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + planet.utf8.count")
+                let sent = try node0.sendMessage(Message(value: planet))
+                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + planet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + planet.utf8.count")
 
                 let _ = try node1.receiveMessage()
             }
@@ -126,8 +126,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node0.setSendTopic(Topic(value: "dwarfPlanet"))
 
             for dwarfPlanet in dwarfPlanets {
-                let bytesSent = try node0.sendMessage(Message(value: dwarfPlanet))
-                XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
+                let sent = try node0.sendMessage(Message(value: dwarfPlanet))
+                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
 
                 let _ = try node1.receiveMessage()
             }
@@ -147,8 +147,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node0.setSendTopic(Topic(value: "planet"))
 
             for planet in planets {
-                let bytesSent = try node0.sendMessage(Message(value: planet))
-                XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + planet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + planet.utf8.count")
+                let sent = try node0.sendMessage(Message(value: planet))
+                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + planet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + planet.utf8.count")
             }
 
             do {
@@ -161,8 +161,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node0.setSendTopic(Topic(value: "dwarfPlanet"))
 
             for dwarfPlanet in dwarfPlanets {
-                let bytesSent = try node0.sendMessage(Message(value: dwarfPlanet))
-                XCTAssertEqual(bytesSent, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "node0.bytesSent != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
+                let sent = try node0.sendMessage(Message(value: dwarfPlanet))
+                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
 
             var received = try node1.receiveMessage()

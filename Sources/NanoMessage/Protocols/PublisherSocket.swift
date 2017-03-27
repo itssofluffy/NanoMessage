@@ -84,22 +84,22 @@ extension PublisherSocket {
     ///
     /// - Returns: The number of bytes sent.
     @discardableResult
-    public func sendMessage(_ message: Message, blockingMode: BlockingMode = .Blocking) throws -> Int {
-        let bytesSent = try sendPayloadToSocket(self,
-                                                { () throws -> Data in
-                                                    if (self.prependTopic) {                    // we are prepending the topic to the start of the message.
-                                                        try self._validateTopic(self.sendTopic) // check that we have a valid topic to send.
+    public func sendMessage(_ message: Message, blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
+        let bytesSent = try sendToSocket(self,
+                                         { () throws -> Data in
+                                             if (self.prependTopic) {                    // we are prepending the topic to the start of the message.
+                                                 try self._validateTopic(self.sendTopic) // check that we have a valid topic to send.
 
-                                                        if (self.ignoreTopicSeperator) {        // check if we are ignoring the topic seperator.
-                                                            return self.sendTopic.data + message.data
-                                                        }
+                                                 if (self.ignoreTopicSeperator) {        // check if we are ignoring the topic seperator.
+                                                     return self.sendTopic.data + message.data
+                                                 }
 
-                                                        return self.sendTopic.data + [self.topicSeperator] + message.data
-                                                    }
+                                                 return self.sendTopic.data + [self.topicSeperator] + message.data
+                                             }
 
-                                                    return message.data
-                                                }(),
-                                                blockingMode)
+                                             return message.data
+                                         }(),
+                                         blockingMode)
 
         if (!sendTopic.isEmpty) {                             // check that we have a send topic.
             if (topicCounts) {                                // remember which topics we've sent and how many.
@@ -116,7 +116,7 @@ extension PublisherSocket {
             }
         }
 
-        return bytesSent
+        return MessagePayload(bytes: bytesSent, topic: sendTopic, message: message)
     }
 }
 
@@ -128,16 +128,16 @@ extension PublisherSocket {
     ///   - closure: The closure to use to perform the send
     ///   - success: The closure to use when `closure()` is succesful.
     ///   - capture: The closure to use to pass any objects required when an error occurs.
-    private func _asyncSend(payload: PublisherMessage,
-                            closure: @escaping (Message) throws -> Int,
-                            success: @escaping (Int) -> Void,
+    private func _asyncSend(payload: Message,
+                            closure: @escaping (Message) throws -> MessagePayload,
+                            success: @escaping (MessagePayload) -> Void,
                             capture: @escaping () -> Array<Any>) {
         aioQueue.async(group: aioGroup) {
             wrapper(do: {
                         try self.mutex.lock {
-                            try self.setSendTopic(payload.topic)
+                            try self.setSendTopic(payload.topic!)
 
-                            success(try closure(payload.message))
+                            try success(closure(Message(value: payload.data)))
                         }
                     },
                     catch: { failure in
@@ -150,15 +150,15 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - payload:      The topic and message to send.
+    ///   - message:      The message to send.
     ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
     ///                   If the message cannot be sent straight away, the closureHandler
     ///                   will be passed `NanoMessageError.MessageNotSent`
     ///   - success:      The closure to use when the async functionality completes succesfully.
-    public func sendMessage(payload:      PublisherMessage,
+    public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (Int) -> Void) {
-        _asyncSend(payload: payload,
+                            success:      @escaping (MessagePayload) -> Void) {
+        _asyncSend(payload: Message(topic: sendTopic, value: message.data),
                    closure: { message in
                        return try self.sendMessage(message, blockingMode: blockingMode)
                    },
@@ -171,13 +171,15 @@ extension PublisherSocket {
     /// Asynchronous send a message.
     ///
     /// - Parameters:
-    ///   - payload: The topic and message to send.
+    ///   - message: The message to send.
     ///   - timeout: The timeout interval to set.
     ///   - success: The closure to use when the async functionality completes succesfully.
-    public func sendMessage(payload: PublisherMessage,
-                            timeout: TimeInterval,
-                            success: @escaping (Int) -> Void) {
-        _asyncSend(payload: payload,
+    public func sendMessage(_ message: Message,
+                            timeout:   TimeInterval,
+                            success:   @escaping (MessagePayload) -> Void) {
+        let payload = Message(topic: sendTopic, value: message.data)
+
+        _asyncSend(payload: Message(topic: sendTopic, value: message.data),
                    closure: { message in
                        return try self.sendMessage(message, timeout: timeout)
                    },

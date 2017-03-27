@@ -22,8 +22,11 @@
 
 import Foundation
 import ISFLibrary
+import FNVHashValue
 
 public struct Message {
+    internal private(set) var topic: Topic? = nil
+
     public internal(set) var data: Data
     public var encoding: String.Encoding = NanoMessage.stringEncoding
     public var string: String {
@@ -39,8 +42,19 @@ public struct Message {
     }
 
     public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
-        self.encoding = encoding
         data = value.data(using: encoding)!
+        self.encoding = encoding
+    }
+
+    internal init(topic: Topic, value: Data) {
+        self.topic = topic
+        data = value
+    }
+
+    internal init(topic: Topic, value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
+        self.topic = topic
+        data = value.data(using: encoding)!
+        self.encoding = encoding
     }
 
     public init(value: Array<Byte>) {
@@ -59,6 +73,16 @@ extension Message {
 
     public var count: Int {
         return data.count
+    }
+}
+
+extension Message: Hashable {
+    public var hashValue: Int {
+        if let unwrapedTopic = topic {
+            return fnv1a(unwrapedTopic.data + data)
+        }
+
+        return fnv1a(data)
     }
 }
 

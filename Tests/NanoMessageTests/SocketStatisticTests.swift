@@ -100,15 +100,15 @@ class SocketStatisticTests: XCTestCase {
 
             pauseForBind()
 
-            var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "node0.bytesSent != payload.count")
+            var sent = try node0.sendMessage(payload)
+            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             let node1Received = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.count, "node1Received.bytes != node1Received.message.count")
             XCTAssertEqual(node1Received.message, payload, "node1Received.message != payload")
 
-            bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "node1.bytesSent != payload.count")
+            sent = try node1.sendMessage(payload)
+            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             let node0Received = try node0.receiveMessage()
             XCTAssertEqual(node0Received.bytes, node0Received.message.count, "node0Received.bytes != node0Received.message.count")

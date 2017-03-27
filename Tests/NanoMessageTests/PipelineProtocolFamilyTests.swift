@@ -64,8 +64,8 @@ class PipelineProtocolFamilyTests: XCTestCase {
 
             pauseForBind()
 
-            let bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "bytesSent != payload.count")
+            let sent = try node0.sendMessage(payload)
+            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             let node1Received = try node1.receiveMessage()
             XCTAssertEqual(node1Received.bytes, node1Received.message.count, "bytes != node1Received.message.count")

@@ -43,7 +43,7 @@ internal func validateNanoSocket(_ nanoSocket: NanoSocket) throws {
     }
 }
 
-/// The low-level send a message function.
+/// The low-level send function.
 ///
 /// - Parameters:
 ///   - nanoSocket:   The nano socket to use.
@@ -59,9 +59,10 @@ internal func validateNanoSocket(_ nanoSocket: NanoSocket) throws {
 ///            `NanoMessageError.SendTimedOut` the send timedout.
 ///
 /// - Returns: The number of bytes sent.
-internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
-                                  _ payload:      Data,
-                                  _ blockingMode: BlockingMode) throws -> Int {
+internal func sendToSocket(_ nanoSocket:   NanoSocket,
+                           _ payload:      Data,
+                           _ blockingMode: BlockingMode) throws -> Int {
+                           //_ blockingMode: BlockingMode) throws -> MessagePayload {
     try validateNanoSocket(nanoSocket)
 
     let bytesSent = Int(nn_send(nanoSocket.fileDescriptor, payload.bytes, payload.count, blockingMode.rawValue))
@@ -86,9 +87,10 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
     }
 
     return bytesSent
+    //return MessagePayload(bytes: bytesSent, message: payload)
 }
 
-/// The low-level receive a message function.
+/// The low-level receive function.
 ///
 /// - Parameters:
 ///   - nanoSocket:   The nano socket to use.
@@ -104,8 +106,8 @@ internal func sendPayloadToSocket(_ nanoSocket:   NanoSocket,
 ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
 ///
 /// - Returns: The number of bytes received and the received message
-internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
-                                       _ blockingMode: BlockingMode) throws -> ReceiveMessage {
+internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
+                                _ blockingMode: BlockingMode) throws -> MessagePayload {
     try validateNanoSocket(nanoSocket)
 
     var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)
@@ -144,5 +146,5 @@ internal func receivePayloadFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.FreeMessage(code: nn_errno())
     }
 
-    return ReceiveMessage(bytes: bytesReceived, message: message)
+    return MessagePayload(bytes: bytesReceived, message: message)
 }

@@ -27,8 +27,8 @@ public protocol ASyncSenderSocket {
     // ASync Output functions.
     func sendMessage(_ message:    Message,
                      blockingMode: BlockingMode,
-                     success:      @escaping (Int) -> Void)
+                     success:      @escaping (MessagePayload) -> Void)
     func sendMessage(_ message:    Message,
                      timeout:      TimeInterval,
-                     success:      @escaping (Int) -> Void)
+                     success:      @escaping (MessagePayload) -> Void)
 }

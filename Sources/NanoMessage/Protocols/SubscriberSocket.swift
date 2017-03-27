@@ -67,10 +67,10 @@ extension SubscriberSocket {
     ///            `NanoMessageError.TimedOut` the receive timedout.
     ///
     /// - Returns: the number of bytes received and the received message
-    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> ReceiveMessage {
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         receivedTopic = Topic()
 
-        var received = try receivePayloadFromSocket(self, blockingMode)
+        var received = try receiveFromSocket(self, blockingMode)
 
         if (received.bytes > 0) {                                   // we have a message to process...
             if (!subscribedToAllTopics || ignoreTopicSeperator) {   // determine how to extract the topic.
@@ -129,7 +129,7 @@ extension SubscriberSocket {
             }
         }
 
-        return received
+        return MessagePayload(bytes: received.bytes, topic: receivedTopic, message: received.message)
     }
 }
 
@@ -144,10 +144,12 @@ extension SubscriberSocket {
         return subscribedTopics.contains(topic)
     }
 
+    private typealias TopicLengths = (equalLengths: Bool, count: Int)
+
     /// Check all topics for equal lengths.
     ///
     /// - Returns: Tuple of all topics of equal length and then standard topic length/count.
-    private func _validateTopicLengths() -> (equalLengths: Bool, count: Int) {
+    private func _validateTopicLengths() -> TopicLengths {
         var equalLengths = true
         var topicLengths = -1
 
@@ -161,7 +163,7 @@ extension SubscriberSocket {
             }
         }
 
-        return (equalLengths: equalLengths, count: topicLengths)
+        return TopicLengths(equalLengths: equalLengths, count: topicLengths)
     }
 
     /// Flip the ignore topic seperator, when true all topic lengths must be of equal length.

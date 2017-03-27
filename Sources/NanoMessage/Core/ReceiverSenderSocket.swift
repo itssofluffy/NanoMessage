@@ -25,10 +25,10 @@ import Foundation
 public protocol ReceiverSenderSocket: ReceiverSocket, SenderSocket {
     func receiveMessage(receiveMode:    BlockingMode,
                         sendMode:       BlockingMode,
-                        _ closure:      @escaping (ReceiveMessage) throws -> Message) throws -> SendMessage
+                        _ closure:      @escaping (MessagePayload) throws -> Message) throws -> MessagePayload
     func receiveMessage(receiveTimeout: TimeInterval,
                         sendTimeout:    TimeInterval,
-                        _ closure:      @escaping (ReceiveMessage) throws -> Message) throws -> SendMessage
+                        _ closure:      @escaping (MessagePayload) throws -> Message) throws -> MessagePayload
 }
 
 extension ReceiverSenderSocket {
@@ -51,11 +51,11 @@ extension ReceiverSenderSocket {
     @discardableResult
     public func receiveMessage(receiveMode: BlockingMode = .Blocking,
                                sendMode:    BlockingMode = .Blocking,
-                               _ closure:   @escaping (ReceiveMessage) throws -> Message) throws -> SendMessage {
+                               _ closure:   @escaping (MessagePayload) throws -> Message) throws -> MessagePayload {
         let message = try closure(receiveMessage(blockingMode: receiveMode))
-        let bytes = try sendMessage(message, blockingMode: sendMode)
+        let sent = try sendMessage(message, blockingMode: sendMode)
 
-        return SendMessage(bytes: bytes, message: message)
+        return MessagePayload(bytes: sent.bytes, message: sent.message)
     }
 
     /// Receive a message and pass that received message to a closure that produces a message that is sent.
@@ -77,10 +77,10 @@ extension ReceiverSenderSocket {
     @discardableResult
     public func receiveMessage(receiveTimeout: TimeInterval,
                                sendTimeout:    TimeInterval,
-                               _ closure:      @escaping (ReceiveMessage) throws -> Message) throws -> SendMessage {
+                               _ closure:      @escaping (MessagePayload) throws -> Message) throws -> MessagePayload {
         let message = try closure(receiveMessage(timeout: receiveTimeout))
-        let bytes = try sendMessage(message, timeout: sendTimeout)
+        let sent = try sendMessage(message, timeout: sendTimeout)
 
-        return SendMessage(bytes: bytes, message: message)
+        return MessagePayload(bytes: sent.bytes, message: sent.message)
     }
 }

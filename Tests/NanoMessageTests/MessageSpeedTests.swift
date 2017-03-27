@@ -92,11 +92,11 @@ class MessageSpeedTests: XCTestCase {
                         let _ = try node1.receiveMessage()
                     case .Asynchronously:
                         node0.sendMessage(messagePayload,
-                                          success: { bytesSent in
+                                          success: { sent in
                                               wrapper(do: {
                                                           try self.asyncSendMutex.lock {
                                                               self.asyncMessagesSent += 1
-                                                              self.asyncBytesSent += UInt64(bytesSent)
+                                                              self.asyncBytesSent += UInt64(sent.bytes)
                                                           }
                                                       },
                                                       catch: { failure in

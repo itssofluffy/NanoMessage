@@ -26,9 +26,9 @@ import Foundation
 public protocol SenderSocket: ASyncSenderSocket {
     // Output functions.
     @discardableResult
-    func sendMessage(_ message: Message, blockingMode: BlockingMode) throws -> Int
+    func sendMessage(_ message: Message, blockingMode: BlockingMode) throws -> MessagePayload
     @discardableResult
-    func sendMessage(_ message: Message, timeout: TimeInterval) throws -> Int
+    func sendMessage(_ message: Message, timeout: TimeInterval) throws -> MessagePayload
     // socket option functions.
     func getSendBufferSize() throws -> UInt
     @discardableResult

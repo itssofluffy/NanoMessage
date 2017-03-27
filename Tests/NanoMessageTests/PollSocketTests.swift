@@ -69,8 +69,8 @@ class PollSocketTests: XCTestCase {
             XCTAssertEqual(node1Poll.messageIsWaiting, false, "node1Poll.messageIsWaiting != false")
             XCTAssertEqual(node1Poll.sendIsBlocked, false, "node1Poll.sendIsBlocked != false")
 
-            let bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "bytesSent != payload.count")
+            let sent = try node0.sendMessage(payload)
+            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             usleep(TimeInterval(milliseconds: 50))          // pause to make sure the message is sent.
 

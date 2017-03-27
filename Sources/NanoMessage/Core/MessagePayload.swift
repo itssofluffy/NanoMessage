@@ -1,5 +1,5 @@
 /*
-    PublisherMessage.swift
+    MessagePayload.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -20,33 +20,20 @@
     IN THE SOFTWARE.
 */
 
-import FNVHashValue
-import ISFLibrary
+public struct MessagePayload {
+    public let bytes: Int
+    public let topic: Topic?
+    public internal(set) var message: Message
 
-public struct PublisherMessage {
-    public private(set) var topic: Topic
-    public private(set) var message: Message
-
-    public init(topic: Topic, message: Message) {
-        self.topic = topic
+    public init(bytes: Int, message: Message) {
+        self.bytes = bytes
+        self.topic = nil
         self.message = message
     }
-}
 
-extension PublisherMessage: Hashable {
-    public var hashValue: Int {
-        return fnv1a(topic.data + message.data)
-    }
-}
-
-extension PublisherMessage: Comparable {
-    public static func <(lhs: PublisherMessage, rhs: PublisherMessage) -> Bool {
-        return (compare(lhs: lhs.topic.data + lhs.message.data, rhs: rhs.topic.data + rhs.message.data) == .LessThan)
-    }
-}
-
-extension PublisherMessage: Equatable {
-    public static func ==(lhs: PublisherMessage, rhs: PublisherMessage) -> Bool {
-        return (lhs.topic.data + lhs.message.data == rhs.topic.data + rhs.message.data)
+    public init(bytes: Int, topic: Topic, message: Message) {
+        self.bytes = bytes
+        self.topic = topic
+        self.message = message
     }
 }

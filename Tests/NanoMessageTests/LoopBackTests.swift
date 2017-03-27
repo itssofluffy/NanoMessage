@@ -71,8 +71,8 @@ class LoopBackTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(node2EndPointId, 0, "node2.createEndPoint('\(connectURL)', .Connect) < 0")
 
             for _ in 0 ..< 10_000 {
-                let node1bytesSent = try node1.sendMessage(payload)
-                XCTAssertEqual(node1bytesSent, payload.count, "node1bytesSent != payload.count")
+                let node1Sent = try node1.sendMessage(payload)
+                XCTAssertEqual(node1Sent.bytes, payload.count, "node1bytesSent != payload.count")
 
                 let node2Received = try node2.receiveMessage()
                 XCTAssertEqual(node2Received.bytes, node2Received.message.count, "node2.bytes != node2Received.message.count")

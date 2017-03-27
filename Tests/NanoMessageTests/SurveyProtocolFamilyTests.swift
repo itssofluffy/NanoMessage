@@ -71,8 +71,8 @@ class SurveyProtocolFamilyTests: XCTestCase {
 
             pauseForBind()
 
-            var bytesSent = try node0.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "node0.bytesSent != payload.count")
+            var sent = try node0.sendMessage(payload)
+            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             usleep(TimeInterval(seconds: 0.75)) // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
 
@@ -80,8 +80,8 @@ class SurveyProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1Received.bytes, node1Received.message.count, "node1.bytes != node1Received.message.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
 
-            bytesSent = try node1.sendMessage(payload)
-            XCTAssertEqual(bytesSent, payload.count, "node1.bytesSent != payload.count")
+            sent = try node1.sendMessage(payload)
+            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             do {
                 var _ = try node0.receiveMessage()

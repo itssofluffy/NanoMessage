@@ -81,10 +81,10 @@ class BindToSocketTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(node3EndPointId, 0, "node3.createEndPoint('\(connectURL2)', .Connect) < 0")
 
             for _ in 0 ..< 10_000 {
-                let node2bytesSent = try node2.sendMessage(payload)
-                XCTAssertEqual(node2bytesSent, payload.count, "node2bytesSent != payload.count")
+                let node2Sent = try node2.sendMessage(payload)
+                XCTAssertEqual(node2Sent.bytes, payload.count, "node2Sent.bytes != payload.count")
 
-                let sent: SendMessage = try node3.receiveMessage { received in
+                let sent: MessagePayload = try node3.receiveMessage { received in
                     XCTAssertEqual(received.bytes, received.message.count, "received.bytes != received.message.count")
                     XCTAssertEqual(received.message, payload, "received.message != payload")
 
