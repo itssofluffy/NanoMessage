@@ -69,7 +69,8 @@ extension ProtocolSocket where Self: SenderSocket {
     ///
     /// - Returns: The number of bytes sent.
     @discardableResult
-    public func sendMessage(_ message: Message, blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
+    public func sendMessage(_ message:    Message,
+                            blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         let bytesSent = try sendToSocket(_nanoSocket, message.data, blockingMode)
 
         return MessagePayload(bytes: bytesSent, message: message)
@@ -95,7 +96,8 @@ extension ProtocolSocket where Self: SenderSocket {
     /// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
     ///            guaranteed and no error will be thrown. 
     @discardableResult
-    public func sendMessage(_ message: Message, timeout: TimeInterval) throws -> MessagePayload {
+    public func sendMessage(_ message: Message,
+                            timeout:   TimeInterval) throws -> MessagePayload {
         let originalTimeout = try setSendTimeout(seconds: timeout)
 
         defer {
@@ -111,18 +113,16 @@ extension ProtocolSocket where Self: SenderSocket {
 
         return try sendMessage(message)   // chain down the sendMessage signature stack
     }
-}
 
-extension ProtocolSocket where Self: SenderSocket & ASyncSenderSocket {
     /// Asynchrounous execute a passed sender closure.
     ///
     /// - Parameters:
     ///   - closure: The closure to use to perform the send
     ///   - success: The closure to use when `closure()` is succesful.
     ///   - capture: The closure to use to pass any objects required when an error occurs.
-    private func _asyncSend(closure: @escaping () throws -> MessagePayload,
-                            success: @escaping (MessagePayload) -> Void,
-                            capture: @escaping () -> Array<Any>) {
+    private func _asyncSendMessage(closure: @escaping () throws -> MessagePayload,
+                                   success: @escaping (MessagePayload) -> Void,
+                                   capture: @escaping () -> Array<Any>) {
         _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
             wrapper(do: {
                         try self._nanoSocket.mutex.lock {
@@ -147,13 +147,13 @@ extension ProtocolSocket where Self: SenderSocket & ASyncSenderSocket {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (MessagePayload) -> Void) {
-        _asyncSend(closure: {
-                       return try self.sendMessage(message, blockingMode: blockingMode)
-                   },
-                   success: success,
-                   capture: {
-                       return [self, message, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
-                   })
+        _asyncSendMessage(closure: {
+                              return try self.sendMessage(message, blockingMode: blockingMode)
+                          },
+                          success: success,
+                          capture: {
+                              return [self, message, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                          })
     }
 
     /// Asynchronous send a message.
@@ -166,13 +166,13 @@ extension ProtocolSocket where Self: SenderSocket & ASyncSenderSocket {
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
                             success:   @escaping (MessagePayload) -> Void) {
-        _asyncSend(closure: {
-                       return try self.sendMessage(message, timeout: timeout)
-                   },
-                   success: success,
-                   capture: {
-                       return [self, message, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
-                   })
+        _asyncSendMessage(closure: {
+                              return try self.sendMessage(message, timeout: timeout)
+                          },
+                          success: success,
+                          capture: {
+                              return [self, message, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                          })
     }
 }
 
@@ -231,30 +231,6 @@ extension ProtocolSocket where Self: ReceiverSocket {
 
         return try receiveMessage()    // chain down the receiveMessage signature stock.
     }
-}
-
-extension ProtocolSocket where Self: ReceiverSocket & ASyncReceiverSocket {
-    /// Asynchrounous execute a passed receiver closure.
-    ///
-    /// - Parameters:
-    ///   - closure: The closure to use to perform the receive
-    ///   - success: The closure to use when `closure()` is succesful.
-    ///   - capture: The closure to use to pass any objects required when an error occurs.
-    private func _asyncReceive(closure: @escaping () throws -> MessagePayload,
-                               success: @escaping (MessagePayload) -> Void,
-                               capture: @escaping () -> Array<Any>) {
-        _nanoSocket.aioQueue.async(group: _nanoSocket.aioGroup) {
-            wrapper(do: {
-                        try self._nanoSocket.mutex.lock {
-                            success(try closure())
-                        }
-                    },
-                    catch: { failure in
-                        nanoMessageErrorLogger(failure)
-                    },
-                    capture: capture)
-        }
-    }
 
     /// Asynchronous receive a message.
     ///
@@ -265,13 +241,14 @@ extension ProtocolSocket where Self: ReceiverSocket & ASyncReceiverSocket {
     ///   - success:      The closure to use when the async functionallity is succesful.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking,
                                success:      @escaping (MessagePayload) -> Void) {
-        _asyncReceive(closure: {
-                          return try self.receiveMessage(blockingMode: blockingMode)
-                      },
-                      success: success,
-                      capture: {
-                          return [self, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
-                      })
+        asyncReceiveFromSocket(nanoSocket: self._nanoSocket,
+                               closure: {
+                                   return try self.receiveMessage(blockingMode: blockingMode)
+                               },
+                               success: success,
+                               capture: {
+                                   return [self, blockingMode, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                               })
     }
 
     /// Asynchronous receive a message.
@@ -282,17 +259,18 @@ extension ProtocolSocket where Self: ReceiverSocket & ASyncReceiverSocket {
     ///   - success: The closure to use when the async functionallity is succesful.
     public func receiveMessage(timeout: TimeInterval,
                                success: @escaping (MessagePayload) -> Void) {
-        _asyncReceive(closure: {
-                          return try self.receiveMessage(timeout: timeout)
-                      },
-                      success: success,
-                      capture: {
-                          return [self, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
-                      })
+        asyncReceiveFromSocket(nanoSocket: self._nanoSocket,
+                               closure: {
+                                   return try self.receiveMessage(timeout: timeout)
+                               },
+                               success: success,
+                               capture: {
+                                   return [self, timeout, self._nanoSocket.aioQueue, self._nanoSocket.aioGroup]
+                               })
     }
 }
 
-extension ProtocolSocket where Self: SenderSocket {
+extension ProtocolSocket where Self: SenderSocketOptions {
     /// Size of the send buffer, in bytes. To prevent blocking for messages larger than the buffer,
     /// exactly one message may be buffered in addition to the data in the send buffer.
     ///
@@ -403,7 +381,7 @@ extension ProtocolSocket where Self: SenderSocket {
     }
 }
 
-extension ProtocolSocket where Self: ReceiverSocket {
+extension ProtocolSocket where Self: ReceiverSocketOptions {
     /// Size of the receive buffer, in bytes. To prevent blocking for messages larger than the buffer,
     /// exactly one message may be buffered in addition to the data in the receive buffer.
     ///
@@ -545,7 +523,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
     }
 }
 
-extension ProtocolSocket where Self: SenderSocket {
+extension ProtocolSocket where Self: SenderSocketStatistics {
     @available(*, unavailable, renamed: "messagesSent")
     public func getMessagesSent() throws -> UInt64 { fatalError() }
     @available(*, unavailable, renamed: "bytesSent")
@@ -554,7 +532,7 @@ extension ProtocolSocket where Self: SenderSocket {
     public func getCurrentSendPriority() throws -> Priority { fatalError() }
 }
 
-extension ProtocolSocket where Self: SenderSocket {
+extension ProtocolSocket where Self: SenderSocketStatistics {
     /// The number messages sent by this socket.
     public var messagesSent: UInt64? {
         return wrapper(do: {
@@ -595,14 +573,14 @@ extension ProtocolSocket where Self: SenderSocket {
     }
 }
 
-extension ProtocolSocket where Self: ReceiverSocket {
+extension ProtocolSocket where Self: ReceiverSocketStatistics {
     @available(*, unavailable, renamed: "messagesReceived")
     public func getMessagesReceived() throws -> UInt64 { fatalError() }
     @available(*, unavailable, renamed: "bytesReceived")
     public func getBytesReceived() throws -> UInt64 { fatalError() }
 }
 
-extension ProtocolSocket where Self: ReceiverSocket {
+extension ProtocolSocket where Self: ReceiverSocketStatistics {
     /// The number messages received by this socket.
     public var messagesReceived: UInt64? {
         return wrapper(do: {

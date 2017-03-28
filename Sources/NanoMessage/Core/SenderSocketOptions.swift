@@ -1,5 +1,5 @@
 /*
-    ReceiverSocket.swift
+    SenderSocketOptions.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -20,5 +20,19 @@
     IN THE SOFTWARE.
 */
 
-/// Receiver socket protocol.
-public protocol ReceiverSocket: ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics { }
+import Foundation
+
+/// Sender socket options protocol.
+public protocol SenderSocketOptions {
+    // socket option functions.
+    func getSendBufferSize() throws -> UInt
+    @discardableResult
+    func setSendBufferSize(bytes: UInt) throws -> UInt
+    func getSendTimeout() throws -> TimeInterval
+    @discardableResult
+    func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval
+    func getSendPriority() throws -> Priority
+    @discardableResult
+    func setSendPriority(_ priority: Priority) throws -> Priority
+    func getSendFd() throws -> Int
+}

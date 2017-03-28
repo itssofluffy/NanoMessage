@@ -20,6 +20,9 @@
     IN THE SOFTWARE.
 */
 
+import ISFLibrary
+import FNVHashValue
+
 public struct MessagePayload {
     public let bytes: Int
     public let topic: Topic?
@@ -35,5 +38,41 @@ public struct MessagePayload {
         self.bytes = bytes
         self.topic = topic
         self.message = message
+    }
+}
+
+extension MessagePayload: Hashable {
+    public var hashValue: Int {
+        if let unwrappedTopic = topic {
+            return fnv1a(typeToBytes(bytes) + typeToBytes(unwrappedTopic.data + message.data))
+        }
+
+        return fnv1a(typeToBytes(bytes) + message.data)
+    }
+}
+
+extension MessagePayload: Comparable {
+    public static func <(lhs: MessagePayload, rhs: MessagePayload) -> Bool {
+        return (lhs.bytes < rhs.bytes && compare(lhs: lhs.message, rhs: rhs.message) == .LessThan)
+    }
+}
+
+extension MessagePayload: Equatable {
+    public static func ==(lhs: MessagePayload, rhs: MessagePayload) -> Bool {
+        return (lhs.bytes == rhs.bytes && lhs.message == rhs.message)
+    }
+}
+
+extension MessagePayload: CustomStringConvertible {
+    public var description: String {
+        var description = "bytes: \(bytes), "
+
+        if let _ = topic {
+            description = "topic: \(topic), "
+        }
+
+        description += "message: \(message)"
+
+        return description
     }
 }

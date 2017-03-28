@@ -74,6 +74,8 @@ do {
 
     print(endPoint)
 
+    let timeout = TimeInterval(seconds: 10)
+
     for dataSet in messages.sorted(by: { $0.message < $1.message }) {
         let topic = Topic(value: dataSet.topic)
         let message = Message(value: dataSet.message)
@@ -82,7 +84,7 @@ do {
 
         print("sending topic: \(topic.string), message: \(message.string)")
 
-        try node0.sendMessage(message, timeout: TimeInterval(seconds: 10))
+        try node0.sendMessage(message, timeout: timeout)
     }
 
     print("messages sent: \(node0.messagesSent!)")

@@ -46,7 +46,7 @@ class VersionTests: XCTestCase {
     func testNanoMessageVersion() {
          XCTAssertEqual(nanoMessageVersion.major, 0, "NanoMessage major of \(nanoMessageVersion.major) not as expected!")
          XCTAssertEqual(nanoMessageVersion.minor, 2, "NanoMessage minor of \(nanoMessageVersion.minor) not as expected!")
-         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 3, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
+         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 5, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
 
          print("major: \(nanoMessageVersion.major), minor: \(nanoMessageVersion.minor), patch: \(nanoMessageVersion.patch)")
     }

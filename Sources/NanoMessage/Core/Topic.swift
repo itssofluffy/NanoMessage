@@ -76,3 +76,9 @@ extension Topic: Equatable {
         return (lhs.data == rhs.data)
     }
 }
+
+extension Topic: CustomStringConvertible {
+    public var description: String {
+        return "\(string)"
+    }
+}

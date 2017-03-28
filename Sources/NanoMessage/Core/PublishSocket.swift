@@ -1,7 +1,7 @@
 /*
-    ASyncSenderSocket.swift
+    PublishSocket.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,13 +22,12 @@
 
 import Foundation
 
-/// ASync Sender socket protocol.
-public protocol ASyncSenderSocket {
-    // ASync Output functions.
-    func sendMessage(_ message:    Message,
-                     blockingMode: BlockingMode,
-                     success:      @escaping (MessagePayload) -> Void)
-    func sendMessage(_ message:    Message,
-                     timeout:      TimeInterval,
-                     success:      @escaping (MessagePayload) -> Void)
+protocol PublishSocket: SenderSocketMethods, SenderSocketOptions, SenderSocketStatistics {
+    var sendTopic: Topic { get }                       // implement private set.
+    var sentTopics: Dictionary<Topic, UInt64> { get }  // implement private set.
+    var prependTopic: Bool { get set }
+    var ignoreTopicSeperator: Bool { get set }
+    var resetTopicAfterSend: Bool { get set }
+
+    func setSendTopic(_ topic: Topic) throws
 }

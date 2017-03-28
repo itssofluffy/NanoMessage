@@ -1,7 +1,7 @@
 /*
-    Publisher.swift
+    ReceiverSocketMethods.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,12 +20,16 @@
     IN THE SOFTWARE.
 */
 
-protocol Publisher: SenderSocket {
-    var sendTopic: Topic { get }                       // implement private set.
-    var sentTopics: Dictionary<Topic, UInt64> { get }  // implement private set.
-    var prependTopic: Bool { get set }
-    var ignoreTopicSeperator: Bool { get set }
-    var resetTopicAfterSend: Bool { get set }
+import Foundation
 
-    func setSendTopic(_ topic: Topic) throws
+/// Receiver socket methods protocol.
+public protocol ReceiverSocketMethods {
+    // Input functions.
+    func receiveMessage(blockingMode: BlockingMode) throws -> MessagePayload
+    func receiveMessage(timeout:      TimeInterval) throws -> MessagePayload
+    // ASync Input functions.
+    func receiveMessage(blockingMode: BlockingMode,
+                        success:      @escaping (MessagePayload) -> Void)
+    func receiveMessage(timeout:      TimeInterval,
+                        success:      @escaping (MessagePayload) -> Void)
 }

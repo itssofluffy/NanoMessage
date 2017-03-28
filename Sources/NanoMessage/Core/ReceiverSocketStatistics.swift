@@ -1,5 +1,5 @@
 /*
-    ReceiverSocket.swift
+    ReceiverSocketStatistics.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -20,5 +20,9 @@
     IN THE SOFTWARE.
 */
 
-/// Receiver socket protocol.
-public protocol ReceiverSocket: ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics { }
+/// Receiver socket statistics protocol.
+public protocol ReceiverSocketStatistics {
+    // socket statistics functions.
+    var messagesReceived: UInt64? { get }
+    var bytesReceived: UInt64? { get }
+}

@@ -1,7 +1,7 @@
 /*
-    ASyncReceiverSocket.swift
+    SenderSocketMethods.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,11 +22,20 @@
 
 import Foundation
 
-/// Async Receiver socket protocol.
-public protocol ASyncReceiverSocket {
-    // ASync Input functions.
-    func receiveMessage(blockingMode: BlockingMode,
-                        success:      @escaping (MessagePayload) -> Void)
-    func receiveMessage(timeout:      TimeInterval,
-                        success:      @escaping (MessagePayload) -> Void)
+/// Sender socket methods protocol.
+public protocol SenderSocketMethods {
+    // Output functions.
+    @discardableResult
+    func sendMessage(_ message:    Message,
+                     blockingMode: BlockingMode) throws -> MessagePayload
+    @discardableResult
+    func sendMessage(_ message:    Message,
+                     timeout:      TimeInterval) throws -> MessagePayload
+    // ASync Output functions.
+    func sendMessage(_ message:    Message,
+                     blockingMode: BlockingMode,
+                     success:      @escaping (MessagePayload) -> Void)
+    func sendMessage(_ message:    Message,
+                     timeout:      TimeInterval,
+                     success:      @escaping (MessagePayload) -> Void)
 }

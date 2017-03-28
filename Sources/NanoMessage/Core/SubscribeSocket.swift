@@ -1,5 +1,5 @@
 /*
-    ReceiverSocket.swift
+    SubscribeSocket.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -20,5 +20,18 @@
     IN THE SOFTWARE.
 */
 
-/// Receiver socket protocol.
-public protocol ReceiverSocket: ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics { }
+protocol SubscribeSocket: ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics {
+    var receivedTopic: Topic { get }                      // implement private set
+    var receivedTopics: Dictionary<Topic, UInt64> { get } // implement private set
+    var removeTopicFromMessage: Bool { get set }
+    var ignoreTopicSeperator: Bool { get }                // implement private set
+    var subscribedTopics: Set<Topic> { get }              // implement private set
+    var subscribedToAllTopics: Bool { get }               // implement private set
+
+    func isTopicSubscribed(_ topic: Topic) -> Bool
+    func flipIgnoreTopicSeperator() throws -> Bool
+    func subscribeTo(topic: Topic) throws -> Bool
+    func unsubscribeFrom(topic: Topic) throws -> Bool
+    func subscribeToAllTopics() throws -> Bool
+    func unsubscribeFromAllTopics() throws
+}

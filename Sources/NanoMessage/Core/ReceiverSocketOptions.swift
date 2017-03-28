@@ -1,7 +1,7 @@
 /*
-    PublisherSubscriber.swift
+    ReceiverSocketOptions.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,12 +20,22 @@
     IN THE SOFTWARE.
 */
 
-import ISFLibrary
+import Foundation
 
-/// PublisherSocket/SubscriberSocket protocol.
-public protocol PublisherSubscriber {
-    var topicCounts: Bool { get set }
-    var topicSeperator: Byte { get set }
-
-    func resetTopicCounts()
+/// Receiver socket options protocol.
+public protocol ReceiverSocketOptions {
+    // socket option functions.
+    func getReceiveBufferSize() throws -> UInt
+    @discardableResult
+    func setReceiveBufferSize(bytes: UInt) throws -> UInt
+    func getMaximumMessageSize() throws -> Int
+    @discardableResult
+    func setMaximumMessageSize(bytes: Int) throws -> Int
+    func getReceiveTimeout() throws -> TimeInterval
+    @discardableResult
+    func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
+    func getReceivePriority() throws -> Priority
+    @discardableResult
+    func setReceivePriority(_ priority: Priority) throws -> Priority
+    func getReceiveFd() throws -> Int
 }

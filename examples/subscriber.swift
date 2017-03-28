@@ -50,14 +50,17 @@ do {
 
     try node0.subscribeTo(topic: Topic(value: "interesting"))
 
+    let timeout = TimeInterval(seconds: 10)
+    let pollTimeout = TimeInterval(seconds: 0.25)
+
     while (true) {
-        let received = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+        let received = try node0.receiveMessage(timeout: timeout)
 
         print("topic            : \(node0.receivedTopic)")
         print("message          : \(received.message.string)")
         print("bytes            : \(received.bytes)")
 
-        let socket = try node0.pollSocket(timeout: TimeInterval(seconds: 0.25))
+        let socket = try node0.pollSocket(timeout: pollTimeout)
 
         if (!socket.messageIsWaiting) {
             break

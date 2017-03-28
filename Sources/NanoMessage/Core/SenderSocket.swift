@@ -1,7 +1,7 @@
 /*
-    Sender.swift
+    SenderSocket.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,28 +20,5 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Sender socket protocol.
-public protocol SenderSocket: ASyncSenderSocket {
-    // Output functions.
-    @discardableResult
-    func sendMessage(_ message: Message, blockingMode: BlockingMode) throws -> MessagePayload
-    @discardableResult
-    func sendMessage(_ message: Message, timeout: TimeInterval) throws -> MessagePayload
-    // socket option functions.
-    func getSendBufferSize() throws -> UInt
-    @discardableResult
-    func setSendBufferSize(bytes: UInt) throws -> UInt
-    func getSendTimeout() throws -> TimeInterval
-    @discardableResult
-    func setSendTimeout(seconds: TimeInterval) throws -> TimeInterval
-    func getSendPriority() throws -> Priority
-    @discardableResult
-    func setSendPriority(_ priority: Priority) throws -> Priority
-    func getSendFd() throws -> Int
-    // socket statistics functions.
-    var messagesSent: UInt64? { get }
-    var bytesSent: UInt64? { get }
-    var currentSendPriority: Priority? { get }
-}
+public protocol SenderSocket: SenderSocketMethods, SenderSocketOptions, SenderSocketStatistics { }

@@ -97,3 +97,17 @@ extension Message: Equatable {
         return (lhs.data == rhs.data)
     }
 }
+
+extension Message: CustomStringConvertible {
+    public var description: String {
+        var description = ""
+
+        if let unwrappedTopic = topic {
+            description = "topic: \(unwrappedTopic), "
+        }
+
+        description += "string: \(string)"
+
+        return description
+    }
+}
