@@ -41,7 +41,7 @@ public var nanoMsgABIVersion: ABIVersion {
 
 /// NanoMessage library version.
 public var nanoMessageVersion: SemanticVersion {
-    return SemanticVersion(major: 0, minor: 2, patch: 5)
+    return SemanticVersion(major: 0, minor: 2, patch: 6)
 }
 
 /// The string encoding to use by default for topics and messages.
@@ -57,15 +57,17 @@ public func terminate() {
 private var _nanomsgSymbol = Dictionary<String, CInt>()
 /// A dictionary of nanomsg symbol names and values.
 public var nanomsgSymbol: Dictionary<String, CInt> {
+    typealias Symbol = (name: String, value:CInt)
+
     if (_nanomsgSymbol.isEmpty) {
         var index: CInt = 0
 
         while (true) {
-            if let symbol = { () -> (name: String, value: CInt)? in
+            if let symbol = { () -> Symbol? in
                                 var value: CInt = 0
 
                                 if let symbolName = nn_symbol(index, &value) {
-                                    return (name: String(cString: symbolName), value: value)
+                                    return Symbol(name: String(cString: symbolName), value: value)
                                 }
 
                                 return nil
