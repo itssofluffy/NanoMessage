@@ -75,33 +75,35 @@ extension SubscriberSocket {
         if (received.bytes > 0) {                                   // we have a message to process...
             if (!subscribedToAllTopics || ignoreTopicSeperator) {   // determine how to extract the topic.
                 for topic in subscribedTopics {
-                    if ( { () -> Bool in                            // Does the message/payload contain the specified topic
-                             if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= received.message.count) {
-                                 if (Data(received.message.data[0 ..< topic.count]) != topic.data) {
-                                     return false
-                                 } else if (self.ignoreTopicSeperator || received.message.data[topic.count] == self.topicSeperator) {
-                                     return true
-                                 }
-                             }
+                    let containsTopic: () -> Bool = {
+                        if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= received.message.count) {
+                            if (Data(received.message.data[0 ..< topic.count]) != topic.data) {
+                                return false
+                            } else if (self.ignoreTopicSeperator || received.message.data[topic.count] == self.topicSeperator) {
+                                return true
+                            }
+                        }
 
-                             return false
-                         }()) {
+                        return false
+                    }
+
+                    if (containsTopic()) {
                         receivedTopic = topic
 
                         break
                     }
                 }
             } else {
-                let topic = { () -> Topic in                        // Get the topic from the message/payload if it exists using the topic seperator.
+                let topic: () -> Topic = {                          // Get the topic from the message/payload if it exists using the topic seperator.
                     if let index = received.message.data.index(of: self.topicSeperator) {
                         return Topic(value: Data(received.message.data[0 ..< index]))
                     }
 
                     return Topic(value: received.message.data)
-                }()
+                }
 
-                if (topic.data != received.message.data) {
-                    receivedTopic = topic
+                if (topic().data != received.message.data) {
+                    receivedTopic = topic()
                 }
             }
 
@@ -275,26 +277,25 @@ extension SubscriberSocket {
             let topicSubscribed = isTopicSubscribed(topic)
 
             if (!topicSubscribed) {
-                if (subscribedToAllTopics) {
-                    try unsubscribeFromAllTopics()
-                } else if (ignoreTopicSeperator &&
-                           !{ () -> Bool in   // Check topic length against (any) existing topics is see if it is of equal length.
-                                let topics = self._validateTopicLengths()
+                let validTopicLength: () -> Bool = {            // Check topic length against (any) existing topics is see if it is of equal length.
+                    let topics = self._validateTopicLengths()
 
-                                if (!topics.equalLengths) {
-                                    return false
-                                } else if (topics.count < 0) {
-                                    return true
-                                } else if (topics.count != topic.count) {
-                                    return false
-                                }
+                    if (!topics.equalLengths) {
+                        return false
+                    } else if (topics.count < 0) {
+                        return true
+                    } else if (topics.count != topic.count) {
+                        return false
+                    }
 
-                                return true
-                            }()) {
-                    throw NanoMessageError.InvalidTopic
+                    return true
                 }
 
-                if (topic.count > NanoMessage.maximumTopicLength) {
+                if (subscribedToAllTopics) {
+                    try unsubscribeFromAllTopics()
+                } else if (ignoreTopicSeperator && !validTopicLength()) {
+                    throw NanoMessageError.InvalidTopic
+                } else if (topic.count > NanoMessage.maximumTopicLength) {
                     throw NanoMessageError.TopicLength
                 }
 

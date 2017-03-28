@@ -86,21 +86,21 @@ extension PublisherSocket {
     @discardableResult
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
-        let bytesSent = try sendToSocket(self,
-                                         { () throws -> Data in
-                                             if (self.prependTopic) {                    // we are prepending the topic to the start of the message.
-                                                 try self._validateTopic(self.sendTopic) // check that we have a valid topic to send.
+        let payload: () throws -> Data = {
+            if (self.prependTopic) {                          // we are prepending the topic to the start of the message.
+                try self._validateTopic(self.sendTopic)       // check that we have a valid topic to send.
 
-                                                 if (self.ignoreTopicSeperator) {        // check if we are ignoring the topic seperator.
-                                                     return self.sendTopic.data + message.data
-                                                 }
+                if (self.ignoreTopicSeperator) {              // check if we are ignoring the topic seperator.
+                    return self.sendTopic.data + message.data
+                }
 
-                                                 return self.sendTopic.data + [self.topicSeperator] + message.data
-                                             }
+                return self.sendTopic.data + [self.topicSeperator] + message.data
+            }
 
-                                             return message.data
-                                         }(),
-                                         blockingMode)
+            return message.data
+        }
+
+        let bytesSent = try sendToSocket(self, payload(), blockingMode)
 
         if (!sendTopic.isEmpty) {                             // check that we have a send topic.
             if (topicCounts) {                                // remember which topics we've sent and how many.

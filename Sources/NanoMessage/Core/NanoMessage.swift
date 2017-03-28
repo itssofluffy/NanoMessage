@@ -62,16 +62,18 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
     if (_nanomsgSymbol.isEmpty) {
         var index: CInt = 0
 
+        let symbolName: () -> Symbol? = {
+            var value: CInt = 0
+
+            if let symbolName = nn_symbol(index, &value) {
+                return Symbol(name: String(cString: symbolName), value: value)
+            }
+
+            return nil
+        }
+
         while (true) {
-            if let symbol = { () -> Symbol? in
-                                var value: CInt = 0
-
-                                if let symbolName = nn_symbol(index, &value) {
-                                    return Symbol(name: String(cString: symbolName), value: value)
-                                }
-
-                                return nil
-                            }() {
+            if let symbol = symbolName() {
                 _nanomsgSymbol[symbol.name] = symbol.value
             } else {
                 break     // no more symbols
@@ -121,6 +123,9 @@ public var symbolProperty: Set<SymbolProperty> {
 ///           `NanoMessageError.PollSocket` if polling the socket fails.
 ///
 /// - Returns: Message waiting and send queue blocked as a tuple of bools.
+///
+/// - Notes:   If a message has been received on a SubscriberSocket will return that a message is waiting irrespective
+///            of the topic being subscribed too.
 public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> Array<PollResult> {
     var pollFds = Array<nn_pollfd>()
     var pollResults = Array<PollResult>()
@@ -147,7 +152,7 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
         }
     }
 
-    for loopCount in 0 ... sockets.count - 1 {
+    for loopCount in 0 ..< sockets.count {
         let messageIsWaiting = ((pollFds[loopCount].revents & _pollinMask) != 0)      // using the event masks determine our return values
         let sendIsBlocked = ((pollFds[loopCount].revents & _polloutMask) != 0)        //
 
