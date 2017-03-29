@@ -66,7 +66,7 @@ extension SubscriberSocket {
     ///            `NanoMessageError.MessageNotReceived` in non-blocking mode there was no message to receive.
     ///            `NanoMessageError.TimedOut` the receive timedout.
     ///
-    /// - Returns: the number of bytes received and the received message
+    /// - Returns: The message payload received.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         receivedTopic = Topic()
 
@@ -149,7 +149,7 @@ extension SubscriberSocket {
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
     ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
-    /// - Returns: the number of bytes received and the received message
+    /// - Returns: The message payload received.
     ///
     /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
     ///            guaranteed behaviour and no error will be thrown. 

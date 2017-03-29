@@ -29,6 +29,13 @@ public protocol ProtocolSocket {
     var _nanoSocket: NanoSocket { get }
 
     init(socketDomain: SocketDomain) throws
+    init(socketDomain: SocketDomain,
+         urls:         Array<URL>,
+         type:         ConnectionType) throws
+    init(socketDomain: SocketDomain,
+         url:          URL,
+         type:         ConnectionType,
+         name:         String) throws
 }
 
 extension ProtocolSocket {
@@ -67,7 +74,7 @@ extension ProtocolSocket where Self: SenderSocket {
     ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
     ///            `NanoMessageError.SendTimedOut` the send timedout.
     ///
-    /// - Returns: The number of bytes sent.
+    /// - Returns: The payload sent.
     @discardableResult
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
@@ -91,7 +98,7 @@ extension ProtocolSocket where Self: SenderSocket {
     ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
     ///            `NanoMessageError.SendTimedOut` the send timedout.
     ///
-    /// - Returns: the number of bytes sent.
+    /// - Returns: The payload sent.
     ///
     /// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
     ///            guaranteed and no error will be thrown. 
@@ -191,7 +198,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
     ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
-    /// - Returns: the number of bytes received and the received message
+    /// - Returns: The message payload received.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         return try receiveFromSocket(_nanoSocket, blockingMode)
     }
@@ -211,7 +218,7 @@ extension ProtocolSocket where Self: ReceiverSocket {
     ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
     ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
-    /// - Returns: the number of bytes received and the received message
+    /// - Returns: The message payload received.
     ///
     /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
     ///            guaranteed behaviour and no error will be thrown. 

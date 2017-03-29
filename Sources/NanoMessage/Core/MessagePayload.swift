@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+import Foundation
 import ISFLibrary
 import FNVHashValue
 
@@ -27,6 +28,8 @@ public struct MessagePayload {
     public let bytes: Int
     public let topic: Topic?
     public internal(set) var message: Message
+
+    public let timestamp = Date().timeIntervalSinceReferenceDate
 
     public init(bytes: Int, message: Message) {
         self.bytes = bytes
@@ -43,23 +46,19 @@ public struct MessagePayload {
 
 extension MessagePayload: Hashable {
     public var hashValue: Int {
-        if let unwrappedTopic = topic {
-            return fnv1a(typeToBytes(bytes) + typeToBytes(unwrappedTopic.data + message.data))
-        }
-
-        return fnv1a(typeToBytes(bytes) + message.data)
+        return fnv1a(timestamp)
     }
 }
 
 extension MessagePayload: Comparable {
     public static func <(lhs: MessagePayload, rhs: MessagePayload) -> Bool {
-        return (lhs.bytes < rhs.bytes && compare(lhs: lhs.message, rhs: rhs.message) == .LessThan)
+        return (lhs.timestamp < rhs.timestamp)
     }
 }
 
 extension MessagePayload: Equatable {
     public static func ==(lhs: MessagePayload, rhs: MessagePayload) -> Bool {
-        return (lhs.bytes == rhs.bytes && lhs.message == rhs.message)
+        return (lhs.timestamp == rhs.timestamp)
     }
 }
 
@@ -71,7 +70,7 @@ extension MessagePayload: CustomStringConvertible {
             description = "topic: \(topic), "
         }
 
-        description += "message: \(message)"
+        description += "message: \(message), timestamp: \(timestamp)"
 
         return description
     }
