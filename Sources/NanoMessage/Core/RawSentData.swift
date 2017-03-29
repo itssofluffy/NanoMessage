@@ -1,5 +1,5 @@
 /*
-    PublishSocket.swift
+    RawSentData.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -22,11 +22,8 @@
 
 import Foundation
 
-protocol PublishSocket: SenderSocketMethods, SenderSocketOptions, SenderSocketStatistics {
-    var sentTopics: Dictionary<Topic, UInt64> { get }  // implement private set.
-    var prependTopic: Bool { get set }
-    var ignoreTopicSeperator: Bool { get set }
-    var resetTopicAfterSend: Bool { get set }
-
-    func setTopic(_ topic: Topic) throws
+/// Raw data returned by NanoSocketIO.sendToSocket()
+internal struct RawSentData {
+    internal let bytes:     Int
+    internal let timestamp: TimeInterval
 }

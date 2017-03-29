@@ -80,7 +80,7 @@ do {
         let topic = Topic(value: dataSet.topic)
         let message = Message(value: dataSet.message)
 
-        try node0.setSendTopic(topic)
+        try node0.setTopic(topic)
 
         let sent = try node0.sendMessage(message, timeout: timeout)
 

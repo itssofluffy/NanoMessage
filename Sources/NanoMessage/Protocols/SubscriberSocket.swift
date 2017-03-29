@@ -34,8 +34,6 @@ public final class SubscriberSocket: NanoSocket, ProtocolSocket, PublishSubscrib
     /// Ignore topic seperator, true means that all topics must be of an equal length.
     /// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
     public fileprivate(set) var ignoreTopicSeperator = false
-    /// The topic last received.
-    public fileprivate(set) var receivedTopic = Topic()
     /// remember which topics we've received and how many.
     public var topicCounts = true
     /// A dictionary of topics and their count that have been received
@@ -68,7 +66,7 @@ extension SubscriberSocket {
     ///
     /// - Returns: The message payload received.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
-        receivedTopic = Topic()
+        var receivedTopic = Topic()
 
         let received = try receiveFromSocket(self, blockingMode)
 

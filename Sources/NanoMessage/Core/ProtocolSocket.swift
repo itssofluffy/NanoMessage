@@ -78,9 +78,12 @@ extension ProtocolSocket where Self: SenderSocket {
     @discardableResult
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
-        let bytesSent = try sendToSocket(_nanoSocket, message.data, blockingMode)
+        let sent = try sendToSocket(_nanoSocket, message.data, blockingMode)
 
-        return MessagePayload(bytes: bytesSent, message: message, direction: .Sent)
+        return MessagePayload(bytes:     sent.bytes,
+                              message:   message,
+                              direction: .Sent,
+                              timestamp: sent.timestamp)
     }
 
     /// Send a message.

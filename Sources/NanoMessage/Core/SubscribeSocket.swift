@@ -21,7 +21,6 @@
 */
 
 protocol SubscribeSocket: ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics {
-    var receivedTopic: Topic { get }                      // implement private set
     var receivedTopics: Dictionary<Topic, UInt64> { get } // implement private set
     var removeTopicFromMessage: Bool { get set }
     var ignoreTopicSeperator: Bool { get }                // implement private set

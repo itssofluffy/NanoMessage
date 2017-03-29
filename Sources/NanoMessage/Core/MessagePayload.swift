@@ -24,6 +24,7 @@ import Foundation
 import ISFLibrary
 import FNVHashValue
 
+/// A sent or received message and additional data.
 public struct MessagePayload {
     public let bytes: Int
     public private(set) var topic: Topic? = nil
@@ -34,18 +35,19 @@ public struct MessagePayload {
 
     internal init(bytes:     Int,
                   message:   Message,
-                  direction: MessageDirection) {
+                  direction: MessageDirection,
+                  timestamp: TimeInterval) {
         self.bytes = bytes
         self.message = message
         self.direction = direction
-        timestamp = Date().timeIntervalSinceReferenceDate
+        self.timestamp = timestamp
     }
 
     internal init(bytes:     Int,
                   topic:     Topic,
                   message:   Message,
                   direction: MessageDirection,
-                  timestamp: TimeInterval = Date().timeIntervalSinceReferenceDate) {
+                  timestamp: TimeInterval) {
         self.bytes = bytes
         self.topic = topic
         self.message = message

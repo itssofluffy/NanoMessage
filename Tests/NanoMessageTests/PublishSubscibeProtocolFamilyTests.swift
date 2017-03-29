@@ -59,7 +59,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.createEndPoint('\(connectURL)', .Connect) < 0")
 
-            try node0.setSendTopic(Topic(value: "shakespeare"))
+            var topic = Topic(value: "shakespeare")
+            try node0.setTopic(topic)
             XCTAssertEqual(node0.prependTopic, true, "node0.prependTopic")
 
             let node1EndPointId: Int = try node1.createEndPoint(url: bindURL, type: .Bind)
@@ -69,28 +70,28 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             // standard publisher -> subscriber where the topic known.
             print("subscribe to an expected topic...")
-            var done = try node1.subscribeTo(topic: node0.sendTopic)
-            XCTAssertEqual(done, true, "node1.subscribeTo(topic: \(node0.sendTopic))")
-            XCTAssertEqual(node1.isTopicSubscribed(node0.sendTopic), true, "node1.isTopicSubscribed()")
+            var done = try node1.subscribeTo(topic: topic)
+            XCTAssertEqual(done, true, "node1.subscribeTo(topic: \(topic))")
+            XCTAssertEqual(node1.isTopicSubscribed(topic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
 
             var node0Sent = try node0.sendMessage(payload)
-            XCTAssertEqual(node0Sent.bytes, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
+            XCTAssertEqual(node0Sent.bytes, topic.count + 1 + payload.count, "node0.bytesSent != topic.count + 1 + payload.count")
 
             var node1Received = try node1.receiveMessage()
-            XCTAssertEqual(node1Received.bytes, node1.receivedTopic.count + 1 + node1Received.message.count, "node1.bytes != node1.receivedTopic.count + 1 + node1Received.message.count")
+            XCTAssertEqual(node1Received.bytes, node1Received.topic!.count + 1 + node1Received.message.count, "node1.bytes != node1received.topic.count + 1 + node1Received.message.count")
             XCTAssertEqual(node1Received.message.count, payload.count, "node1Received.message.count != payload.count")
             XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
-            XCTAssertEqual(node1.receivedTopic, node0.sendTopic, "node1.receivedTopic != node0.sendTopic")
+            XCTAssertEqual(node1Received.topic, topic, "node1Received.topic != topic")
 
             // standard publisher -> subscriber where the topic is unknown.
             print("subscribe to an unknown topic...")
-            try node1.unsubscribeFrom(topic: node0.sendTopic)
+            try node1.unsubscribeFrom(topic: topic)
             try node1.subscribeTo(topic: Topic(value: "xxxx"))
             XCTAssertEqual(node1.subscribedTopics.count, 1, "node1.subscribedTopics.count != 0")
 
             node0Sent = try node0.sendMessage(payload)
-            XCTAssertEqual(node0Sent.bytes, node0.sendTopic.count + 1 + payload.count, "node0.bytesSent != node0.sendTopic.count + 1 + payload.count")
+            XCTAssertEqual(node0Sent.bytes, node0Sent.topic!.count + 1 + payload.count, "node0.bytesSent != node0Sent.topic.count + 1 + payload.count")
 
             try node1.setReceiveTimeout(seconds: -1)
 
@@ -112,28 +113,30 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let planets = [ "mercury", "venus", "mars", "earth", "mars", "jupiter", "saturn", "uranus", "neptune" ]
 
-            try node0.setSendTopic(Topic(value: "planet"))
+            topic = Topic(value: "planet")
+            try node0.setTopic(topic)
 
             for planet in planets {
                 let sent = try node0.sendMessage(Message(value: planet))
-                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + planet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + planet.utf8.count")
+                XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + planet.utf8.count, "sent.bytes != sent.topic.count + 1 + planet.utf8.count")
 
                 let _ = try node1.receiveMessage()
             }
 
             let dwarfPlanets = [ "Eris", "Pluto", "Makemake", "Or", "Haumea", "Quaoar", "Senda", "Orcus", "2002 MS", "Ceres", "Salacia" ]
 
-            try node0.setSendTopic(Topic(value: "dwarfPlanet"))
+            topic = Topic(value: "dwarfPlanet")
+            try node0.setTopic(Topic(value: "dwarfPlanet"))
 
             for dwarfPlanet in dwarfPlanets {
                 let sent = try node0.sendMessage(Message(value: dwarfPlanet))
-                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
+                XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != sent.topic.count + 1 + dwarfPlanet.utf8.count")
 
                 let _ = try node1.receiveMessage()
             }
 
             XCTAssertEqual(node0.sentTopics.count, 1 + 2, "node0.sentTopics.count != 3")
-            XCTAssertEqual(node0.sentTopics[node0.sendTopic]!, UInt64(dwarfPlanets.count), "node0.sentTopics[\"\(node0.sendTopic)\"] != \(dwarfPlanets.count)")
+            XCTAssertEqual(node0.sentTopics[topic]!, UInt64(dwarfPlanets.count), "node0.sentTopics[\"\(topic)\"] != \(dwarfPlanets.count)")
 
             XCTAssertEqual(node1.subscribedTopics.count, 0, "node1.subscribedTopics.count != 0")
             XCTAssertEqual(node1.receivedTopics.count, 1 + 2, "node1.receivedTopics.count != 3")
@@ -144,11 +147,11 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.unsubscribeFromAllTopics()
             try node1.subscribeTo(topic: Topic(value: "dwarfPlanet"))
 
-            try node0.setSendTopic(Topic(value: "planet"))
+            try node0.setTopic(Topic(value: "planet"))
 
             for planet in planets {
                 let sent = try node0.sendMessage(Message(value: planet))
-                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + planet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + planet.utf8.count")
+                XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + planet.utf8.count, "sent.bytes != sent.topic.count + 1 + planet.utf8.count")
             }
 
             do {
@@ -158,15 +161,16 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")
             }
 
-            try node0.setSendTopic(Topic(value: "dwarfPlanet"))
+            topic = Topic(value: "dwarfPlanet")
+            try node0.setTopic(topic)
 
             for dwarfPlanet in dwarfPlanets {
                 let sent = try node0.sendMessage(Message(value: dwarfPlanet))
-                XCTAssertEqual(sent.bytes, node0.sendTopic.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
+                XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
 
             var received = try node1.receiveMessage()
-            XCTAssertEqual(node1.receivedTopic, node0.sendTopic, "node1.receivedTopic != node0.sendTopic")
+            XCTAssertEqual(received.topic, topic, "received.topic != topic")
             XCTAssertEqual(received.message.string, dwarfPlanets[0], "received.message.string != \"\(dwarfPlanets[0])\"")
 
             try node1.unsubscribeFromAllTopics()
@@ -192,15 +196,15 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let _ = try node1.flipIgnoreTopicSeperator()
             XCTAssertEqual(node1.ignoreTopicSeperator, true, "node1.ignoreTopicSeperator")
 
-            try node0.setSendTopic(Topic(value: "AAA"))
+            try node0.setTopic(Topic(value: "AAA"))
 
-            let _ = try node0.sendMessage(payload)
+            let sent = try node0.sendMessage(payload)
 
             received = try node1.receiveMessage()
 
-            XCTAssertEqual(node1.receivedTopic.count, node0.sendTopic.count, "node1.receivedTopic.count != node0.sendTopic.count")
-            XCTAssertEqual(node1.receivedTopic, node0.sendTopic, "node1.receivedTopic != node0.sendTopic")
-            XCTAssertEqual(received.message, payload, "node1.receivedTopic != payload")
+            XCTAssertEqual(received.topic!.count, sent.topic!.count, "received.topic.count != sent.topic.count")
+            XCTAssertEqual(received.topic, sent.topic, "received.topic != sent.topic")
+            XCTAssertEqual(received.message, payload, "received.topic != payload")
 
             completed = true
         } catch let error as NanoMessageError {

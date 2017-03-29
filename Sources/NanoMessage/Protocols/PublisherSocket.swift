@@ -29,10 +29,11 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, PublishSubscribe
         return self
     }
 
+    /// The topic to send.
+    fileprivate var _topic = Topic()
+
     /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
-    /// The topic to send.
-    public fileprivate(set) var sendTopic = Topic()
     /// remember which topics we've sent and how many.
     public var topicCounts = true
     /// A Dictionary of the topics sent with a count of the times sent.
@@ -88,39 +89,42 @@ extension PublisherSocket {
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         let payload: () throws -> Data = {
             if (self.prependTopic) {                          // we are prepending the topic to the start of the message.
-                try self._validateTopic(self.sendTopic)       // check that we have a valid topic to send.
+                try self._validateTopic(self._topic)          // check that we have a valid topic to send.
 
                 if (self.ignoreTopicSeperator) {              // check if we are ignoring the topic seperator.
-                    return self.sendTopic.data + message.data
+                    return self._topic.data + message.data
                 }
 
-                return self.sendTopic.data + [self.topicSeperator] + message.data
+                return self._topic.data + [self.topicSeperator] + message.data
             }
 
             return message.data
         }
 
-        let sent = try MessagePayload(bytes:     sendToSocket(self, payload(), blockingMode),
-                                      topic:     sendTopic,
-                                      message:   message,
-                                      direction: .Sent)
+        let sent = try sendToSocket(self, payload(), blockingMode)
 
-        if (!sendTopic.isEmpty) {                             // check that we have a send topic.
+        if (!_topic.isEmpty) {                                // check that we have a send topic.
             if (topicCounts) {                                // remember which topics we've sent and how many.
-                if var topicCount = sentTopics[sendTopic] {
+                if var topicCount = sentTopics[_topic] {
                     topicCount += 1
-                    sentTopics[sendTopic] = topicCount
+                    sentTopics[_topic] = topicCount
                 } else {
-                    sentTopics[sendTopic] = 1
+                    sentTopics[_topic] = 1
                 }
-            }
-
-            if (resetTopicAfterSend) {                        // are we resetting the topic?
-                sendTopic = Topic()                           // reset the topic, don't use setSendTopic() as this checks for isEmpty!
             }
         }
 
-        return sent
+        defer {
+            if (!_topic.isEmpty && resetTopicAfterSend) {     // are we resetting the topic?
+                _topic = Topic()                              // reset the topic, don't use setSendTopic() as this checks for isEmpty!
+            }
+        }
+
+        return MessagePayload(bytes:     sent.bytes,
+                              topic:     _topic,
+                              message:   message,
+                              direction: .Sent,
+                              timestamp: sent.timestamp)
     }
 
     /// Send a message.
@@ -175,7 +179,7 @@ extension PublisherSocket {
         aioQueue.async(group: aioGroup) {
             wrapper(do: {
                         try self.mutex.lock {
-                            try self.setSendTopic(payload.topic!)
+                            try self.setTopic(payload.topic!)
 
                             try success(closure(Message(value: payload.data)))
                         }
@@ -198,7 +202,7 @@ extension PublisherSocket {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (MessagePayload) -> Void) {
-        let payload = Message(topic: sendTopic, value: message.data)
+        let payload = Message(topic: _topic, value: message.data)
 
         _asyncSendMessage(payload: payload,
                           closure: { message in
@@ -219,7 +223,7 @@ extension PublisherSocket {
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
                             success:   @escaping (MessagePayload) -> Void) {
-        let payload = Message(topic: sendTopic, value: message.data)
+        let payload = Message(topic: _topic, value: message.data)
 
         _asyncSendMessage(payload: payload,
                           closure: { message in
@@ -240,10 +244,10 @@ extension PublisherSocket {
     ///
     /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined to send.
     ///             `NanoMessageError.TopicLength` if the topic length too large.
-    public func setSendTopic(_ topic: Topic) throws {
+    public func setTopic(_ topic: Topic) throws {
         try _validateTopic(topic)               // check that we have a valid topic.
 
-        sendTopic = topic
+        _topic = topic
     }
 
     /// reset the topic counts.

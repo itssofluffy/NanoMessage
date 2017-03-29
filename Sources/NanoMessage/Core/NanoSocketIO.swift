@@ -61,11 +61,12 @@ internal func validateNanoSocket(_ nanoSocket: NanoSocket) throws {
 /// - Returns: The number of bytes sent.
 internal func sendToSocket(_ nanoSocket:   NanoSocket,
                            _ payload:      Data,
-                           _ blockingMode: BlockingMode) throws -> Int {
-                           //_ blockingMode: BlockingMode) throws -> MessagePayload {
+                           _ blockingMode: BlockingMode) throws -> RawSentData {
     try validateNanoSocket(nanoSocket)
 
     let bytesSent = Int(nn_send(nanoSocket.fileDescriptor, payload.bytes, payload.count, blockingMode.rawValue))
+
+    let timestamp = Date().timeIntervalSinceReferenceDate
 
     guard (bytesSent >= 0) else {
         let errno = nn_errno()
@@ -86,8 +87,7 @@ internal func sendToSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.SendMessage(code: errno)
     }
 
-    return bytesSent
-    //return MessagePayload(bytes: bytesSent, message: payload)
+    return RawSentData(bytes: bytesSent, timestamp: timestamp)
 }
 
 /// The low-level receive function.
@@ -113,6 +113,8 @@ internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
     var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)
 
     let bytesReceived = Int(nn_recv(nanoSocket.fileDescriptor, &buffer, NN_MSG, blockingMode.rawValue))
+
+    let timestamp = Date().timeIntervalSinceReferenceDate
 
     defer {
         // not sure if this needed because of the deallocation using nn_freemsg() but doesn't seem to hurt
@@ -146,7 +148,7 @@ internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.FreeMessage(code: nn_errno())
     }
 
-    return MessagePayload(bytes: bytesReceived, message: message, direction: .Received)
+    return MessagePayload(bytes: bytesReceived, message: message, direction: .Received, timestamp: timestamp)
 }
 
 /// Asynchrounous execute a passed receiver closure.
