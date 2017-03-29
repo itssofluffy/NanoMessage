@@ -57,9 +57,7 @@ extension SenderReceiverSocket {
                             sendMode:    BlockingMode = .Blocking,
                             receiveMode: BlockingMode = .Blocking,
                             _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
-        let sent = try sendMessage(message, blockingMode: sendMode)
-
-        try closure(MessagePayload(bytes: sent.bytes, message: sent.message))
+        try closure(sendMessage(message, blockingMode: sendMode))
 
         return try receiveMessage(blockingMode: receiveMode)
     }
@@ -87,9 +85,7 @@ extension SenderReceiverSocket {
                             sendTimeout:    TimeInterval,
                             receiveTimeout: TimeInterval,
                             _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
-        let sent = try sendMessage(message, timeout: sendTimeout)
-
-        try closure(MessagePayload(bytes: sent.bytes, message: sent.message))
+        try closure(sendMessage(message, timeout: sendTimeout))
 
         return try receiveMessage(timeout: receiveTimeout)
     }

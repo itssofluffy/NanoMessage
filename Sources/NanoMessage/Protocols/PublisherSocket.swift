@@ -117,7 +117,7 @@ extension PublisherSocket {
             }
         }
 
-        return MessagePayload(bytes: bytesSent, topic: sendTopic, message: message)
+        return MessagePayload(bytes: bytesSent, topic: sendTopic, message: message, direction: .Sent)
     }
 
     /// Send a message.

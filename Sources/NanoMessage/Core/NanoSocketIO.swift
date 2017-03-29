@@ -146,7 +146,7 @@ internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.FreeMessage(code: nn_errno())
     }
 
-    return MessagePayload(bytes: bytesReceived, message: message)
+    return MessagePayload(bytes: bytesReceived, message: message, direction: .Received)
 }
 
 /// Asynchrounous execute a passed receiver closure.

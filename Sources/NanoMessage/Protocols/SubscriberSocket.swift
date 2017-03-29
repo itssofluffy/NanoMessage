@@ -131,7 +131,11 @@ extension SubscriberSocket {
             }
         }
 
-        return MessagePayload(bytes: received.bytes, topic: receivedTopic, message: received.message)
+        return MessagePayload(bytes:     received.bytes,
+                              topic:     receivedTopic,
+                              message:   received.message,
+                              direction: .Received,
+                              timestamp: received.timestamp)
     }
 
     /// Receive a message.

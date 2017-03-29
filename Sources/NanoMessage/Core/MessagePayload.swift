@@ -29,18 +29,30 @@ public struct MessagePayload {
     public let topic: Topic?
     public internal(set) var message: Message
 
-    public let timestamp = Date().timeIntervalSinceReferenceDate
+    public let direction: MessageDirection
+    public let timestamp: TimeInterval
 
-    public init(bytes: Int, message: Message) {
+    internal init(bytes:     Int,
+                  message:   Message,
+                  direction: MessageDirection,
+                  timestamp: TimeInterval = Date().timeIntervalSinceReferenceDate) {
         self.bytes = bytes
         self.topic = nil
         self.message = message
+        self.direction = direction
+        self.timestamp = timestamp
     }
 
-    public init(bytes: Int, topic: Topic, message: Message) {
+    internal init(bytes:     Int,
+                  topic:     Topic,
+                  message:   Message,
+                  direction: MessageDirection,
+                  timestamp: TimeInterval = Date().timeIntervalSinceReferenceDate) {
         self.bytes = bytes
         self.topic = topic
         self.message = message
+        self.direction = direction
+        self.timestamp = timestamp
     }
 }
 
@@ -70,7 +82,7 @@ extension MessagePayload: CustomStringConvertible {
             description = "topic: \(topic), "
         }
 
-        description += "message: \(message), timestamp: \(timestamp)"
+        description += "message: \(message), direction: \(direction), timestamp: \(timestamp)"
 
         return description
     }

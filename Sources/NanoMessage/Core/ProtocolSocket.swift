@@ -80,7 +80,7 @@ extension ProtocolSocket where Self: SenderSocket {
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         let bytesSent = try sendToSocket(_nanoSocket, message.data, blockingMode)
 
-        return MessagePayload(bytes: bytesSent, message: message)
+        return MessagePayload(bytes: bytesSent, message: message, direction: .Sent)
     }
 
     /// Send a message.
