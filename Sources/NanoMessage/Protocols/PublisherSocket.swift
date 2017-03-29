@@ -100,7 +100,10 @@ extension PublisherSocket {
             return message.data
         }
 
-        let bytesSent = try sendToSocket(self, payload(), blockingMode)
+        let sent = try MessagePayload(bytes:     sendToSocket(self, payload(), blockingMode),
+                                      topic:     sendTopic,
+                                      message:   message,
+                                      direction: .Sent)
 
         if (!sendTopic.isEmpty) {                             // check that we have a send topic.
             if (topicCounts) {                                // remember which topics we've sent and how many.
@@ -117,7 +120,7 @@ extension PublisherSocket {
             }
         }
 
-        return MessagePayload(bytes: bytesSent, topic: sendTopic, message: message, direction: .Sent)
+        return sent
     }
 
     /// Send a message.

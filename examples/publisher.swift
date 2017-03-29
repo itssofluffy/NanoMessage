@@ -82,9 +82,9 @@ do {
 
         try node0.setSendTopic(topic)
 
-        print("sending topic: \(topic.string), message: \(message.string)")
+        let sent = try node0.sendMessage(message, timeout: timeout)
 
-        try node0.sendMessage(message, timeout: timeout)
+        print("\(sent)")
     }
 
     print("messages sent: \(node0.messagesSent!)")

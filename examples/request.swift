@@ -54,11 +54,11 @@ do {
                                          sendTimeout: timeout,
                                          receiveTimeout: timeout,
                                          { sent in
-                                             print("sent a message of '\(sent.message.string)' as \(sent.bytes) bytes sent...")
+                                             print("sent \(sent)")
                                              print("waiting for a response...")
                                          })
 
-    print("...and recieved \(received.bytes) bytes as a message of '\(received.message.string)'")
+    print("and recieved \(received)")
 
     print("messages sent    : \(node0.messagesSent!)")
     print("bytes sent       : \(node0.bytesSent!)")

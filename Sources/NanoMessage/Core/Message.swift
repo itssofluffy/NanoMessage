@@ -27,7 +27,7 @@ import FNVHashValue
 public struct Message {
     internal private(set) var topic: Topic? = nil
 
-    public internal(set) var data: Data
+    public let data: Data
     public var encoding: String.Encoding = NanoMessage.stringEncoding
     public var string: String {
         return (data.count == 0) ? "" : String(data: data, encoding: encoding)!
@@ -48,7 +48,7 @@ public struct Message {
 
     internal init(topic: Topic, value: Data) {
         self.topic = topic
-        data = value
+        self.data = value
     }
 
     internal init(topic: Topic, value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
@@ -106,7 +106,7 @@ extension Message: CustomStringConvertible {
             description = "topic: \(unwrappedTopic), "
         }
 
-        description += "string: \(string)"
+        description += "string: \(string), encoding: \(encoding)"
 
         return description
     }

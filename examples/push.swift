@@ -68,7 +68,9 @@ do {
     let messagePayload = Message(value: [Byte](repeating: 0xff, count: messageSize))
 
     for _ in 1 ... sendCount {
-        try node0.sendMessage(messagePayload, timeout: TimeInterval(seconds: 10))
+        let sent = try node0.sendMessage(messagePayload, timeout: TimeInterval(seconds: 10))
+
+        print("\(sent)")
     }
 
     print("messages: \(node0.messagesSent!)")

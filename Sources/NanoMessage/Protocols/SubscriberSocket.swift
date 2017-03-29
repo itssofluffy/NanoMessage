@@ -70,16 +70,18 @@ extension SubscriberSocket {
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         receivedTopic = Topic()
 
-        var received = try receiveFromSocket(self, blockingMode)
+        let received = try receiveFromSocket(self, blockingMode)
+
+        var message = received.message.data
 
         if (received.bytes > 0) {                                   // we have a message to process...
             if (!subscribedToAllTopics || ignoreTopicSeperator) {   // determine how to extract the topic.
                 for topic in subscribedTopics {
                     let containsTopic: () -> Bool = {
-                        if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= received.message.count) {
-                            if (Data(received.message.data[0 ..< topic.count]) != topic.data) {
+                        if (((self.ignoreTopicSeperator) ? topic.count : topic.count + 1) <= message.count) {
+                            if (Data(message[0 ..< topic.count]) != topic.data) {
                                 return false
-                            } else if (self.ignoreTopicSeperator || received.message.data[topic.count] == self.topicSeperator) {
+                            } else if (self.ignoreTopicSeperator || message[topic.count] == self.topicSeperator) {
                                 return true
                             }
                         }
@@ -95,14 +97,14 @@ extension SubscriberSocket {
                 }
             } else {
                 let topic: () -> Topic = {                          // Get the topic from the message/payload if it exists using the topic seperator.
-                    if let index = received.message.data.index(of: self.topicSeperator) {
-                        return Topic(value: Data(received.message.data[0 ..< index]))
+                    if let index = message.index(of: self.topicSeperator) {
+                        return Topic(value: Data(message[0 ..< index]))
                     }
 
                     return Topic(value: received.message.data)
                 }
 
-                if (topic().data != received.message.data) {
+                if (topic().data != message) {
                     receivedTopic = topic()
                 }
             }
@@ -113,12 +115,12 @@ extension SubscriberSocket {
 
             if (removeTopicFromMessage) {                           // are we removing the topic from the message/payload...
                 var offset = receivedTopic.count
+
                 if (subscribedToAllTopics || !ignoreTopicSeperator) {
                     offset += 1
                 }
 
-                let range = received.message.data.startIndex ..< received.message.data.index(received.message.data.startIndex, offsetBy: offset)
-                received.message.data.removeSubrange(range)
+                message.removeSubrange(message.startIndex ..< message.index(message.startIndex, offsetBy: offset))
             }
 
             if (topicCounts) {                                      // remember which topics we've received and how many.
@@ -133,7 +135,7 @@ extension SubscriberSocket {
 
         return MessagePayload(bytes:     received.bytes,
                               topic:     receivedTopic,
-                              message:   received.message,
+                              message:   Message(value: message),
                               direction: .Received,
                               timestamp: received.timestamp)
     }

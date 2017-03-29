@@ -26,21 +26,19 @@ import FNVHashValue
 
 public struct MessagePayload {
     public let bytes: Int
-    public let topic: Topic?
-    public internal(set) var message: Message
+    public private(set) var topic: Topic? = nil
+    public let message: Message
 
     public let direction: MessageDirection
     public let timestamp: TimeInterval
 
     internal init(bytes:     Int,
                   message:   Message,
-                  direction: MessageDirection,
-                  timestamp: TimeInterval = Date().timeIntervalSinceReferenceDate) {
+                  direction: MessageDirection) {
         self.bytes = bytes
-        self.topic = nil
         self.message = message
         self.direction = direction
-        self.timestamp = timestamp
+        timestamp = Date().timeIntervalSinceReferenceDate
     }
 
     internal init(bytes:     Int,
@@ -78,11 +76,11 @@ extension MessagePayload: CustomStringConvertible {
     public var description: String {
         var description = "bytes: \(bytes), "
 
-        if let _ = topic {
-            description = "topic: \(topic), "
+        if let unwrappedTopic = topic {
+            description = "topic: \(unwrappedTopic), "
         }
 
-        description += "message: \(message), direction: \(direction), timestamp: \(timestamp)"
+        description += "message: (\(message)), direction: \(direction), timestamp: \(timestamp)"
 
         return description
     }
