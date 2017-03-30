@@ -46,9 +46,12 @@ do {
 
     print(endPoint)
 
+    let timeout = TimeInterval(seconds: 10)
+    let pollTimeout = TimeInterval(milliseconds: 250)
+
     while (true) {
         do {
-            let received = try node0.receiveMessage(timeout: TimeInterval(seconds: 10))
+            let received = try node0.receiveMessage(timeout: timeout)
 
             print("\(received)")
         } catch NanoMessageError.ReceiveTimedOut {
@@ -57,7 +60,7 @@ do {
             throw error
         }
 
-        let socket = try node0.pollSocket(timeout: TimeInterval(milliseconds: 250))
+        let socket = try node0.pollSocket(timeout: pollTimeout)
 
         if (!socket.messageIsWaiting) {
             break

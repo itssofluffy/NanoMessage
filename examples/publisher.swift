@@ -26,7 +26,7 @@ import ISFLibrary
 import FNVHashValue
 
 struct DataSet: Hashable {
-    let topic: String
+    let topic:   String
     let message: String
 
     init(topic: String, message: String) {

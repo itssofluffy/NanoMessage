@@ -49,6 +49,7 @@ do {
     print(endPoint)
 
     let timeout = TimeInterval(seconds: 10)
+    let pollTimeout = TimeInterval(milliseconds: 250)
 
     while (true) {
         print("waiting for a request...")
@@ -71,7 +72,7 @@ do {
 
         print("and sent \(sent)")
 
-        let socket = try node0.pollSocket(timeout: TimeInterval(milliseconds: 250))
+        let socket = try node0.pollSocket(timeout: pollTimeout)
 
         if (!socket.messageIsWaiting) {
             break

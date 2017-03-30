@@ -65,10 +65,11 @@ do {
 
     print(endPoint)
 
-    let messagePayload = Message(value: [Byte](repeating: 0xff, count: messageSize))
+    let messagePayload = Message(value: Array<Byte>(repeating: 0xff, count: messageSize))
+    let timeout = TimeInterval(seconds: 10)
 
-    for _ in 1 ... sendCount {
-        let sent = try node0.sendMessage(messagePayload, timeout: TimeInterval(seconds: 10))
+    for _ in 0 ..< sendCount {
+        let sent = try node0.sendMessage(messagePayload, timeout: timeout)
 
         print("\(sent)")
     }
