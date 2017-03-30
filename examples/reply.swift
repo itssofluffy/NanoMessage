@@ -50,25 +50,33 @@ do {
 
     let timeout = TimeInterval(seconds: 10)
 
-    print("waiting for a request...")
+    while (true) {
+        print("waiting for a request...")
 
-    let sent = try node0.receiveMessage(receiveTimeout: timeout,
-                                        sendTimeout: timeout,
-                                        { received in
-                                            print("received \(received)")
+        let sent = try node0.receiveMessage(receiveTimeout: timeout,
+                                            sendTimeout: timeout,
+                                            { received in
+                                                print("received \(received)")
 
-                                            var message = ""
+                                                var message = ""
 
-                                            if (received.message.string == "ping") {
-                                                message = "pong"
-                                            } else {
-                                                message = "i don't like wiff wafe"
-                                            }
+                                                if (received.message.string == "ping") {
+                                                    message = "pong"
+                                                } else {
+                                                    message = "i like wiff wafe"
+                                                }
 
-                                            return Message(value: message)
-                                        })
+                                                return Message(value: message)
+                                            })
 
-    print("and sent \(sent)")
+        print("and sent \(sent)")
+
+        let socket = try node0.pollSocket(timeout: TimeInterval(milliseconds: 250))
+
+        if (!socket.messageIsWaiting) {
+            break
+        }
+    }
 
     print("messages received: \(node0.messagesReceived!)")
     print("bytes received   : \(node0.bytesReceived!)")

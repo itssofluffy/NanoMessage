@@ -25,18 +25,26 @@ import NanoMessage
 import ISFLibrary
 
 var urlToUse = "tcp://localhost:5555"
+var sendCount = 1
 
 switch (CommandLine.arguments.count) {
     case 1:
         break
     case 2:
         urlToUse = CommandLine.arguments[1]
+    case 3:
+        urlToUse = CommandLine.arguments[1]
+        sendCount = Int(CommandLine.arguments[2])!
     default:
         fatalError("usage: request [url]")
 }
 
 guard let url = URL(string: urlToUse) else {
     fatalError("url is not valid")
+}
+
+if (sendCount < 1) {
+    sendCount = 1
 }
 
 do {
@@ -50,15 +58,17 @@ do {
 
     let timeout = TimeInterval(seconds: 10)
 
-    let received = try node0.sendMessage(Message(value: "ping"),
-                                         sendTimeout: timeout,
-                                         receiveTimeout: timeout,
-                                         { sent in
-                                             print("sent \(sent)")
-                                             print("waiting for a response...")
-                                         })
+    for _ in 1 ... sendCount {
+        let received = try node0.sendMessage(Message(value: "ping"),
+                                            sendTimeout: timeout,
+                                            receiveTimeout: timeout,
+                                            { sent in
+                                                print("sent \(sent)")
+                                                print("waiting for a response...")
+                                            })
 
-    print("and recieved \(received)")
+        print("and recieved \(received)")
+    }
 
     print("messages sent    : \(node0.messagesSent!)")
     print("bytes sent       : \(node0.bytesSent!)")
