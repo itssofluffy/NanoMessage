@@ -79,7 +79,7 @@ extension MessagePayload: CustomStringConvertible {
         var description = "bytes: \(bytes), "
 
         if let unwrappedTopic = topic {
-            description = "topic: \(unwrappedTopic), "
+            description += "topic: \(unwrappedTopic), "
         }
 
         description += "message: (\(message)), direction: \(direction), timestamp: \(timestamp)"
