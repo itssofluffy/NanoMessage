@@ -64,7 +64,7 @@ do {
                                                 if (received.message.string == "ping") {
                                                     message = "pong"
                                                 } else {
-                                                    message = "i like wiff wafe"
+                                                    message = "personally i prefer wiff-wafe"
                                                 }
 
                                                 return Message(value: message)
