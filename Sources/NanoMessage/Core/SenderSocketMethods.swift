@@ -21,9 +21,10 @@
 */
 
 import Foundation
+import ISFLibrary
 
 /// Sender socket methods protocol.
-public protocol SenderSocketMethods {
+public protocol SenderSocketMethods: SenderSocketOptions {
     // Output functions.
     @discardableResult
     func sendMessage(_ message:    Message,
@@ -38,4 +39,44 @@ public protocol SenderSocketMethods {
     func sendMessage(_ message:    Message,
                      timeout:      TimeInterval,
                      success:      @escaping (MessagePayload) -> Void)
+}
+
+extension SenderSocketMethods {
+    /// Send a message.
+    ///
+    /// - Parameters:
+    ///   - message: The message to send.
+    ///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
+    ///              If the message cannot be sent straight away, the function will throw `NanoMessageError.MessageNotSent`
+    ///
+    /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
+    ///            `NanoMessageError.GetSocketOption`
+    ///            `NanoMessageError.SetSocketOption`
+    ///            `NanoMessageError.SendMessage` there was a problem sending the message.
+    ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+    ///            `NanoMessageError.SendTimedOut` the send timedout.
+    ///
+    /// - Returns: The message payload sent.
+    ///
+    /// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
+    ///            guaranteed and no error will be thrown. 
+    @discardableResult
+    public func sendMessage(_ message: Message,
+                            timeout:   TimeInterval) throws -> MessagePayload {
+        let originalTimeout = try setSendTimeout(seconds: timeout)
+
+        defer {
+            if (originalTimeout != timeout) {
+                wrapper(do: { () -> Void in
+                            try self.setSendTimeout(seconds: originalTimeout)
+                        },
+                        catch: { failure in
+                            nanoMessageErrorLogger(failure)
+                        })
+            }
+        }
+
+        return try sendMessage(message, blockingMode: .Blocking)   // chain down the sendMessage signature stack
+    }
 }

@@ -86,8 +86,13 @@ class SurveyProtocolFamilyTests: XCTestCase {
             do {
                 var _ = try node0.receiveMessage()
                 XCTAssert(false, "received a message on node0")
-            } catch NanoMessageError.ReceiveTimedOut {
-                XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")   // we have timedout...yah!!!
+            } catch let error as NanoMessageError {
+                switch error {
+                    case .DeadlineExpired:
+                        XCTAssert(true, "\(error)")   // we have deadline expired!!!
+                    default:
+                        throw error
+                }
             }
 
             completed = true

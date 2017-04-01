@@ -1,5 +1,5 @@
 /*
-    SenderReceiverSocket.swift
+    SenderReceiverSurveyorSocket.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -20,4 +20,8 @@
     IN THE SOFTWARE.
 */
 
-public protocol SenderReceiverSocket: SenderReceiverProtocol, SenderSocket, ReceiverSocket { }
+import Foundation
+
+public protocol SenderReceiverSurveyorSocket: SenderReceiverProtocol,
+                                              SenderSocketMethods, SenderSocketOptions, SenderSocketStatistics,
+                                              ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics { }

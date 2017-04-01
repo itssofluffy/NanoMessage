@@ -127,44 +127,6 @@ extension PublisherSocket {
                               timestamp: sent.timestamp)
     }
 
-    /// Send a message.
-    ///
-    /// - Parameters:
-    ///   - message: The message to send.
-    ///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
-    ///              If the message cannot be sent straight away, the function will throw `NanoMessageError.MessageNotSent`
-    ///
-    /// - Throws:  `NanoMessageError.SocketIsADevice`
-    ///            `NanoMessageError.NoEndPoint`
-    ///            `NanoMessageError.GetSocketOption`
-    ///            `NanoMessageError.SetSocketOption`
-    ///            `NanoMessageError.SendMessage` there was a problem sending the message.
-    ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
-    ///            `NanoMessageError.SendTimedOut` the send timedout.
-    ///
-    /// - Returns: The message payload sent.
-    ///
-    /// - Note:    The timeout before the call send was performed will be restore after the function returns but this is not
-    ///            guaranteed and no error will be thrown. 
-    @discardableResult
-    public func sendMessage(_ message: Message,
-                            timeout:   TimeInterval) throws -> MessagePayload {
-        let originalTimeout = try setSendTimeout(seconds: timeout)
-
-        defer {
-            if (originalTimeout != timeout) {
-                wrapper(do: { () -> Void in
-                            try self.setSendTimeout(seconds: originalTimeout)
-                        },
-                        catch: { failure in
-                            nanoMessageErrorLogger(failure)
-                        })
-            }
-        }
-
-        return try sendMessage(message)   // chain down the sendMessage signature stack
-    }
-
     /// Asynchrounous execute a passed sender closure.
     ///
     /// - Parameters:
@@ -172,10 +134,10 @@ extension PublisherSocket {
     ///   - closure: The closure to use to perform the send
     ///   - success: The closure to use when `closure()` is succesful.
     ///   - capture: The closure to use to pass any objects required when an error occurs.
-    private func _asyncSendMessage(payload: Message,
-                                   closure: @escaping (Message) throws -> MessagePayload,
-                                   success: @escaping (MessagePayload) -> Void,
-                                   capture: @escaping () -> Array<Any>) {
+    private func _asyncSendToSocket(payload: Message,
+                                    closure: @escaping (Message) throws -> MessagePayload,
+                                    success: @escaping (MessagePayload) -> Void,
+                                    capture: @escaping () -> Array<Any>) {
         aioQueue.async(group: aioGroup) {
             wrapper(do: {
                         try self.mutex.lock {
@@ -204,14 +166,14 @@ extension PublisherSocket {
                             success:      @escaping (MessagePayload) -> Void) {
         let payload = Message(topic: _topic, value: message.data)
 
-        _asyncSendMessage(payload: payload,
-                          closure: { message in
-                              return try self.sendMessage(message, blockingMode: blockingMode)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, payload, blockingMode, self.aioQueue, self.aioGroup]
-                          })
+        _asyncSendToSocket(payload: payload,
+                           closure: { message in
+                               return try self.sendMessage(message, blockingMode: blockingMode)
+                           },
+                           success: success,
+                           capture: {
+                               return [self, payload, blockingMode, self.aioQueue, self.aioGroup]
+                           })
     }
 
     /// Asynchronous send a message.
@@ -225,14 +187,14 @@ extension PublisherSocket {
                             success:   @escaping (MessagePayload) -> Void) {
         let payload = Message(topic: _topic, value: message.data)
 
-        _asyncSendMessage(payload: payload,
-                          closure: { message in
-                              return try self.sendMessage(message, timeout: timeout)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, payload, timeout, self.aioQueue, self.aioGroup]
-                          })
+        _asyncSendToSocket(payload: payload,
+                           closure: { message in
+                               return try self.sendMessage(message, timeout: timeout)
+                           },
+                           success: success,
+                           capture: {
+                               return [self, payload, timeout, self.aioQueue, self.aioGroup]
+                           })
     }
 }
 
