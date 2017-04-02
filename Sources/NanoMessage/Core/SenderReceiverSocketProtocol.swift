@@ -1,5 +1,5 @@
 /*
-    SenderReceiverSocket.swift
+    SenderReceiverSocketProtocol.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -20,22 +20,20 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
-public protocol SenderReceiverSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverSocketWithTimeout {
+public protocol SenderReceiverSocketProtocol: SenderSocket, ReceiverSocket {
     func sendMessage(_ message:      Message,
-                     sendTimeout:    TimeInterval,
-                     receiveTimeout: TimeInterval,
+                     sendMode:       BlockingMode,
+                     receiveMode:    BlockingMode,
                      _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
 }
 
-extension SenderReceiverSocket {
+extension SenderReceiverSocketProtocol {
     /// Send a message and pass that sent message to a closure, the receive a message.
     ///
     /// - Parameters:
     ///   - message:
-    ///   - sendTimeout:
-    ///   - receiveTimeout:
+    ///   - sendMode:
+    ///   - receiveMode:
     ///   - closure:
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
@@ -49,12 +47,12 @@ extension SenderReceiverSocket {
     ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
     /// - Returns: The received message.
-    public func sendMessage(_ message:      Message,
-                            sendTimeout:    TimeInterval,
-                            receiveTimeout: TimeInterval,
-                            _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
-        try closure(sendMessage(message, timeout: sendTimeout))
+    public func sendMessage(_ message:   Message,
+                            sendMode:    BlockingMode = .Blocking,
+                            receiveMode: BlockingMode = .Blocking,
+                            _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
+        try closure(sendMessage(message, blockingMode: sendMode))
 
-        return try receiveMessage(timeout: receiveTimeout)
+        return try receiveMessage(blockingMode: receiveMode)
     }
 }
