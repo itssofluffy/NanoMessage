@@ -22,6 +22,4 @@
 
 import Foundation
 
-public protocol SenderReceiverSurveyorSocket: SenderReceiverProtocol,
-                                              SenderSocketMethods, SenderSocketOptions, SenderSocketStatistics,
-                                              ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics { }
+public protocol SenderReceiverSurveyorSocket: SenderReceiverProtocol, SenderSocket, ReceiverSocketMethods, ReceiverSocketOptions, ReceiverSocketStatistics { }

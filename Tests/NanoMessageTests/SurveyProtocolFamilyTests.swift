@@ -76,16 +76,15 @@ class SurveyProtocolFamilyTests: XCTestCase {
 
             usleep(TimeInterval(seconds: 0.75)) // sleep for 3/4 second, deadline is 1/2 second, will cause node0.receiveMessage() to timeout.
 
-            let node1Received = try node1.receiveMessage()
-            XCTAssertEqual(node1Received.bytes, node1Received.message.count, "node1.bytes != node1Received.message.count")
-            XCTAssertEqual(node1Received.message, payload, "node1.message != payload")
+            let received = try node1.receiveMessage()
+            XCTAssertEqual(received.bytes, received.message.count, "received.bytes != received.message.count")
+            XCTAssertEqual(received.message, payload, "received.message != payload")
 
             sent = try node1.sendMessage(payload)
-            XCTAssertEqual(sent.bytes, payload.count, "sent.bytes != payload.count")
 
             do {
-                var _ = try node0.receiveMessage()
-                XCTAssert(false, "received a message on node0")
+                _ = try node0.receiveMessage()
+                XCTAssert(false, "received a message on node0!!!")
             } catch let error as NanoMessageError {
                 switch error {
                     case .DeadlineExpired:
@@ -93,6 +92,8 @@ class SurveyProtocolFamilyTests: XCTestCase {
                     default:
                         throw error
                 }
+            } catch {
+                throw error
             }
 
             completed = true

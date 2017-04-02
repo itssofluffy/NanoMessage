@@ -20,9 +20,39 @@
     IN THE SOFTWARE.
 */
 
-/// Receiver socket statistics protocol.
+import ISFLibrary
+
+/// Receiver socket statistics protocol._.
 public protocol ReceiverSocketStatistics {
     // socket statistics functions.
     var messagesReceived: UInt64? { get }
     var bytesReceived: UInt64? { get }
+}
+
+extension ReceiverSocketStatistics {
+    /// The number messages received by this socket.
+    public var messagesReceived: UInt64? {
+        return wrapper(do: {
+                           return try getSocketStatistic(self as! NanoSocket, .MessagesReceived)
+                       },
+                       catch: { failure in
+                           nanoMessageErrorLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
+    }
+
+    /// The number of bytes received by this socket.
+    public var bytesReceived: UInt64? {
+        return wrapper(do: {
+                           return try getSocketStatistic(self as! NanoSocket, .BytesReceived)
+                       },
+                       catch: { failure in
+                           nanoMessageErrorLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
+    }
 }

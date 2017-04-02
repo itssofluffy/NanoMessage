@@ -39,3 +39,145 @@ public protocol ReceiverSocketOptions {
     func setReceivePriority(_ priority: Priority) throws -> Priority
     func getReceiveFd() throws -> Int
 }
+
+extension ReceiverSocketOptions {
+    /// Size of the receive buffer, in bytes. To prevent blocking for messages larger than the buffer,
+    /// exactly one message may be buffered in addition to the data in the receive buffer.
+    ///
+    /// Default value is 131072 bytes (128kB).
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: The sockets receive buffer size.
+    public func getReceiveBufferSize() throws -> UInt {
+        return try getSocketOption(self as! NanoSocket, .ReceiveBuffer)
+    }
+
+    /// Size of the receive buffer, in bytes. To prevent blocking for messages larger than the buffer,
+    /// exactly one message may be buffered in addition to the data in the receive buffer.
+    ///
+    /// - Parameters:
+    ///   - bytes: The size of the receive buffer.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///            `NanoMessageError.SetSocketOption`
+    ///
+    /// - Returns: The sockets receive buffer size before being set.
+    @discardableResult
+    public func setReceiveBufferSize(bytes: UInt) throws -> UInt {
+        let originalValue = try getReceiveBufferSize()
+
+        try setSocketOption(self as! NanoSocket, .ReceiveBuffer, bytes)
+
+        return originalValue
+    }
+
+    /// Maximum message size that can be received, in bytes. Negative value means that the received size
+    /// is limited only by available addressable memory.
+    ///
+    /// Default value is 1048576 bytes (1024kB).
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: The sockets receive buffer size.
+    ///
+    /// - Note:    The receive size is unlimited is not currently supported
+    public func getMaximumMessageSize() throws -> Int {
+        return try getSocketOption(self as! NanoSocket, .ReceiveMaximumMessageSize)
+    }
+
+    /// Maximum message size that can be received, in bytes. Negative value means that the received size
+    /// is limited only by available addressable memory.
+    ///
+    /// - Parameters:
+    ///   - bytes: The size of the maximum receive message size.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///            `NanoMessageError.SetSocketOption`
+    ///
+    /// - Returns: The sockets receive buffer size before being set.
+    @discardableResult
+    public func setMaximumMessageSize(bytes: Int) throws -> Int {
+        let originalValue = try getMaximumMessageSize()
+
+        try setSocketOption(self as! NanoSocket, .ReceiveMaximumMessageSize, (bytes < 0) ? -1 : bytes)
+
+        return originalValue
+    }
+
+    /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
+    /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
+    ///
+    /// Default value is -1.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: The sockets receive timeout in timeinterval (-1 seconds if there is no timeout).
+    public func getReceiveTimeout() throws -> TimeInterval {
+        return try getSocketOption(self as! NanoSocket, .ReceiveTimeout)
+    }
+
+    /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
+    /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
+    ///
+    /// - Parameters:
+    ///   - seconds: The receive timeout (-1 for no timeout).
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///            `NanoMessageError.SetSocketOption`
+    ///
+    /// - Returns: The sockets receive timeout in timeinterval before being set.
+    @discardableResult
+    public func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval {
+        let originalValue = try getReceiveTimeout()
+
+        try setSocketOption(self as! NanoSocket, .ReceiveTimeout, seconds)
+
+        return originalValue
+    }
+
+    /// The inbound priority for endpoints subsequently added to the socket. When receiving a message, messages
+    /// from peer with higher priority are received before messages from peer with lower priority.
+    /// Highest priority is 1, lowest priority is 16.
+    ///
+    /// Default value is 8.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: The sockets receive timeout.
+    public func getReceivePriority() throws -> Priority {
+        return try getSocketOption(self as! NanoSocket, .ReceivePriority)
+    }
+
+    /// The inbound priority for endpoints subsequently added to the socket. When receiving a message, messages
+    /// from peer with higher priority are received before messages from peer with lower priority.
+    /// Highest priority is 1, lowest priority is 16.
+    ///
+    /// - Parameters:
+    ///   - priority: The receive priority.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///            `NanoMessageError.SetSocketOption`
+    ///
+    /// - Returns: The sockets receive timeout before being set.
+    @discardableResult
+    public func setReceivePriority(_ priority: Priority) throws -> Priority {
+        let originalValue = try getReceivePriority()
+
+        try setSocketOption(self as! NanoSocket, .ReceivePriority, priority)
+
+        return originalValue
+    }
+
+    @available(*, unavailable, renamed: "getReceiveFileDescriptor")
+    public func getReceiveFd() throws -> Int { fatalError() }
+    /// Retrieves the underlying file descriptor for the messages that are received on the socket.
+    /// The descriptor should be used only for polling and never read from or written to.
+    ///
+    /// - Throws:  `NanoMessageError.GetSocketOption`
+    ///
+    /// - Returns: The sockets underlying receiver file descriptor.
+    public func getReceiveFileDescriptor() throws -> Int {
+        return try getSocketOption(self as! NanoSocket, .ReceiveFileDescriptor)
+    }
+}

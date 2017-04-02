@@ -20,10 +20,53 @@
     IN THE SOFTWARE.
 */
 
+import ISFLibrary
+
 /// Sender socket statistics protocol.
 public protocol SenderSocketStatistics {
     // socket statistics functions.
     var messagesSent: UInt64? { get }
     var bytesSent: UInt64? { get }
     var currentSendPriority: Priority? { get }
+}
+
+extension SenderSocketStatistics {
+    /// The number messages sent by this socket.
+    public var messagesSent: UInt64? {
+        return wrapper(do: {
+                           return try getSocketStatistic(self as! NanoSocket, .MessagesSent)
+                       },
+                       catch: { failure in
+                           nanoMessageErrorLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
+    }
+
+    /// The number of bytes sent by this socket.
+    public var bytesSent: UInt64? {
+        return wrapper(do: {
+                           return try getSocketStatistic(self as! NanoSocket, .BytesSent)
+                       },
+                       catch: { failure in
+                           nanoMessageErrorLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
+    }
+
+    /// The current send priority of the socket.
+    public var currentSendPriority: Priority? {
+        return wrapper(do: {
+                           return try getSocketStatistic(self as! NanoSocket, .CurrentSendPriority)
+                       },
+                       catch: { failure in
+                           nanoMessageErrorLogger(failure)
+                       },
+                       capture: {
+                           return [self]
+                       })
+    }
 }
