@@ -24,7 +24,7 @@ import Foundation
 import ISFLibrary
 
 /// Surveyor socket.
-public final class SurveyorSocket: NanoSocket, ProtocolSocket, SenderReceiverSocket {
+public final class SurveyorSocket: NanoSocket, ProtocolSocket, SenderReceiverSurveyorSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .SurveyorProtocol)
     }
@@ -48,16 +48,19 @@ extension SurveyorSocket {
     ///
     /// - Returns: The message payload received.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
-        var deadline = TimeInterval()
-
         do {
-            deadline = try getDeadline()
-
             return try receiveFromSocket(self, blockingMode)
         } catch let error as NanoMessageError {
             switch error {
                 case .ReceiveTimedOut:
-                    throw NanoMessageError.DeadlineExpired(timeout: deadline)
+                    let deadline = wrapper(do: { () -> TimeInterval in
+                                               return try self.getDeadline()
+                                           },
+                                           catch: { failure in
+                                               nanoMessageErrorLogger(failure)
+                                           })
+
+                    throw NanoMessageError.DeadlineExpired(timeout: deadline!)
                 default:
                     throw error
             }

@@ -1,7 +1,7 @@
 /*
-    PullSocket.swift
+    ReceiverSocketWithTimeout.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,11 +20,5 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
-/// Pull socket.
-public final class PullSocket: NanoSocket, ProtocolSocket, ReceiverSocketWithTimeout {
-    public init(socketDomain: SocketDomain = .StandardSocket) throws {
-        try super.init(socketDomain: socketDomain, socketProtocol: .PullProtocol)
-    }
-}
+/// Receiver socket protocol.
+public protocol ReceiverSocketWithTimeout: ReceiverSocketMethods, ReceiverSocketTimeoutMethods, ReceiverSocketOptions, ReceiverSocketTimeoutOptions, ReceiverSocketStatistics { }

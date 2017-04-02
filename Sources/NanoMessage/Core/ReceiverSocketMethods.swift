@@ -27,11 +27,8 @@ import ISFLibrary
 public protocol ReceiverSocketMethods: ReceiverSocketOptions {
     // Input functions.
     func receiveMessage(blockingMode: BlockingMode) throws -> MessagePayload
-    func receiveMessage(timeout:      TimeInterval) throws -> MessagePayload
     // ASync Input functions.
     func receiveMessage(blockingMode: BlockingMode,
-                        success:      @escaping (MessagePayload) -> Void)
-    func receiveMessage(timeout:      TimeInterval,
                         success:      @escaping (MessagePayload) -> Void)
 }
 
@@ -55,66 +52,6 @@ extension ReceiverSocketMethods {
         return try receiveFromSocket(self as! NanoSocket, blockingMode)
     }
 
-    /// Receive a message.
-    ///
-    /// - Parameters:
-    ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
-    ///              If there is no message to receive the function will throw `NanoMessageError.MessageNotReceived`.
-    ///
-    /// - Throws:  `NanoMessageError.SocketIsADevice`
-    ///            `NanoMessageError.NoEndPoint`
-    ///            `NanoMessageError.GetSocketOption`
-    ///            `NanoMessageError.SetSocketOption`
-    ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
-    ///            `NanoMessageError.MessageNotAvailable` there was no message to receive.
-    ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
-    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
-    ///
-    /// - Returns: The message payload received.
-    ///
-    /// - Note:    The timeout before the call received was performed will be restore after the function returns but this is not
-    ///            guaranteed behaviour and no error will be thrown. 
-    public func receiveMessage(timeout: TimeInterval) throws -> MessagePayload {
-        let originalTimeout = try setReceiveTimeout(seconds: timeout)
-
-        defer {
-            if (originalTimeout != timeout) {
-                wrapper(do: { () -> Void in
-                            try self.setReceiveTimeout(seconds: originalTimeout)
-                        },
-                        catch: { failure in
-                            nanoMessageErrorLogger(failure)
-                        })
-            }
-        }
-
-        return try receiveMessage(blockingMode: .Blocking)    // chain down the receiveMessage signature stock.
-    }
-
-    /// Asynchrounous execute a passed receiver closure.
-    ///
-    /// - Parameters:
-    ///   - nanoSocket: The socket to perform the operation on.
-    ///   - closure:    The closure to use to perform the receive
-    ///   - success:    The closure to use when `closure()` is succesful.
-    ///   - capture:    The closure to use to pass any objects required when an error occurs.
-    private func _asyncReceiveFromSocket(nanoSocket: NanoSocket,
-                                         closure:    @escaping () throws -> MessagePayload,
-                                         success:    @escaping (MessagePayload) -> Void,
-                                         capture:    @escaping () -> Array<Any>) {
-        nanoSocket.aioQueue.async(group: nanoSocket.aioGroup) {
-            wrapper(do: {
-                        try nanoSocket.mutex.lock {
-                            try success(closure())
-                        }
-                    },
-                    catch: { failure in
-                        nanoMessageErrorLogger(failure)
-                    },
-                    capture: capture)
-        }
-    }
-
     /// Asynchronous receive a message.
     ///
     /// - Parameters:
@@ -124,31 +61,13 @@ extension ReceiverSocketMethods {
     ///   - success:      The closure to use when the async functionallity is succesful.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking,
                                success:      @escaping (MessagePayload) -> Void) {
-        _asyncReceiveFromSocket(nanoSocket: self as! NanoSocket,
-                                closure: {
-                                    return try self.receiveMessage(blockingMode: blockingMode)
-                                },
-                                success: success,
-                                capture: {
-                                    return [self, blockingMode]
-                                })
-    }
-
-    /// Asynchronous receive a message.
-    ///
-    /// - Parameters:
-    ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
-    ///              If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
-    ///   - success: The closure to use when the async functionallity is succesful.
-    public func receiveMessage(timeout: TimeInterval,
-                               success: @escaping (MessagePayload) -> Void) {
-        _asyncReceiveFromSocket(nanoSocket: self as! NanoSocket,
-                                closure: {
-                                    return try self.receiveMessage(timeout: timeout)
-                                },
-                                success: success,
-                                capture: {
-                                    return [self, timeout]
-                                })
+        asyncReceiveFromSocket(nanoSocket: self as! NanoSocket,
+                               closure: {
+                                   return try self.receiveMessage(blockingMode: blockingMode)
+                               },
+                               success: success,
+                               capture: {
+                                   return [self, blockingMode]
+                               })
     }
 }

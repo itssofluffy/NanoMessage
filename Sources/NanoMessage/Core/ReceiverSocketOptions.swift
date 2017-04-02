@@ -31,9 +31,6 @@ public protocol ReceiverSocketOptions {
     func getMaximumMessageSize() throws -> Int
     @discardableResult
     func setMaximumMessageSize(bytes: Int) throws -> Int
-    func getReceiveTimeout() throws -> TimeInterval
-    @discardableResult
-    func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
     func getReceivePriority() throws -> Priority
     @discardableResult
     func setReceivePriority(_ priority: Priority) throws -> Priority
@@ -101,37 +98,6 @@ extension ReceiverSocketOptions {
         let originalValue = try getMaximumMessageSize()
 
         try setSocketOption(self as! NanoSocket, .ReceiveMaximumMessageSize, (bytes < 0) ? -1 : bytes)
-
-        return originalValue
-    }
-
-    /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
-    /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
-    ///
-    /// Default value is -1.
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketOption`
-    ///
-    /// - Returns: The sockets receive timeout in timeinterval (-1 seconds if there is no timeout).
-    public func getReceiveTimeout() throws -> TimeInterval {
-        return try getSocketOption(self as! NanoSocket, .ReceiveTimeout)
-    }
-
-    /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
-    /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
-    ///
-    /// - Parameters:
-    ///   - seconds: The receive timeout (-1 for no timeout).
-    ///
-    /// - Throws:  `NanoMessageError.GetSocketOption`
-    ///            `NanoMessageError.SetSocketOption`
-    ///
-    /// - Returns: The sockets receive timeout in timeinterval before being set.
-    @discardableResult
-    public func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval {
-        let originalValue = try getReceiveTimeout()
-
-        try setSocketOption(self as! NanoSocket, .ReceiveTimeout, seconds)
 
         return originalValue
     }

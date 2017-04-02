@@ -57,7 +57,6 @@ class SurveyProtocolFamilyTests: XCTestCase {
             let node1 = try RespondentSocket()
 
             try node0.setSendTimeout(seconds: 1)          // set send timeout to 1 seconds.
-            try node0.setReceiveTimeout(seconds: 1)       // set receive timeout to 1 seconds.
             try node1.setSendTimeout(seconds: 1)          // set send timeout to 1 seconds.
             try node1.setReceiveTimeout(seconds: 1)       // set receive timeout to 1 seconds.
 
@@ -83,7 +82,7 @@ class SurveyProtocolFamilyTests: XCTestCase {
             sent = try node1.sendMessage(payload)
 
             do {
-                _ = try node0.receiveMessage()
+                _ = try node0.receiveMessage(blockingMode: .Blocking)
                 XCTAssert(false, "received a message on node0!!!")
             } catch let error as NanoMessageError {
                 switch error {

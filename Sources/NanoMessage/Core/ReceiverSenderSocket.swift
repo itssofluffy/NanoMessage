@@ -22,7 +22,7 @@
 
 import Foundation
 
-public protocol ReceiverSenderSocket: ReceiverSocket, SenderSocket {
+public protocol ReceiverSenderSocket: ReceiverSocketWithTimeout, SenderSocket {
     func receiveMessage(receiveMode:    BlockingMode,
                         sendMode:       BlockingMode,
                         _ closure:      @escaping (MessagePayload) throws -> Message) throws -> MessagePayload
