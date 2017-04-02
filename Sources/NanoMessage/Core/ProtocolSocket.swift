@@ -21,13 +21,9 @@
 */
 
 import Foundation
-import ISFLibrary
-import Dispatch
 
 /// Socket protocol protocol.
-public protocol ProtocolSocket {
-    var _nanoSocket: NanoSocket { get }
-
+public protocol ProtocolSocket: NanoSocketProtocol {
     init(socketDomain: SocketDomain) throws
     init(socketDomain: SocketDomain,
          urls:         Array<URL>,
@@ -45,7 +41,7 @@ extension ProtocolSocket {
         try self.init(socketDomain: socketDomain)
 
         for url in urls {
-            let _: EndPoint = try _nanoSocket.createEndPoint(url: url, type: type)
+            let _: EndPoint = try createEndPoint(url: url, type: type, name: "")
         }
     }
 
@@ -55,75 +51,6 @@ extension ProtocolSocket {
                 name:         String = "") throws {
         try self.init(socketDomain: socketDomain)
 
-        let _: EndPoint = try _nanoSocket.createEndPoint(url: url, type: type, name: name)
-    }
-}
-
-extension ProtocolSocket where Self: SenderSocket {
-    /// Send a message.
-    ///
-    /// - Parameters:
-    ///   - message:      The message to send.
-    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-    ///                   If the message cannot be sent straight away, the function will throw
-    ///                   `NanoMessageError.MessageNotSent`
-    ///
-    /// - Throws:  `NanoMessageError.SocketIsADevice`
-    ///            `NanoMessageError.NoEndPoint`
-    ///            `NanoMessageError.SendMessage` there was a problem sending the message.
-    ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
-    ///            `NanoMessageError.SendTimedOut` the send timedout.
-    ///
-    /// - Returns: The payload sent.
-    @discardableResult
-    public func sendMessage(_ message:    Message,
-                            blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
-        let sent = try sendToSocket(_nanoSocket, message.data, blockingMode)
-
-        return MessagePayload(bytes:     sent.bytes,
-                              message:   message,
-                              direction: .Sent,
-                              timestamp: sent.timestamp)
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - message:      The message to send.
-    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-    ///                   If the message cannot be sent straight away, the closureHandler
-    ///                   will be passed `NanoMessageError.MessageNotSent`
-    ///   - success:      The closure to use when the async functionallity is succesful.
-    public func sendMessage(_ message:    Message,
-                            blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (MessagePayload) -> Void) {
-        asyncSendToSocket(nanoSocket: self._nanoSocket,
-                          closure: {
-                              return try self.sendMessage(message, blockingMode: blockingMode)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, message, blockingMode]
-                          })
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - message: The message to send.
-    ///   - timeout: Specifies that the send should be performed in non-blocking mode for a timeinterval.
-    ///              If the message cannot be sent straight away, the closureHandler will be passed `NanoMessageError.MessageNotSent`
-    ///   - success: The closure to use when the async functionallity is succesful.
-    public func sendMessage(_ message: Message,
-                            timeout:   TimeInterval,
-                            success:   @escaping (MessagePayload) -> Void) {
-        asyncSendToSocket(nanoSocket: self._nanoSocket,
-                          closure: {
-                              return try self.sendMessage(message, timeout: timeout)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, message, timeout]
-                          })
+        let _: EndPoint = try createEndPoint(url: url, type: type, name: name)
     }
 }

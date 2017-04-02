@@ -24,11 +24,7 @@ import Foundation
 import ISFLibrary
 
 /// Surveyor socket.
-public final class SurveyorSocket: NanoSocket, ProtocolSocket, SenderReceiverSurveyorSocket {
-    public var _nanoSocket: NanoSocket {
-        return self
-    }
-
+public final class SurveyorSocket: NanoSocket, ProtocolSocket, SenderReceiverSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .SurveyorProtocol)
     }

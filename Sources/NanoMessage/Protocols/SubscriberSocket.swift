@@ -25,10 +25,6 @@ import ISFLibrary
 
 /// Subscriber socket.
 public final class SubscriberSocket: NanoSocket, ProtocolSocket, PublishSubscribeSocket, SubscribeSocket {
-    public var _nanoSocket: NanoSocket {
-        return self
-    }
-
     /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
     /// Ignore topic seperator, true means that all topics must be of an equal length.

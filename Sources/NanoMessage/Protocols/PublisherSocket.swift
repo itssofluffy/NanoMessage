@@ -25,10 +25,6 @@ import ISFLibrary
 
 /// Publisher socket.
 public final class PublisherSocket: NanoSocket, ProtocolSocket, PublishSubscribeSocket, PublishSocket {
-    public var _nanoSocket: NanoSocket {
-        return self
-    }
-
     /// The topic to send.
     fileprivate var _topic = Topic()
 

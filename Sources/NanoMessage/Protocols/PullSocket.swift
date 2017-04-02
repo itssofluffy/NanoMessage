@@ -24,10 +24,6 @@ import Foundation
 
 /// Pull socket.
 public final class PullSocket: NanoSocket, ProtocolSocket, ReceiverSocket {
-    public var _nanoSocket: NanoSocket {
-        return self
-    }
-
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .PullProtocol)
     }

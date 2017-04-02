@@ -39,6 +39,25 @@ extension ReceiverSocketMethods {
     /// Receive a message.
     ///
     /// - Parameters:
+    ///   - blockingMode: Specifies if the socket should operate in blocking or non-blocking mode.
+    ///                   if in non-blocking mode and there is no message to receive the function
+    ///                   will throw `NanoMessageError.MessageNotReceived`.
+    ///
+    /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
+    ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
+    ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
+    ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
+    ///
+    /// - Returns: The message payload received.
+    public func receiveMessage(blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
+        return try receiveFromSocket(self as! NanoSocket, blockingMode)
+    }
+
+    /// Receive a message.
+    ///
+    /// - Parameters:
     ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
     ///              If there is no message to receive the function will throw `NanoMessageError.MessageNotReceived`.
     ///

@@ -27,9 +27,7 @@ import Dispatch
 import Mutex
 
 /// A NanoMessage base socket.
-public class NanoSocket {
-    @available(*, unavailable, renamed: "fileDescriptor")
-    public let socketFd: CInt = -1
+public class NanoSocket: NanoSocketProtocol {
     /// The raw nanomsg socket file descriptor.
     public let fileDescriptor: CInt
     /// The domain of the socket as it was created with.
@@ -217,15 +215,6 @@ extension NanoSocket {
                     capture: capture)
         }
     }
-
-    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
-    public func bindToURL(_ url: URL, name: String = "") throws -> EndPoint { fatalError() }
-    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
-    public func bindToURL(_ url: URL, name: String = "") throws -> Int { fatalError() }
-    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
-    public func connectToURL(_ url: URL, name: String = "") throws -> EndPoint { fatalError() }
-    @available(*, unavailable, renamed: "createEndPoint(url:type:name:)")
-    public func connectToURL(_ url: URL, name: String = "") throws -> Int { fatalError() }
 
     /// Adds a local or remote endpoint to the socket. The library would then try to bind or connect to the specified endpoint.
     ///
@@ -487,13 +476,6 @@ extension NanoSocket {
 }
 
 extension NanoSocket {
-    @available(*, unavailable, renamed: "socketDomain")
-    public func getSocketDomain() throws -> SocketDomain { fatalError() }
-    @available(*, unavailable, renamed: "socketProtocol")
-    public func getSocketProtocol() throws -> SocketProtocol { fatalError() }
-    @available(*, unavailable, renamed: "socketProtocolFamily")
-    public func getSocketProtocolFamily() throws -> ProtocolFamily { fatalError() }
-
     /// Specifies how long the socket should try to send pending outbound messages after the socket
     /// has been de-referenced, in milliseconds. A Negative value means infinite linger.
     ///
@@ -508,22 +490,6 @@ extension NanoSocket {
     public func getLinger() throws -> TimeInterval {
         return try getSocketOption(self, .Linger)
     }
-
-    /// Specifies how long the socket should try to send pending outbound messages after the socket
-    /// has been de-referenced, in milliseconds. A Negative value means infinite linger.
-    ///
-    /// - Parameters:
-    ///   - seconds: The linger time.
-    ///
-    /// - Throws: `NanoMessageError.GetSocketOption`
-    ///           `NanoMessageError.SetSocketOption`
-    ///
-    /// - Returns: The linger time on the socket before being set.
-    ///
-    /// - Note:   The underlying nanomsg library no longer supports this feature, linger time is always it's default value.
-    @available(*, unavailable, message: "nanomsg library no longer supports this feature")
-    @discardableResult
-    public func setLinger(seconds: TimeInterval) throws -> TimeInterval { fatalError() }
 
     /// For connection-based transports such as TCP, this specifies how long to wait, in milliseconds,
     /// when connection is broken before trying to re-establish it. Note that actual reconnect interval
@@ -657,8 +623,6 @@ extension NanoSocket {
         return originalValue
     }
 
-    @available(*, unavailable, renamed: "getMaximumTTL()")
-    public func getMaxTTL() throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
     /// message is received (for example via the `bindToSocket()` function) counts as a single hop.
     /// This provides a form of protection against inadvertent loops.
@@ -670,9 +634,6 @@ extension NanoSocket {
         return try getSocketOption(self, .MaximumTTL)
     }
 
-    @available(*, unavailable, renamed: "setMaximumTTL(hops:)")
-    @discardableResult
-    public func setMaxTTL(hops: Int) throws -> Int { fatalError() }
     /// The maximum number of "hops" a message can go through before it is dropped. Each time the
     /// message is received (for example via the `bindToSocket()` function) counts as a single hop.
     /// This provides a form of protection against inadvertent loops.
@@ -760,29 +721,6 @@ extension NanoSocket {
 
         return originalValue
     }
-}
-
-extension NanoSocket {
-    @available(*, unavailable, renamed: "establishedConnections")
-    public func getEstablishedConnections() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "acceptedConnections")
-    public func getAcceptedConnections() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "droppedConnections")
-    public func getDroppedConnections() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "brokenConnections")
-    public func getBrokenConnections() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "connectErrors")
-    public func getConnectErrors() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "bindErrors")
-    public func getBindErrors() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "acceptErrors")
-    public func getAcceptErrors() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "currentInProgressConnections")
-    public func getCurrentInProgressConnections() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "currentConnections")
-    public func getCurrentConnections() throws -> UInt64 { fatalError() }
-    @available(*, unavailable, renamed: "currentEndPointErrors")
-    public func getCurrentEndPointErrors() throws -> UInt64 { fatalError() }
 }
 
 extension NanoSocket {

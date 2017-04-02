@@ -20,4 +20,73 @@
     IN THE SOFTWARE.
 */
 
-public protocol SenderReceiverSocket: SenderReceiverProtocol, SenderSocket, ReceiverSocket { }
+import Foundation
+
+public protocol SenderReceiverSocket: SenderSocket, ReceiverSocket {
+    func sendMessage(_ message:      Message,
+                     sendMode:       BlockingMode,
+                     receiveMode:    BlockingMode,
+                     _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
+    func sendMessage(_ message:      Message,
+                     sendTimeout:    TimeInterval,
+                     receiveTimeout: TimeInterval,
+                     _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
+}
+
+extension SenderReceiverSocket {
+    /// Send a message and pass that sent message to a closure, the receive a message.
+    ///
+    /// - Parameters:
+    ///   - message:
+    ///   - sendMode:
+    ///   - receiveMode:
+    ///   - closure:
+    ///
+    /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
+    ///            `NanoMessageError.SendMessage` there was a problem sending the message.
+    ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+    ///            `NanoMessageError.SendTimedOut` the send timedout.
+    ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
+    ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
+    ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
+    ///
+    /// - Returns: The received message.
+    public func sendMessage(_ message:   Message,
+                            sendMode:    BlockingMode = .Blocking,
+                            receiveMode: BlockingMode = .Blocking,
+                            _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
+        try closure(sendMessage(message, blockingMode: sendMode))
+
+        return try receiveMessage(blockingMode: receiveMode)
+    }
+
+    /// Send a message and pass that sent message to a closure, the receive a message.
+    ///
+    /// - Parameters:
+    ///   - message:
+    ///   - sendTimeout:
+    ///   - receiveTimeout:
+    ///   - closure:
+    ///
+    /// - Throws:  `NanoMessageError.SocketIsADevice`
+    ///            `NanoMessageError.NoEndPoint`
+    ///            `NanoMessageError.SendMessage` there was a problem sending the message.
+    ///            `NanoMessageError.MessageNotSent` the send has beem performed in non-blocking mode and the message cannot be sent straight away.
+    ///            `NanoMessageError.SendTimedOut` the send timedout.
+    ///            `NanoMessageError.ReceiveMessage` there was an issue when receiving the message.
+    ///            `NanoMessageError.MessageNotAvailable` in non-blocking mode there was no message to receive.
+    ///            `NanoMessageError.ReceiveTimedOut` the receive timedout.
+    ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
+    ///
+    /// - Returns: The received message.
+    public func sendMessage(_ message:      Message,
+                            sendTimeout:    TimeInterval,
+                            receiveTimeout: TimeInterval,
+                            _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
+        try closure(sendMessage(message, timeout: sendTimeout))
+
+        return try receiveMessage(timeout: receiveTimeout)
+    }
+}
