@@ -61,8 +61,8 @@ public struct Message {
         data = Data(bytes: value)
     }
 
-    internal init(value: UnsafeMutableBufferPointer<Byte>) {
-        data = Data(bytes: Array(value))
+    internal init(buffer: UnsafeMutableBufferPointer<Byte>) {
+        data = Data(bytes: Array(buffer))
     }
 }
 

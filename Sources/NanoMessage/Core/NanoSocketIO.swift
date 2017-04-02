@@ -142,13 +142,16 @@ internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.ReceiveMessage(code: errno)
     }
 
-    let message = Message(value: UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
+    let message = Message(buffer: UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
 
     guard (nn_freemsg(buffer) >= 0) else {
         throw NanoMessageError.FreeMessage(code: nn_errno())
     }
 
-    return MessagePayload(bytes: bytesReceived, message: message, direction: .Received, timestamp: timestamp)
+    return MessagePayload(bytes:     bytesReceived,
+                          message:   message,
+                          direction: .Received,
+                          timestamp: timestamp)
 }
 
 /// Asynchrounous execute a passed receiver closure.

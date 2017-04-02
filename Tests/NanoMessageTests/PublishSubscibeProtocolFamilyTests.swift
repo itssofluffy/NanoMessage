@@ -75,6 +75,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1.isTopicSubscribed(topic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
 
+            try node0.setTopic(topic)
+
             var node0Sent = try node0.sendMessage(payload)
             XCTAssertEqual(node0Sent.bytes, topic.count + 1 + payload.count, "node0.bytesSent != topic.count + 1 + payload.count")
 
@@ -89,6 +91,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.unsubscribeFrom(topic: topic)
             try node1.subscribeTo(topic: Topic(value: "xxxx"))
             XCTAssertEqual(node1.subscribedTopics.count, 1, "node1.subscribedTopics.count != 0")
+
+            try node0.setTopic(Topic(value: "yyyy"))
 
             node0Sent = try node0.sendMessage(payload)
             XCTAssertEqual(node0Sent.bytes, node0Sent.topic!.count + 1 + payload.count, "node0.bytesSent != node0Sent.topic.count + 1 + payload.count")
@@ -114,9 +118,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let planets = [ "mercury", "venus", "mars", "earth", "mars", "jupiter", "saturn", "uranus", "neptune" ]
 
             topic = Topic(value: "planet")
-            try node0.setTopic(topic)
 
             for planet in planets {
+                try node0.setTopic(topic)
+
                 let sent = try node0.sendMessage(Message(value: planet))
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + planet.utf8.count, "sent.bytes != sent.topic.count + 1 + planet.utf8.count")
 
@@ -126,16 +131,17 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let dwarfPlanets = [ "Eris", "Pluto", "Makemake", "Or", "Haumea", "Quaoar", "Senda", "Orcus", "2002 MS", "Ceres", "Salacia" ]
 
             topic = Topic(value: "dwarfPlanet")
-            try node0.setTopic(Topic(value: "dwarfPlanet"))
 
             for dwarfPlanet in dwarfPlanets {
+                try node0.setTopic(topic)
+
                 let sent = try node0.sendMessage(Message(value: dwarfPlanet))
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != sent.topic.count + 1 + dwarfPlanet.utf8.count")
 
                 let _ = try node1.receiveMessage()
             }
 
-            XCTAssertEqual(node0.sentTopics.count, 1 + 2, "node0.sentTopics.count != 3")
+            XCTAssertEqual(node0.sentTopics.count, 4, "node0.sentTopics.count != 3")
             XCTAssertEqual(node0.sentTopics[topic]!, UInt64(dwarfPlanets.count), "node0.sentTopics[\"\(topic)\"] != \(dwarfPlanets.count)")
 
             XCTAssertEqual(node1.subscribedTopics.count, 0, "node1.subscribedTopics.count != 0")
@@ -147,9 +153,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.unsubscribeFromAllTopics()
             try node1.subscribeTo(topic: Topic(value: "dwarfPlanet"))
 
-            try node0.setTopic(Topic(value: "planet"))
 
             for planet in planets {
+                try node0.setTopic(Topic(value: "planet"))
+
                 let sent = try node0.sendMessage(Message(value: planet))
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + planet.utf8.count, "sent.bytes != sent.topic.count + 1 + planet.utf8.count")
             }
@@ -162,9 +169,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             }
 
             topic = Topic(value: "dwarfPlanet")
-            try node0.setTopic(topic)
 
             for dwarfPlanet in dwarfPlanets {
+                try node0.setTopic(topic)
+
                 let sent = try node0.sendMessage(Message(value: dwarfPlanet))
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
