@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run -t -i nanomessage /src/nanomessage/.build/debug/NanoMessagePackageTests.xctest

@@ -24,4 +24,4 @@ COPY . /src/nanomessage
 
 WORKDIR /src/nanomessage
 
-RUN swift build
+RUN make test
