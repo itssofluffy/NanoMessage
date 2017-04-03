@@ -131,30 +131,32 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
     var pollResults = Array<PollResult>()
 
     for socket in sockets {
-        guard (!socket.socketIsADevice) else {                                        // guard against polling a device socket.
+        guard (!socket.socketIsADevice) else {                          // guard against polling a device socket.
             throw NanoMessageError.SocketIsADevice(socket: socket)
         }
 
-        var eventMask = CShort.allZeros                                               //
-        if (socket.receiverSocket) {                                                  // if the socket can receive then set the event mask appropriately.
+        var eventMask = CShort.allZeros                                 //
+        if (socket.receiverSocket) {                                    // if the socket can receive then set the event mask appropriately.
             eventMask = _pollinMask
         }
-        if (socket.senderSocket) {                                                    // if the socket can send then set the event mask appropriately.
+        if (socket.senderSocket) {                                      // if the socket can send then set the event mask appropriately.
             eventMask = eventMask | _polloutMask
         }
 
-        pollFds.append(nn_pollfd(fd: socket.fileDescriptor, events: eventMask, revents: 0))
+        pollFds.append(nn_pollfd(fd:      socket.fileDescriptor,
+                                 events:  eventMask,
+                                 revents: CShort.allZeros))
     }
 
-    try pollFds.withUnsafeMutableBufferPointer { fileDescriptors in                   // poll the list of nano sockets.
+    try pollFds.withUnsafeMutableBufferPointer { fileDescriptors in     // poll the list of nano sockets.
         guard (nn_poll(fileDescriptors.baseAddress, CInt(sockets.count), CInt(timeout.milliseconds)) >= 0) else {
             throw NanoMessageError.PollSocket(code: nn_errno())
         }
     }
 
-    for loopCount in 0 ..< sockets.count {
-        let messageIsWaiting = ((pollFds[loopCount].revents & _pollinMask) != 0)      // using the event masks determine our return values
-        let sendIsBlocked = ((pollFds[loopCount].revents & _polloutMask) != 0)        //
+    for pollFd in pollFds {
+        let messageIsWaiting = ((pollFd.revents & _pollinMask) != 0)    // using the event masks determine our return values
+        let sendIsBlocked = ((pollFd.revents & _polloutMask) != 0)      //
 
         pollResults.append(PollResult(messageIsWaiting: messageIsWaiting, sendIsBlocked: sendIsBlocked))
     }

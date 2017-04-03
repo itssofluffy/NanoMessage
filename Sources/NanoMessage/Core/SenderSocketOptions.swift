@@ -34,7 +34,7 @@ public protocol SenderSocketOptions {
     func getSendPriority() throws -> Priority
     @discardableResult
     func setSendPriority(_ priority: Priority) throws -> Priority
-    func getSendFd() throws -> Int
+    func getSendFileDescriptor() throws -> Int
 }
 
 extension SenderSocketOptions {

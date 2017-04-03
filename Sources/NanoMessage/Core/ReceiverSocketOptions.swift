@@ -34,7 +34,7 @@ public protocol ReceiverSocketOptions {
     func getReceivePriority() throws -> Priority
     @discardableResult
     func setReceivePriority(_ priority: Priority) throws -> Priority
-    func getReceiveFd() throws -> Int
+    func getReceiveFileDescriptor() throws -> Int
 }
 
 extension ReceiverSocketOptions {
