@@ -1,7 +1,7 @@
 /*
     NanoSocketProtocol.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -46,7 +46,7 @@ public protocol NanoSocketProtocol {
     /// - Warning: Please not that if true this will block until the class has been de-referenced.
     var blockTillCloseSuccess: Bool { get set }
     /// Is the socket attached to a device.
-    var socketIsADevice:Bool { get }
+    var socketIsADevice: Bool { get }
     /// The dispatch queue that async send/receive messages are run on.
     var aioQueue: DispatchQueue { get set }
     /// The async dispatch queue's group.

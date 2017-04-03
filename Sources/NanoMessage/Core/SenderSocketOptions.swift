@@ -135,8 +135,6 @@ extension SenderSocketOptions {
         return originalValue
     }
 
-    @available(*, unavailable, renamed: "getSendFileDescriptor")
-    public func getSendFd() throws -> Int { fatalError() }
     /// Retrieves the underlying file descriptor for the messages that can be sent to the socket.
     /// The descriptor should be used only for polling and never read from or written to.
     ///

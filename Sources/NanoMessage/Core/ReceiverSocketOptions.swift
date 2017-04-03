@@ -135,8 +135,6 @@ extension ReceiverSocketOptions {
         return originalValue
     }
 
-    @available(*, unavailable, renamed: "getReceiveFileDescriptor")
-    public func getReceiveFd() throws -> Int { fatalError() }
     /// Retrieves the underlying file descriptor for the messages that are received on the socket.
     /// The descriptor should be used only for polling and never read from or written to.
     ///
