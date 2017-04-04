@@ -166,7 +166,7 @@ extension PublisherSocket {
                            },
                            success: success,
                            capture: {
-                               return [self, payload, blockingMode, self.aioQueue, self.aioGroup]
+                               return [self, payload, blockingMode]
                            })
     }
 
@@ -187,7 +187,7 @@ extension PublisherSocket {
                            },
                            success: success,
                            capture: {
-                               return [self, payload, timeout, self.aioQueue, self.aioGroup]
+                               return [self, payload, timeout]
                            })
     }
 }
