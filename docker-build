@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cocker build -t nanomessage .
+docker build -t nanomessage .
 typeset rc=$?
 
 exit $rc
