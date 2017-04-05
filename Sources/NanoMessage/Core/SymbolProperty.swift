@@ -20,8 +20,8 @@
     IN THE SOFTWARE.
 */
 
-import FNVHashValue
 import ISFLibrary
+import FNVHashValue
 
 /// Nanomsg symbol.
 public struct SymbolProperty {

@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Push socket.
 public final class PushSocket: NanoSocket, ProtocolSocket, SenderSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {

@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Pull socket.
 public final class PullSocket: NanoSocket, ProtocolSocket, ReceiverSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {

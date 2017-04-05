@@ -21,7 +21,6 @@
 */
 
 import Foundation
-import ISFLibrary
 import FNVHashValue
 
 /// A sent or received message and additional data.

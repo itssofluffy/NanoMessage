@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Reply socket.
 public final class ReplySocket: NanoSocket, ProtocolSocket, ReceiverSenderSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {

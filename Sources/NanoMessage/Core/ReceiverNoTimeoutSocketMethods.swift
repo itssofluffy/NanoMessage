@@ -20,9 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-import ISFLibrary
-
 /// Receiver socket methods protocol.
 public protocol ReceiverNoTimeoutSocketMethods: ReceiverNoTimeoutSocketOptions {
     // Input functions.

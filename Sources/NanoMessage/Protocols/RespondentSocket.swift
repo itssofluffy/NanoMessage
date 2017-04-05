@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Respondent socket.
 public final class RespondentSocket: NanoSocket, ProtocolSocket, ReceiverSenderSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {

@@ -21,8 +21,8 @@
 */
 
 import CNanoMessage
-import ISFLibrary
 import Foundation
+import ISFLibrary
 
 private let NN_MSG: size_t = -1
 

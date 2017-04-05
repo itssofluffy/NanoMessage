@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Receiver socket options protocol.
 public protocol ReceiverNoTimeoutSocketOptions {
     // socket option functions.

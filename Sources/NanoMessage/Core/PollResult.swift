@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+/// Socket polling event result.
 public struct PollResult {
     public let messageIsWaiting: Bool
     public let sendIsBlocked: Bool

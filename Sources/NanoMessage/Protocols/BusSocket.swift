@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Bus socket.
 public final class BusSocket: NanoSocket, ProtocolSocket, ReceiverSocket, SenderSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {

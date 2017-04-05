@@ -88,8 +88,8 @@ extension Message: Hashable {
 
 extension Message: Comparable {
     public static func <(lhs: Message, rhs: Message) -> Bool {
-        if let lhsUnwrappedTopic = lhs.topic, let rhsUnwrappedTopic = rhs.topic {
-            return (lhsUnwrappedTopic == rhsUnwrappedTopic && lhs.data < rhs.data)
+        if let lhsTopic = lhs.topic, let rhsTopic = rhs.topic {
+            return (lhsTopic == rhsTopic && lhs.data < rhs.data)
         }
 
         return (lhs.data < rhs.data)
@@ -98,8 +98,8 @@ extension Message: Comparable {
 
 extension Message: Equatable {
     public static func ==(lhs: Message, rhs: Message) -> Bool {
-        if let lhsUnwrappedTopic = lhs.topic, let rhsUnwrappedTopic = rhs.topic {
-            return (lhsUnwrappedTopic == rhsUnwrappedTopic && lhs.data == rhs.data)
+        if let lhsTopic = lhs.topic, let rhsTopic = rhs.topic {
+            return (lhsTopic == rhsTopic && lhs.data == rhs.data)
         }
 
         return (lhs.data == rhs.data)

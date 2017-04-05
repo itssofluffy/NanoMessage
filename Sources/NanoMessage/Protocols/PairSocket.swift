@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
-
 /// Pair (one-to-one) socket
 public final class PairSocket: NanoSocket, ProtocolSocket, ReceiverSocket, SenderSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {

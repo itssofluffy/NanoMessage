@@ -20,8 +20,8 @@
     IN THE SOFTWARE.
 */
 
-import Foundation
 import CNanoMessage
+import Foundation
 import ISFLibrary
 import Dispatch
 import Mutex
