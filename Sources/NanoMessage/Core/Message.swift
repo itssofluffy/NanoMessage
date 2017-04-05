@@ -46,6 +46,10 @@ public struct Message {
         self.encoding = encoding
     }
 
+    public init(value: Array<Byte>) {
+        data = Data(bytes: value)
+    }
+
     internal init(topic: Topic, value: Data) {
         self.topic = topic
         self.data = value
@@ -55,10 +59,6 @@ public struct Message {
         self.topic = topic
         data = value.data(using: encoding)!
         self.encoding = encoding
-    }
-
-    public init(value: Array<Byte>) {
-        data = Data(bytes: value)
     }
 
     internal init(buffer: UnsafeMutableBufferPointer<Byte>) {
@@ -78,8 +78,8 @@ extension Message {
 
 extension Message: Hashable {
     public var hashValue: Int {
-        if let unwrapedTopic = topic {
-            return fnv1a(unwrapedTopic.data + data)
+        if let unwrappedTopic = topic {
+            return fnv1a(unwrappedTopic.data + data)
         }
 
         return fnv1a(data)
@@ -88,12 +88,20 @@ extension Message: Hashable {
 
 extension Message: Comparable {
     public static func <(lhs: Message, rhs: Message) -> Bool {
-        return (compare(lhs: lhs.data, rhs: rhs.data) == .LessThan)
+        if let lhsUnwrappedTopic = lhs.topic, let rhsUnwrappedTopic = rhs.topic {
+            return (lhsUnwrappedTopic == rhsUnwrappedTopic && lhs.data < rhs.data)
+        }
+
+        return (lhs.data < rhs.data)
     }
 }
 
 extension Message: Equatable {
     public static func ==(lhs: Message, rhs: Message) -> Bool {
+        if let lhsUnwrappedTopic = lhs.topic, let rhsUnwrappedTopic = rhs.topic {
+            return (lhsUnwrappedTopic == rhsUnwrappedTopic && lhs.data == rhs.data)
+        }
+
         return (lhs.data == rhs.data)
     }
 }

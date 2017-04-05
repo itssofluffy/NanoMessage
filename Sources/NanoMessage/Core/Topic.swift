@@ -67,7 +67,7 @@ extension Topic: Hashable {
 
 extension Topic: Comparable {
     public static func <(lhs: Topic, rhs: Topic) -> Bool {
-        return (compare(lhs: lhs.data, rhs: rhs.data) == .LessThan)
+        return (lhs.data < rhs.data)
     }
 }
 
