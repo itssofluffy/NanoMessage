@@ -21,7 +21,7 @@
 */
 
 /// Receiver socket methods protocol.
-public protocol ReceiverNoTimeoutSocketMethods: ReceiverNoTimeoutSocketOptions {
+public protocol ReceiverNoTimeoutSocketMethods {
     // Input functions.
     func receiveMessage(blockingMode: BlockingMode) throws -> MessagePayload
     // ASync Input functions.
