@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-protocol SubscribeSocket: ReceiverWithTimeoutSocket {
+protocol SubscribeSocket: ReceiverSocket {
     var receivedTopics: Dictionary<Topic, UInt64> { get } // implement private set
     var removeTopicFromMessage: Bool { get set }
     var ignoreTopicSeperator: Bool { get }                // implement private set

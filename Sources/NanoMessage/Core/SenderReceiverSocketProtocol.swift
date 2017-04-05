@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-public protocol SenderReceiverSocketProtocol: SenderSocket, ReceiverSocket {
+public protocol SenderReceiverSocketProtocol: SenderSocket, ReceiverNoTimeoutSocketMethods {
     func sendMessage(_ message:      Message,
                      sendMode:       BlockingMode,
                      receiveMode:    BlockingMode,

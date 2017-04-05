@@ -23,7 +23,7 @@
 import Foundation
 
 /// Request socket.
-public final class RequestSocket: NanoSocket, ProtocolSocket, SenderReceiverWithTimeoutSocket {
+public final class RequestSocket: NanoSocket, ProtocolSocket, SenderReceiverSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .RequestProtocol)
     }
