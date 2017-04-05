@@ -22,10 +22,9 @@
 
 import Foundation
 
-public protocol SenderReceiverSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverSocketWithTimeout {
+public protocol SenderReceiverSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverSocket {
     func sendMessage(_ message:      Message,
                      sendTimeout:    TimeInterval,
-                     receiveTimeout: TimeInterval,
                      _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
 }
 
@@ -35,7 +34,6 @@ extension SenderReceiverSocket {
     /// - Parameters:
     ///   - message:
     ///   - sendTimeout:
-    ///   - receiveTimeout:
     ///   - closure:
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
@@ -51,10 +49,9 @@ extension SenderReceiverSocket {
     /// - Returns: The received message.
     public func sendMessage(_ message:      Message,
                             sendTimeout:    TimeInterval,
-                            receiveTimeout: TimeInterval,
                             _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
         try closure(sendMessage(message, timeout: sendTimeout))
 
-        return try receiveMessage(timeout: receiveTimeout)
+        return try receiveMessage(blockingMode: .Blocking)
     }
 }

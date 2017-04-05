@@ -1,5 +1,5 @@
 /*
-    ReceiverSocketWithTimeout.swift
+    ReceiverWithTimeoutSocket.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -21,4 +21,4 @@
 */
 
 /// Receiver socket protocol.
-public protocol ReceiverSocketWithTimeout: ReceiverSocketMethods, ReceiverSocketTimeoutMethods, ReceiverSocketOptions, ReceiverSocketTimeoutOptions, ReceiverSocketStatistics { }
+public protocol ReceiverWithTimeoutSocket: ReceiverSocketMethods, ReceiverWithTimeoutSocketMethods, ReceiverSocketOptions, ReceiverWithTimeoutSocketOptions, ReceiverSocketStatistics { }

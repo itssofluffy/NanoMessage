@@ -1,5 +1,5 @@
 /*
-    ReceiverSocketTimeoutOptions.swift
+    ReceiverWithTimeoutSocketOptions.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -23,14 +23,14 @@
 import Foundation
 
 /// Receiver socket options protocol.
-public protocol ReceiverSocketTimeoutOptions {
+public protocol ReceiverWithTimeoutSocketOptions {
     // socket option functions.
     func getReceiveTimeout() throws -> TimeInterval
     @discardableResult
     func setReceiveTimeout(seconds: TimeInterval) throws -> TimeInterval
 }
 
-extension ReceiverSocketTimeoutOptions {
+extension ReceiverWithTimeoutSocketOptions {
     /// The timeout of receive operation on the socket, in milliseconds. If message cannot be received within
     /// the specified timeout, `NanoMessageError.TimedOut` is thrown. Negative value means infinite timeout.
     ///

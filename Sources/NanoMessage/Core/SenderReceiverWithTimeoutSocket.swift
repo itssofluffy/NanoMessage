@@ -1,5 +1,5 @@
 /*
-    SenderReceiverSurveyorSocket.swift
+    SenderReceiverWithTimeoutSocket.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -22,18 +22,20 @@
 
 import Foundation
 
-public protocol SenderReceiverSurveyorSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverSocket {
+public protocol SenderReceiverWithTimeoutSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverWithTimeoutSocket {
     func sendMessage(_ message:      Message,
                      sendTimeout:    TimeInterval,
+                     receiveTimeout: TimeInterval,
                      _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
 }
 
-extension SenderReceiverSurveyorSocket {
+extension SenderReceiverWithTimeoutSocket {
     /// Send a message and pass that sent message to a closure, the receive a message.
     ///
     /// - Parameters:
     ///   - message:
     ///   - sendTimeout:
+    ///   - receiveTimeout:
     ///   - closure:
     ///
     /// - Throws:  `NanoMessageError.SocketIsADevice`
@@ -49,9 +51,10 @@ extension SenderReceiverSurveyorSocket {
     /// - Returns: The received message.
     public func sendMessage(_ message:      Message,
                             sendTimeout:    TimeInterval,
+                            receiveTimeout: TimeInterval,
                             _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
         try closure(sendMessage(message, timeout: sendTimeout))
 
-        return try receiveMessage(blockingMode: .Blocking)
+        return try receiveMessage(timeout: receiveTimeout)
     }
 }

@@ -23,7 +23,7 @@
 import Foundation
 
 /// Bus socket.
-public final class BusSocket: NanoSocket, ProtocolSocket, ReceiverSocketWithTimeout, SenderSocket {
+public final class BusSocket: NanoSocket, ProtocolSocket, ReceiverWithTimeoutSocket, SenderSocket {
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .BusProtocol)
     }

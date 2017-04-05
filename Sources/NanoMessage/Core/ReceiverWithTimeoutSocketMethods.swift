@@ -1,5 +1,5 @@
 /*
-    ReceiverSocketTimeoutMethods.swift
+    ReceiverWithTimeoutSocketMethods.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -24,7 +24,7 @@ import Foundation
 import ISFLibrary
 
 /// Receiver socket methods protocol.
-public protocol ReceiverSocketTimeoutMethods: ReceiverSocketMethods, ReceiverSocketTimeoutOptions {
+public protocol ReceiverWithTimeoutSocketMethods: ReceiverSocketMethods, ReceiverWithTimeoutSocketOptions {
     // Input functions.
     func receiveMessage(timeout: TimeInterval) throws -> MessagePayload
     // ASync Input functions.
@@ -32,7 +32,7 @@ public protocol ReceiverSocketTimeoutMethods: ReceiverSocketMethods, ReceiverSoc
                         success: @escaping (MessagePayload) -> Void)
 }
 
-extension ReceiverSocketTimeoutMethods {
+extension ReceiverWithTimeoutSocketMethods {
     /// Receive a message.
     ///
     /// - Parameters:

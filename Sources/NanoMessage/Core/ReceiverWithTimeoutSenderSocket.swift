@@ -1,5 +1,5 @@
 /*
-    ReceiverSenderSocket.swift
+    ReceiverWithTimeoutSenderSocket.swift
 
     Copyright (c) 2017 Stephen Whittle  All rights reserved.
 
@@ -22,7 +22,7 @@
 
 import Foundation
 
-public protocol ReceiverSenderSocket: ReceiverSocketWithTimeout, SenderSocket {
+public protocol ReceiverWithTimeoutSenderSocket: ReceiverWithTimeoutSocket, SenderSocket {
     func receiveMessage(receiveMode:    BlockingMode,
                         sendMode:       BlockingMode,
                         _ closure:      @escaping (MessagePayload) throws -> Message) throws -> MessagePayload
@@ -31,7 +31,7 @@ public protocol ReceiverSenderSocket: ReceiverSocketWithTimeout, SenderSocket {
                         _ closure:      @escaping (MessagePayload) throws -> Message) throws -> MessagePayload
 }
 
-extension ReceiverSenderSocket {
+extension ReceiverWithTimeoutSenderSocket {
     /// Receive a message and pass that received message to a closure that produces a message that is sent.
     ///
     /// - Parameters:
