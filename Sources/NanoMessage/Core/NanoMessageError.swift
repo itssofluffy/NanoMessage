@@ -76,7 +76,7 @@ public enum NanoMessageError: Error {
 
 extension NanoMessageError: CustomStringConvertible {
     public var description: String {
-        func errorString(_ code: CInt) -> String {
+        let errorString: (CInt) -> String = { code in
             var errorMessage = nanoMessageError(code)
 
             if let errorCode = nanomsgError[code] {

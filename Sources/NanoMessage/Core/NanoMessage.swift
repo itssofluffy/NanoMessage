@@ -128,7 +128,6 @@ public var symbolProperty: Set<SymbolProperty> {
 ///            of the topic being subscribed too.
 public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterval(seconds: 1)) throws -> Array<PollResult> {
     var pollFds = Array<nn_pollfd>()
-    var pollResults = Array<PollResult>()
 
     for socket in sockets {
         guard (!socket.socketIsADevice) else {                          // guard against polling a device socket.
@@ -153,6 +152,8 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
             throw NanoMessageError.PollSocket(code: nn_errno())
         }
     }
+
+    var pollResults = Array<PollResult>()
 
     for pollFd in pollFds {
         let messageIsWaiting = ((pollFd.revents & _pollinMask) != 0)    // using the event masks determine our return values
