@@ -87,7 +87,7 @@ public class NanoSocket: NanoSocketProtocol {
     /// The async dispatch queue's group.
     public var aioGroup = DispatchGroup()
     /// async mutex lock.
-    internal var mutex: Mutex
+    public private(set) var mutex: Mutex
 
     /// Attempt a call to the underlying library within a loop with a delay.
     ///

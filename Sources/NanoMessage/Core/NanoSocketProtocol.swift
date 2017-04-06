@@ -22,6 +22,7 @@
 
 import Foundation
 import Dispatch
+import Mutex
 
 /// A NanoMessage base socket.
 public protocol NanoSocketProtocol {
@@ -51,6 +52,8 @@ public protocol NanoSocketProtocol {
     var aioQueue: DispatchQueue { get set }
     /// The async dispatch queue's group.
     var aioGroup: DispatchGroup { get set }
+    /// async mutex lock.
+    var mutex: Mutex { get }
 
     /// Adds a local or remote endpoint to the socket. The library would then try to bind or connect to the specified endpoint.
     ///
