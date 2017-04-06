@@ -1,0 +1,192 @@
+BusSocket        --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol
+                   |                                   |
+                   +-- ProtocolSocket                --+
+                   |
+                   |                                   +-- ReceiverNoTimeoutSocketMethod
+                   |                                   |
+                   |                                   +-- ReceiverSocketMethods        --+-- ReceiverSocketOptions
+                   |                                   |
+                   +-- ReceiverSocket                --+-- ReceiverNoTimeoutSocketOptions
+                   |                                   |
+                   |                                   +-- ReceiverSocketOptions
+                   |                                   |
+                   |                                   +-- ReceiverSocketStatistics
+                   |
+                   |                                   +-- SenderSocketMethods          --+-- SenderSocketOptions
+                   |                                   |
+                   +-- SenderSocket                  --+-- SenderSocketOptions
+                                                       |
+                                                       +-- SenderSocketStatistics
+
+
+PairSocket       --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol
+                   |                                   |
+                   +-- ProtocolSocket                --+
+                   |
+                   |                                   +-- ReceiverNoTimeoutSocketMethod
+                   |                                   |
+                   |                                   +-- ReceiverSocketMethods        --+-- ReceiverSocketOptions
+                   |                                   |
+                   +-- ReceiverSocket                --+-- ReceiverNoTimeoutSocketOptions
+                   |                                   |
+                   |                                   +-- ReceiverSocketOptions
+                   |                                   |
+                   |                                   +-- ReceiverSocketStatistics
+                   |
+                   |                                   +-- SenderSocketMethods          --+-- SenderSocketOptions
+                   |                                   |
+                   +-- SenderSocket                  --+-- SenderSocketOptions
+                                                       |
+                                                       +-- SenderSocketStatistics
+
+
+PublisherSocket  --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol
+                   |                                   |
+                   +-- ProtocolSocket                --+
+                   |
+                   +-- PublishSubscribeSocket                                             +-- SenderSocketMethods            --+-- SenderSocketOptions
+                   |                                                                      |
+                   +-- PublishSocket                 --+-- SenderSocket                 --+-- SenderSocketOptions
+                                                                                          |
+                                                                                          +-- SenderSocketStatistics
+
+
+PullSocket       --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol
+                   |                                   |
+                   +-- ProtocolSocket                --+
+                   |
+                   |                                   +-- ReceiverNoTimeoutSocketMethod
+                   |                                   |
+                   |                                   +-- ReceiverSocketMethods        --+-- ReceiverSocketOptions
+                   |                                   |
+                   +-- ReceiverSocket                --+-- ReceiverNoTimeoutSocketOptions
+                                                       |
+                                                       +-- ReceiverSocketOptions
+                                                       |
+                                                       +-- ReceiverSocketStatistics
+
+
+PushSocket       --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol
+                   |                                   |
+                   +-- ProtocolSocket                --+
+                   |
+                   |                                   +-- SenderSocketMethods          --+-- SenderSocketOptions
+                   |                                   |
+                   +-- SenderSocket                  --+-- SenderSocketOptions
+                                                       |
+                                                       +-- SenderSocketStatistics
+
+
+ReplySocket      --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol             +-- ReceiverNoTimeoutSocketMethods
+                   |                                   |                                  |
+                   +-- ProtocolSocket                --+                                  +-- ReceiverSocketMethods --+-- ReceiverSocketOptions
+                   |                                                                      |
+                   |                                   +-- ReceiverSocket               --+-- ReceiverNoTimeoutSocketOptions
+                   |                                   |                                  |
+                   |                                   |                                  +-- ReceiverSocketOptions
+                   |                                   |                                  |
+                   |                                   |                                  +-- ReceiverSocketStatastics
+                   +-- ReceiverSenderSocket          --+
+                                                       |
+                                                       |
+                                                       |                                  +-- SenderSocketMethods   --+-- SenderSocketOptions
+                                                       |                                  |
+                                                       +-- SenderSocket                 --+-- SenderSocketOptions
+                                                                                          |
+                                                                                          +-- SenderSocketStatistics
+
+
+RequestSocket    --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol                                         +-- SenderSocketMethods --+-- SenderSocketOptions
+                   |                                   |                                                              |
+                   +-- ProtocolSocket                --+                                  +-- SenderSocket          --+-- SenderSocketOptions
+                   |                                                                      |                           |
+                   |                                   +-- SenderReceiverSocketProtocol --+                           +-- SenderSocketStatistics
+                   |                                   |                                  |
+                   |                                   |                                  +-- ReceiverNoTimeoutSocketMethods
+                   |                                   |
+                   |                                   |                                  +-- SenderSocketMethods   --+-- SenderSocketOptions
+                   |                                   |                                  |
+                   +-- SenderReceiverSocket          --+-- SenderSocket                 --+-- SenderSocketOptions
+                                                       |                                  |
+                                                       |                                  +-- SenderSocketStatistics
+                                                       |
+                                                       |                                  +-- ReceiverNoTimeoutSocketMethods
+                                                       |                                  |
+                                                       |                                  +-- ReceiverSocketMethods --+-- ReceiverSocketOptions
+                                                       |                                  |
+                                                       +-- ReceiverSocket               --+-- ReceiverNoTimeoutSocketOptions
+                                                                                          |
+                                                                                          +-- ReceiverSocketOptions
+                                                                                          |
+                                                                                          +-- ReceiverSocketStatistics
+
+
+RespondentSocket --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol             +-- ReceiverNoTimeoutSocketMethods
+                   |                                   |                                  |
+                   +-- ProtocolSocket                --+                                  +-- ReceiverSocketMethods --+-- ReceiverSocketOptions
+                   |                                                                      |
+                   |                                   +-- ReceiverSocket               --+-- ReceiverNoTimeoutSocketOptions
+                   |                                   |                                  |
+                   |                                   |                                  +-- ReceiverSocketOptions
+                   |                                   |                                  |
+                   +-- ReceiverSenderSocket          --+                                  +-- ReceiverSocketStatistics
+                                                       |
+                                                       |                                  +-- SenderSocketMethods   --+-- SenderSocketOptions
+                                                       |                                  |
+                                                       +-- SenderSocket                 --+-- SenderSocketOptions
+                                                                                          |
+                                                                                          +-- SenderSocketStatistics
+
+
+SubscriberSocket --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol
+                   |                                   |
+                   +-- ProtocolSocket                --+                                  +-- ReceiverNoTimeoutSocketMethods
+                   |                                                                      |
+                   +-- PublishSubscribeSocket                                             +-- ReceiverSocketMethods --+-- ReceiverSocketOptions
+                   |                                                                      |
+                   +-- SubscribeSocket               --+-- ReceiverSocket               --+-- ReceiverNoTimeoutSocketOptions
+                                                                                          |
+                                                                                          +-- ReceiverSocketOptions
+                                                                                          |
+                                                                                          +-- ReceiverSocketStatistics
+
+
+SurveyorSocket   --+-- NanoSocket                    --+
+                   |                                   |
+                   |                                   +-- NanoSocketProtocol                                         +-- SenderSocketMethods --+-- SenderSocketOptions
+                   |                                   |                                                              |
+                   +-- ProtocolSocket                --+                                  +-- SenderSocket          --+-- SenderSocketOptions
+                   |                                                                      |                           |
+                   |                                   +-- SenderReceiverSocketProtocol --+                           +-- SenderSocketStatistics
+                   |                                   |                                  |
+                   |                                   |                                  +-- ReceiverNoTimeoutSocketMethods
+                   |                                   |
+                   |                                   |                                  +-- SenderSocketMethods   --+-- SenderSocketOptions
+                   |                                   |                                  |
+                   +-- SenderReceiverNoTimeoutSocket --+-- SenderSocket                 --+-- SenderSocketOptions
+                                                       |                                  |
+                                                       |                                  +-- SenderSocketStatistics
+                                                       |
+                                                       |                                  +-- ReceiverNoTimeoutSocketMethods
+                                                       |                                  |
+                                                       +-- ReceiverNoTimeoutSocket      --+-- ReceiverNoTimeoutSocketOptions
+                                                                                          |
+                                                                                          +-- ReceiverSocketStatistics

@@ -50,8 +50,8 @@ public enum NanoMessageError: Error {
     case NanoSocket(code: CInt)
     case CloseFailed(code: CInt)
     case Interrupted
-    case BindToEndPoint(code: CInt, url: URL)
-    case ConnectToEndPoint(code: CInt, url: URL)
+    case BindToEndPoint(code: CInt, url: URL, type: ConnectionType)
+    case ConnectToEndPoint(code: CInt, url: URL, type: ConnectionType)
     case RemoveEndPoint(code: CInt, url: URL, endPointId: Int)
     case BindToSocket(code: CInt, nanoSocketName: String)
     case LoopBack(code: CInt)
@@ -95,22 +95,20 @@ extension NanoMessageError: CustomStringConvertible {
                 return "nn_close() failed: " + errorString(code)
             case .Interrupted:
                 return "operation was interrupted"
-            case .BindToEndPoint(let code, let url):
-                return "createEndPoint('\(url.absoluteString)', .Bind) failed: " + errorString(code)
-            case .ConnectToEndPoint(let code, let url):
-                return "createEndPoint('\(url.absoluteString)', .Connect) failed: " + errorString(code)
+            case .BindToEndPoint(let code, let url, let type), .ConnectToEndPoint(let code, let url, let type):
+                return "createEndPoint(url: \(url.absoluteString), type: \(type)) failed: " + errorString(code)
             case .RemoveEndPoint(let code, let url, let endPointId):
-                return "removeEndPoint('\(url.absoluteString)' #(\(endPointId))) failed: " + errorString(code)
+                return "removeEndPoint(url: \(url.absoluteString)) endpoint.id: \(endPointId) failed: " + errorString(code)
             case .BindToSocket(let code, let nanoSocketName):
-                return "bindToSocket('\(nanoSocketName)') failed: " + errorString(code)
+                return "bindToSocket(\(nanoSocketName)) failed: " + errorString(code)
             case .LoopBack(let code):
                 return "loopBack() failed: " + errorString(code)
             case .GetSocketOption(let code, let option):
-                return "getSocketOption('\(option)') failed: " + errorString(code)
+                return "getSocketOption(\(option)) failed: " + errorString(code)
             case .SetSocketOption(let code, let option):
-                return "setSocketOption('\(option)') failed: " + errorString(code)
+                return "setSocketOption(\(option)) failed: " + errorString(code)
             case .GetSocketStatistic(let code, let option):
-                return "getSocketStatistic('\(option)') failed: " + errorString(code)
+                return "getSocketStatistic(\(option)) failed: " + errorString(code)
             case .PollSocket(let code):
                 return "pollSocket() failed: " + errorString(code)
             case .SocketIsADevice(let socket):

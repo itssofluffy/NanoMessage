@@ -252,7 +252,7 @@ extension NanoSocket {
             return (type == .Bind) ? nn_bind(self.fileDescriptor, address) : nn_connect(self.fileDescriptor, address)
         }
         let error: (CInt) -> NanoMessageError = { errno in
-            return (type == .Bind) ? .BindToEndPoint(code: errno, url: url) : .ConnectToEndPoint(code: errno, url: url)
+            return (type == .Bind) ? .BindToEndPoint(code: errno, url: url, type: type) : .ConnectToEndPoint(code: errno, url: url, type: type)
         }
 
         let endPointId = try url.absoluteString.withCString { address -> Int in
