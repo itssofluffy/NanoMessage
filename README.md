@@ -1,15 +1,43 @@
-# Swift classes for [nanomsg](http://nanomsg.org/)
+# NanoMessage
+
+[![Swift][swift-badge]][swift-url]
+[![License][mit-badge]][mit-url]
+
+**NanoMessage** is a **Swift-3** class wrapper of [nanomsg](http://nanomsg.org/)
+
+## Socket Protocols
+
+- [x] Pair
+- [x] Push/Pull
+- [x] Request/Reply
+- [x] Publisher/Subscriber
+- [x] Surveyor/Respondent
+- [x] Bus
+
+## Transport Mechanisms
+
+- [x] TCP/IP
+- [x] In-Process Communication
+- [x] Inter-Process Communication
+- [x] Web Socket
+
+## Features
+
+- [x] Send/Receive (Synchronous/Asynchronous) Blocking/Non-Blocking And Timeout
+- [x] Same message payload object for Send/Receive with message context
+- [x] Socket Polling (Single or Multiple)
+- [x] Device/Socket Binding (Synchronous/Asynchronous)
+- [x] Socket Loopback (Synchronous/Asynchronous)
 
 ## Usage
 
-If [Swift Package Manager](https://github.com/apple/swift-package-manager) is
-used, add this package as a dependency in `Package.swift`,
+If [Swift Package Manager](https://github.com/apple/swift-package-manager) is used, add this package as a dependency in `Package.swift`,
 
 ```swift
 .Package(url: "https://github.com/itssofluffy/NanoMessage.git", majorVersion: 0)
 ```
 
-## Example
+## Examples
 
 Push
 ```swift
@@ -65,3 +93,12 @@ do {
 }
 
 ```
+
+## License
+
+This project is released under the MIT license. See [LICENSE](LICENSE) for details.
+
+[swift-badge]: https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat
+[swift-url]: https://swift.org
+[mit-badge]: https://img.shields.io/badge/License-MIT-blue.svg?style=flat
+[mit-url]: https://tldrlegal.com/license/mit-license
