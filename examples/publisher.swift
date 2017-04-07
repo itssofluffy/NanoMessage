@@ -25,24 +25,6 @@ import Foundation
 import ISFLibrary
 import FNVHashValue
 
-struct DataSet: Hashable {
-    let topic:   String
-    let message: String
-
-    init(topic: String, message: String) {
-        self.topic = topic
-        self.message = message
-    }
-
-    var hashValue: Int {
-        return fnv1a(self.topic + self.message)
-    }
-
-    static func ==(lhs: DataSet, rhs: DataSet) -> Bool {
-        return (lhs.topic == rhs.topic && lhs.message == rhs.message)
-    }
-}
-
 var urlToUse = "tcp://localhost:5555"
 
 switch (CommandLine.arguments.count) {
@@ -59,12 +41,12 @@ guard let url = URL(string: urlToUse) else {
 }
 
 do {
-    var messages = Set<DataSet>()
+    var messages = Set<Message>()
 
-    messages.insert(DataSet(topic: "interesting", message: "this is message #1"))
-    messages.insert(DataSet(topic: "not-really",  message: "this is message #2"))
-    messages.insert(DataSet(topic: "interesting", message: "this is message #3"))
-    messages.insert(DataSet(topic: "interesting", message: "this is message #4"))
+    try messages.insert(Message(topic: Topic(value: "interesting"), message: "this is message #1"))
+    try messages.insert(Message(topic: Topic(value: "not-really"),  message: "this is message #2"))
+    try messages.insert(Message(topic: Topic(value: "interesting"), message: "this is message #3"))
+    try messages.insert(Message(topic: Topic(value: "interesting"), message: "this is message #4"))
 
     let node0 = try PublisherSocket()
 
@@ -76,12 +58,7 @@ do {
 
     let timeout = TimeInterval(seconds: 10)
 
-    for dataSet in messages.sorted(by: { $0.message < $1.message }) {
-        let topic = Topic(value: dataSet.topic)
-        let message = Message(value: dataSet.message)
-
-        try node0.setTopic(topic)
-
+    for message in messages.sorted(by: { $0.data < $1.data }) {
         let sent = try node0.sendMessage(message, timeout: timeout)
 
         print("\(sent)")

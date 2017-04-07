@@ -25,9 +25,6 @@ import ISFLibrary
 
 /// Publisher socket.
 public final class PublisherSocket: NanoSocket, ProtocolSocket, PublishSubscribeSocket, PublishSocket {
-    /// The topic to send.
-    fileprivate var _topic = Topic()
-
     /// The seperator used between topic and message.
     public var topicSeperator: Byte = Byte("|")
     /// remember which topics we've sent and how many.
@@ -40,27 +37,14 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, PublishSubscribe
     /// if true then the Subscriber socket should do the same and have subscribed to topics of equal length.
     public var ignoreTopicSeperator = false
 
+    fileprivate var _topic = Topic()
+
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .PublisherProtocol)
     }
 }
 
 extension PublisherSocket {
-    /// validate the passed topic.
-    ///
-    /// - Parameters:
-    ///   - topic:  The topic to validate.
-    ///
-    /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined.
-    ///             `NanoMessageError.TopicLength` if the topic length too large.
-    fileprivate func _validateTopic(_ topic: Topic) throws {
-        if (topic.isEmpty) {
-            throw NanoMessageError.NoTopic
-        } else if (topic.count > NanoMessage.maximumTopicLength) {
-            throw NanoMessageError.TopicLength
-        }
-    }
-
     /// Send a message.
     ///
     /// - Parameters:
@@ -82,8 +66,14 @@ extension PublisherSocket {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
         let payload: () throws -> Data = {
+            self._topic = Topic()
+
             if (self.prependTopic) {                          // we are prepending the topic to the start of the message.
-                try self._validateTopic(self._topic)          // check that we have a valid topic to send.
+                guard (message.topic != nil) else {
+                    throw NanoMessageError.NoTopic
+                }
+
+                self._topic = message.topic!
 
                 if (self.ignoreTopicSeperator) {              // check if we are ignoring the topic seperator.
                     return self._topic.data + message.data
@@ -116,35 +106,9 @@ extension PublisherSocket {
 
         return MessagePayload(bytes:     sent.bytes,
                               topic:     _topic,
-                              message:   message,
+                              message:   Message(value: message.data),
                               direction: .Sent,
                               timestamp: sent.timestamp)
-    }
-
-    /// Asynchrounous execute a passed sender closure.
-    ///
-    /// - Parameters:
-    ///   - payload: A PublisherMessage to send.
-    ///   - closure: The closure to use to perform the send
-    ///   - success: The closure to use when `closure()` is succesful.
-    ///   - capture: The closure to use to pass any objects required when an error occurs.
-    private func _asyncSendToSocket(payload: Message,
-                                    closure: @escaping (Message) throws -> MessagePayload,
-                                    success: @escaping (MessagePayload) -> Void,
-                                    capture: @escaping () -> Array<Any>) {
-        aioQueue.async(group: aioGroup) {
-            wrapper(do: {
-                        try self.mutex.lock {
-                            try self.setTopic(payload.topic!)
-
-                            try success(closure(Message(value: payload.data)))
-                        }
-                    },
-                    catch: { failure in
-                        nanoMessageErrorLogger(failure)
-                    },
-                    capture: capture)
-        }
     }
 
     /// Asynchronous send a message.
@@ -158,16 +122,20 @@ extension PublisherSocket {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (MessagePayload) -> Void) {
-        let payload = Message(topic: _topic, value: message.data)
+        if let topic = message.topic {
+            _topic = topic
+        }
 
-        _asyncSendToSocket(payload: payload,
-                           closure: { message in
-                               return try self.sendMessage(message, blockingMode: blockingMode)
-                           },
-                           success: success,
-                           capture: {
-                               return [self, payload, blockingMode]
-                           })
+        let payload = Message(topic: _topic, message: message.data)
+
+        asyncSendToSocket(nanoSocket: self,
+                          closure: { message in
+                              return try self.sendMessage(payload, blockingMode: blockingMode)
+                          },
+                          success: success,
+                          capture: {
+                              return [self, payload, blockingMode]
+                          })
     }
 
     /// Asynchronous send a message.
@@ -179,33 +147,24 @@ extension PublisherSocket {
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
                             success:   @escaping (MessagePayload) -> Void) {
-        let payload = Message(topic: _topic, value: message.data)
+        if let topic = message.topic {
+            _topic = topic
+        }
 
-        _asyncSendToSocket(payload: payload,
-                           closure: { message in
-                               return try self.sendMessage(message, timeout: timeout)
-                           },
-                           success: success,
-                           capture: {
-                               return [self, payload, timeout]
-                           })
+        let payload = Message(topic: _topic, message: message.data)
+
+        asyncSendToSocket(nanoSocket: self,
+                          closure: { message in
+                              return try self.sendMessage(payload, timeout: timeout)
+                          },
+                          success: success,
+                          capture: {
+                              return [self, payload, timeout]
+                          })
     }
 }
 
 extension PublisherSocket {
-    /// set the topic to send.
-    ///
-    /// - Parameters:
-    ///   - topic:  The topic to send.
-    ///
-    /// - Throws:   `NanoMessageError.NoTopic` if there was no topic defined to send.
-    ///             `NanoMessageError.TopicLength` if the topic length too large.
-    public func setTopic(_ topic: Topic) throws {
-        try _validateTopic(topic)               // check that we have a valid topic.
-
-        _topic = topic
-    }
-
     /// reset the topic counts.
     public func resetTopicCounts() {
         sentTopics = Dictionary<Topic, UInt64>()

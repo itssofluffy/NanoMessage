@@ -59,8 +59,7 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.createEndPoint('\(connectURL)', .Connect) < 0")
 
-            var topic = Topic(value: "shakespeare")
-            try node0.setTopic(topic)
+            var topic = try Topic(value: "shakespeare")
             XCTAssertEqual(node0.prependTopic, true, "node0.prependTopic")
 
             let node1EndPointId: Int = try node1.createEndPoint(url: bindURL, type: .Bind)
@@ -75,9 +74,9 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             XCTAssertEqual(node1.isTopicSubscribed(topic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
 
-            try node0.setTopic(topic)
+            var message = Message(topic: topic, message: payload.data)
 
-            var node0Sent = try node0.sendMessage(payload)
+            var node0Sent = try node0.sendMessage(message)
             XCTAssertEqual(node0Sent.bytes, topic.count + 1 + payload.count, "node0.bytesSent != topic.count + 1 + payload.count")
 
             var node1Received = try node1.receiveMessage()
@@ -92,9 +91,9 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             try node1.subscribeTo(topic: Topic(value: "xxxx"))
             XCTAssertEqual(node1.subscribedTopics.count, 1, "node1.subscribedTopics.count != 0")
 
-            try node0.setTopic(Topic(value: "yyyy"))
+            message = try Message(topic: Topic(value: "yyyy"), message: payload.data)
 
-            node0Sent = try node0.sendMessage(payload)
+            node0Sent = try node0.sendMessage(message)
             XCTAssertEqual(node0Sent.bytes, node0Sent.topic!.count + 1 + payload.count, "node0.bytesSent != node0Sent.topic.count + 1 + payload.count")
 
             try node1.setReceiveTimeout(seconds: -1)
@@ -117,12 +116,12 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let planets = [ "mercury", "venus", "mars", "earth", "mars", "jupiter", "saturn", "uranus", "neptune" ]
 
-            topic = Topic(value: "planet")
+            topic = try Topic(value: "planet")
 
             for planet in planets {
-                try node0.setTopic(topic)
+                message = Message(topic: topic, message: planet)
 
-                let sent = try node0.sendMessage(Message(value: planet))
+                let sent = try node0.sendMessage(message)
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + planet.utf8.count, "sent.bytes != sent.topic.count + 1 + planet.utf8.count")
 
                 let _ = try node1.receiveMessage()
@@ -130,12 +129,12 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             let dwarfPlanets = [ "Eris", "Pluto", "Makemake", "Or", "Haumea", "Quaoar", "Senda", "Orcus", "2002 MS", "Ceres", "Salacia" ]
 
-            topic = Topic(value: "dwarfPlanet")
+            topic = try Topic(value: "dwarfPlanet")
 
             for dwarfPlanet in dwarfPlanets {
-                try node0.setTopic(topic)
+                message = Message(topic: topic, message: dwarfPlanet)
 
-                let sent = try node0.sendMessage(Message(value: dwarfPlanet))
+                let sent = try node0.sendMessage(message)
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != sent.topic.count + 1 + dwarfPlanet.utf8.count")
 
                 let _ = try node1.receiveMessage()
@@ -146,8 +145,8 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             XCTAssertEqual(node1.subscribedTopics.count, 0, "node1.subscribedTopics.count != 0")
             XCTAssertEqual(node1.receivedTopics.count, 1 + 2, "node1.receivedTopics.count != 3")
-            XCTAssertEqual(UInt64(planets.count), node1.receivedTopics[Topic(value: "planet")]!, "planets.count != node1.receivedTopics[\"planet\"]")
-            XCTAssertEqual(UInt64(dwarfPlanets.count), node1.receivedTopics[Topic(value: "dwarfPlanet")]!, "planets.count != node1.receivedTopics[\"dwarfPlanet\"]")
+            try XCTAssertEqual(UInt64(planets.count), node1.receivedTopics[Topic(value: "planet")]!, "planets.count != node1.receivedTopics[\"planet\"]")
+            try XCTAssertEqual(UInt64(dwarfPlanets.count), node1.receivedTopics[Topic(value: "dwarfPlanet")]!, "planets.count != node1.receivedTopics[\"dwarfPlanet\"]")
 
             print("unsubscribe from all topics and subscribe to only one topic...")
             try node1.unsubscribeFromAllTopics()
@@ -155,9 +154,9 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
 
             for planet in planets {
-                try node0.setTopic(Topic(value: "planet"))
+                message = try Message(topic: Topic(value: "planet"), message: planet)
 
-                let sent = try node0.sendMessage(Message(value: planet))
+                let sent = try node0.sendMessage(message)
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + planet.utf8.count, "sent.bytes != sent.topic.count + 1 + planet.utf8.count")
             }
 
@@ -168,12 +167,12 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
                 XCTAssert(true, "\(NanoMessageError.ReceiveTimedOut)")
             }
 
-            topic = Topic(value: "dwarfPlanet")
+            topic = try Topic(value: "dwarfPlanet")
 
             for dwarfPlanet in dwarfPlanets {
-                try node0.setTopic(topic)
+                message = Message(topic: topic, message: dwarfPlanet)
 
-                let sent = try node0.sendMessage(Message(value: dwarfPlanet))
+                let sent = try node0.sendMessage(message)
                 XCTAssertEqual(sent.bytes, sent.topic!.count + 1 + dwarfPlanet.utf8.count, "sent.bytes != node0.sendTopic.count + 1 + dwarfPlanet.utf8.count")
             }
 
@@ -204,9 +203,9 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let _ = try node1.flipIgnoreTopicSeperator()
             XCTAssertEqual(node1.ignoreTopicSeperator, true, "node1.ignoreTopicSeperator")
 
-            try node0.setTopic(Topic(value: "AAA"))
+            message = try Message(topic: Topic(value: "AAA"), message: payload.data)
 
-            let sent = try node0.sendMessage(payload)
+            let sent = try node0.sendMessage(message)
 
             received = try node1.receiveMessage()
 

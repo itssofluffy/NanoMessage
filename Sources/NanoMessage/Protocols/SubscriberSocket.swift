@@ -90,16 +90,18 @@ extension SubscriberSocket {
                     }
                 }
             } else {
-                let topic: () -> Topic = {                          // Get the topic from the message/payload if it exists using the topic seperator.
+                let setTopic: () throws -> Topic = {                // Get the topic from the message/payload if it exists using the topic seperator.
                     if let index = message.index(of: self.topicSeperator) {
-                        return Topic(value: Data(message[0 ..< index]))
+                        return try Topic(value: Data(message[0 ..< index]))
                     }
 
-                    return Topic(value: received.message.data)
+                    return try Topic(value: received.message.data)
                 }
 
-                if (topic().data != message) {
-                    receivedTopic = topic()
+                let topic = try setTopic()
+
+                if (topic.data != message) {
+                    receivedTopic = topic
                 }
             }
 

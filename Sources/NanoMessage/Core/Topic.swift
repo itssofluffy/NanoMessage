@@ -28,23 +28,41 @@ public struct Topic {
     public private(set) var data: Data
     public var encoding: String.Encoding = NanoMessage.stringEncoding
     public var string: String {
-        return (data.count == 0) ? "" : String(data: data, encoding: encoding)!
+        return String(data: data, encoding: encoding)!
     }
 
     public init() {
         data = Data()
     }
 
-    public init(value: Data) {
+    public init(value: Data) throws {
+        if (value.isEmpty) {
+            throw NanoMessageError.NoTopic
+        } else if (value.count > NanoMessage.maximumTopicLength) {
+            throw NanoMessageError.TopicLength
+        }
+
         data = value
     }
 
-    public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
+    public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) throws {
+        if (value.isEmpty) {
+            throw NanoMessageError.NoTopic
+        } else if (value.utf16.count > NanoMessage.maximumTopicLength) {
+            throw NanoMessageError.TopicLength
+        }
+
         self.encoding = encoding
         data = value.data(using: encoding)!
     }
 
-    public init(value: Array<Byte>) {
+    public init(value: Array<Byte>) throws {
+        if (value.isEmpty) {
+            throw NanoMessageError.NoTopic
+        } else if (value.count > NanoMessage.maximumTopicLength) {
+            throw NanoMessageError.TopicLength
+        }
+
         data = Data(bytes: value)
     }
 }
