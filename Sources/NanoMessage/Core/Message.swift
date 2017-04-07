@@ -50,12 +50,12 @@ public struct Message {
         data = Data(bytes: value)
     }
 
-    internal init(topic: Topic, value: Data) {
+    public init(topic: Topic, value: Data) {
         self.topic = topic
         self.data = value
     }
 
-    internal init(topic: Topic, value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
+    public init(topic: Topic, value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
         self.topic = topic
         data = value.data(using: encoding)!
         self.encoding = encoding
