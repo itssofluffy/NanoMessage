@@ -110,58 +110,6 @@ extension PublisherSocket {
                               direction: .Sent,
                               timestamp: sent.timestamp)
     }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - message:      The message to send.
-    ///   - blockingMode: Specifies that the send should be performed in non-blocking mode.
-    ///                   If the message cannot be sent straight away, the closureHandler
-    ///                   will be passed `NanoMessageError.MessageNotSent`
-    ///   - success:      The closure to use when the async functionality completes succesfully.
-    public func sendMessage(_ message:    Message,
-                            blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (MessagePayload) -> Void) {
-        if let topic = message.topic {
-            _topic = topic
-        }
-
-        let payload = Message(topic: _topic, message: message.data)
-
-        asyncSendToSocket(nanoSocket: self,
-                          closure: { message in
-                              return try self.sendMessage(payload, blockingMode: blockingMode)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, payload, blockingMode]
-                          })
-    }
-
-    /// Asynchronous send a message.
-    ///
-    /// - Parameters:
-    ///   - message: The message to send.
-    ///   - timeout: The timeout interval to set.
-    ///   - success: The closure to use when the async functionality completes succesfully.
-    public func sendMessage(_ message: Message,
-                            timeout:   TimeInterval,
-                            success:   @escaping (MessagePayload) -> Void) {
-        if let topic = message.topic {
-            _topic = topic
-        }
-
-        let payload = Message(topic: _topic, message: message.data)
-
-        asyncSendToSocket(nanoSocket: self,
-                          closure: { message in
-                              return try self.sendMessage(payload, timeout: timeout)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, payload, timeout]
-                          })
-    }
 }
 
 extension PublisherSocket {
