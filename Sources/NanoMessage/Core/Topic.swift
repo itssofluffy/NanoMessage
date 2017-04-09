@@ -36,9 +36,11 @@ public struct Topic {
     }
 
     public init(value: Data) throws {
-        if (value.isEmpty) {
+        guard (!value.isEmpty) else {
             throw NanoMessageError.NoTopic
-        } else if (value.count > NanoMessage.maximumTopicLength) {
+        }
+
+        guard (value.count <= NanoMessage.maximumTopicLength) else {
             throw NanoMessageError.TopicLength
         }
 
@@ -46,9 +48,12 @@ public struct Topic {
     }
 
     public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) throws {
-        if (value.isEmpty) {
+        guard (!value.isEmpty) else {
             throw NanoMessageError.NoTopic
-        } else if (value.utf16.count > NanoMessage.maximumTopicLength) {
+        }
+
+        guard ((encoding == .utf8 && value.utf8.count <= NanoMessage.maximumTopicLength) ||
+               (encoding == .utf16 && value.utf16.count <= NanoMessage.maximumTopicLength)) else {
             throw NanoMessageError.TopicLength
         }
 
@@ -57,9 +62,11 @@ public struct Topic {
     }
 
     public init(value: Array<Byte>) throws {
-        if (value.isEmpty) {
+        guard (!value.isEmpty) else {
             throw NanoMessageError.NoTopic
-        } else if (value.count > NanoMessage.maximumTopicLength) {
+        }
+
+        guard (value.count <= NanoMessage.maximumTopicLength) else {
             throw NanoMessageError.TopicLength
         }
 
