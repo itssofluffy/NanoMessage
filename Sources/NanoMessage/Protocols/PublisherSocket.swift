@@ -31,13 +31,9 @@ public final class PublisherSocket: NanoSocket, ProtocolSocket, PublishSubscribe
     public var topicCounts = true
     /// A Dictionary of the topics sent with a count of the times sent.
     public fileprivate(set) var sentTopics = Dictionary<Topic, UInt64>()
-    /// Prepend the topic to the start of the message when sending.
-    public var prependTopic = true
     /// When prepending the topic to the message do we ignore the topic seperator,
     /// if true then the Subscriber socket should do the same and have subscribed to topics of equal length.
     public var ignoreTopicSeperator = false
-
-    fileprivate var _topic = Topic()
 
     public init(socketDomain: SocketDomain = .StandardSocket) throws {
         try super.init(socketDomain: socketDomain, socketProtocol: .PublisherProtocol)
@@ -65,47 +61,35 @@ extension PublisherSocket {
     @discardableResult
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking) throws -> MessagePayload {
+        var topic = Topic()
+
         let payload: () throws -> Data = {
-            self._topic = Topic()
-
-            if (self.prependTopic) {                          // we are prepending the topic to the start of the message.
-                guard (message.topic != nil) else {
-                    throw NanoMessageError.NoTopic
-                }
-
-                self._topic = message.topic!
-
-                if (self.ignoreTopicSeperator) {              // check if we are ignoring the topic seperator.
-                    return self._topic.data + message.data
-                }
-
-                return self._topic.data + [self.topicSeperator] + message.data
+            guard (message.topic != nil) else {
+                throw NanoMessageError.NoTopic
             }
 
-            return message.data
+            topic = message.topic!
+
+            if (self.ignoreTopicSeperator) {                  // check if we are ignoring the topic seperator.
+                return topic.data + message.data
+            }
+
+            return topic.data + [self.topicSeperator] + message.data
         }
 
         let sent = try sendToSocket(self, payload(), blockingMode)
 
-        if (!_topic.isEmpty) {                                // check that we have a send topic.
-            if (topicCounts) {                                // remember which topics we've sent and how many.
-                if var topicCount = sentTopics[_topic] {
-                    topicCount += 1
-                    sentTopics[_topic] = topicCount
-                } else {
-                    sentTopics[_topic] = 1
-                }
-            }
-        }
-
-        defer {
-            if (!_topic.isEmpty) {                            // are we resetting the topic?
-                _topic = Topic()                              // reset the topic, don't use setSendTopic() as this checks for isEmpty!
+        if (topicCounts) {                                    // remember which topics we've sent and how many.
+            if var topicCount = sentTopics[topic] {
+                topicCount += 1
+                sentTopics[topic] = topicCount
+            } else {
+                sentTopics[topic] = 1
             }
         }
 
         return MessagePayload(bytes:     sent.bytes,
-                              topic:     _topic,
+                              topic:     topic,
                               message:   Message(value: message.data),
                               direction: .Sent,
                               timestamp: sent.timestamp)

@@ -22,6 +22,5 @@
 
 protocol PublishSocket: SenderSocket {
     var sentTopics: Dictionary<Topic, UInt64> { get }  // implement private set.
-    var prependTopic: Bool { get set }
     var ignoreTopicSeperator: Bool { get set }
 }

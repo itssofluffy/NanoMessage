@@ -59,9 +59,6 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
             let node0EndPointId: Int = try node0.createEndPoint(url: connectURL, type: .Connect)
             XCTAssertGreaterThanOrEqual(node0EndPointId, 0, "node0.createEndPoint('\(connectURL)', .Connect) < 0")
 
-            var topic = try Topic(value: "shakespeare")
-            XCTAssertEqual(node0.prependTopic, true, "node0.prependTopic")
-
             let node1EndPointId: Int = try node1.createEndPoint(url: bindURL, type: .Bind)
             XCTAssertGreaterThanOrEqual(node1EndPointId, 0, "node1.createEndPoint('\(bindURL)', .Bind) < 0")
 
@@ -69,7 +66,10 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
 
             // standard publisher -> subscriber where the topic known.
             print("subscribe to an expected topic...")
+
+            var topic = try Topic(value: "shakespeare")
             var done = try node1.subscribeTo(topic: topic)
+
             XCTAssertEqual(done, true, "node1.subscribeTo(topic: \(topic))")
             XCTAssertEqual(node1.isTopicSubscribed(topic), true, "node1.isTopicSubscribed()")
             XCTAssertEqual(node1.removeTopicFromMessage, true, "node1.removeTopicFromMessage")
