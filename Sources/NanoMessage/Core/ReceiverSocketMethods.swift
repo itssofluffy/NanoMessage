@@ -77,7 +77,7 @@ extension ReceiverSocketMethods {
     ///   - success: The closure to use when the async functionallity is succesful.
     public func receiveMessage(timeout: TimeInterval,
                                success: @escaping (MessagePayload) -> Void) {
-        asyncReceiveFromSocket(nanoSocket: self as! NanoSocket,
+        asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
                                closure: {
                                    return try self.receiveMessage(timeout: timeout)
                                },

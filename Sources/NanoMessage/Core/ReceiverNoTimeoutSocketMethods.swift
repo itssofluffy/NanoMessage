@@ -58,7 +58,7 @@ extension ReceiverNoTimeoutSocketMethods {
     ///   - success:      The closure to use when the async functionallity is succesful.
     public func receiveMessage(blockingMode: BlockingMode = .Blocking,
                                success:      @escaping (MessagePayload) -> Void) {
-        asyncReceiveFromSocket(nanoSocket: self as! NanoSocket,
+        asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
                                closure: {
                                    return try self.receiveMessage(blockingMode: blockingMode)
                                },

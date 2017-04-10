@@ -117,14 +117,14 @@ extension SenderSocketMethods {
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
                             success:      @escaping (MessagePayload) -> Void) {
-        asyncSendToSocket(nanoSocket: self as! NanoSocket,
-                          closure: {
-                              return try self.sendMessage(message, blockingMode: blockingMode)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, message, blockingMode]
-                          })
+        asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
+                               closure: {
+                                   return try self.sendMessage(message, blockingMode: blockingMode)
+                               },
+                               success: success,
+                               capture: {
+                                   return [self, message, blockingMode]
+                               })
     }
 
     /// Asynchronous send a message.
@@ -137,13 +137,13 @@ extension SenderSocketMethods {
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
                             success:   @escaping (MessagePayload) -> Void) {
-        asyncSendToSocket(nanoSocket: self as! NanoSocket,
-                          closure: {
-                              return try self.sendMessage(message, timeout: timeout)
-                          },
-                          success: success,
-                          capture: {
-                              return [self, message, timeout]
-                          })
+        asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
+                               closure: {
+                                   return try self.sendMessage(message, timeout: timeout)
+                               },
+                               success: success,
+                               capture: {
+                                   return [self, message, timeout]
+                               })
     }
 }
