@@ -41,12 +41,12 @@ guard let url = URL(string: urlToUse) else {
 }
 
 do {
-    var messages = Set<Message>()
+    var messages = Array<Message>()
 
-    try messages.insert(Message(topic: Topic(value: "interesting"), message: "this is message #1"))
-    try messages.insert(Message(topic: Topic(value: "not-really"),  message: "this is message #2"))
-    try messages.insert(Message(topic: Topic(value: "interesting"), message: "this is message #3"))
-    try messages.insert(Message(topic: Topic(value: "interesting"), message: "this is message #4"))
+    try messages.append(Message(topic: Topic(value: "interesting"), message: "this is message #1"))
+    try messages.append(Message(topic: Topic(value: "not-really"),  message: "this is message #2"))
+    try messages.append(Message(topic: Topic(value: "interesting"), message: "this is message #3"))
+    try messages.append(Message(topic: Topic(value: "interesting"), message: "this is message #4"))
 
     let node0 = try PublisherSocket()
 
@@ -58,7 +58,7 @@ do {
 
     let timeout = TimeInterval(seconds: 10)
 
-    for message in messages.sorted(by: { $0.data < $1.data }) {
+    for message in messages {
         let sent = try node0.sendMessage(message, timeout: timeout)
 
         print("\(sent)")
