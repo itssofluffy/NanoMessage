@@ -95,7 +95,7 @@ extension SubscriberSocket {
                         return try Topic(value: Data(message[0 ..< index]))
                     }
 
-                    return try Topic(value: received.message.data)
+                    return try Topic(value: message)
                 }
 
                 let topic = try setTopic()
