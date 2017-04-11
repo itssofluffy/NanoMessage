@@ -47,11 +47,8 @@ public struct MessagePayload {
                   message:   Message,
                   direction: MessageDirection,
                   timestamp: TimeInterval) {
-        self.bytes = bytes
+        self.init(bytes: bytes, message: message, direction: direction, timestamp: timestamp)
         self.topic = topic
-        self.message = message
-        self.direction = direction
-        self.timestamp = timestamp
     }
 }
 

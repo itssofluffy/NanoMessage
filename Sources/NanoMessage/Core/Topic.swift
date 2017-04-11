@@ -48,29 +48,12 @@ public struct Topic {
     }
 
     public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) throws {
-        guard (!value.isEmpty) else {
-            throw NanoMessageError.NoTopic
-        }
-
-        guard ((encoding == .utf8 && value.utf8.count <= NanoMessage.maximumTopicLength) ||
-               (encoding == .utf16 && value.utf16.count <= NanoMessage.maximumTopicLength)) else {
-            throw NanoMessageError.TopicLength
-        }
-
+        try self.init(value: value.data(using: encoding)!)
         self.encoding = encoding
-        data = value.data(using: encoding)!
     }
 
     public init(value: Array<Byte>) throws {
-        guard (!value.isEmpty) else {
-            throw NanoMessageError.NoTopic
-        }
-
-        guard (value.count <= NanoMessage.maximumTopicLength) else {
-            throw NanoMessageError.TopicLength
-        }
-
-        data = Data(bytes: value)
+        try self.init(value: Data(bytes: value))
     }
 }
 

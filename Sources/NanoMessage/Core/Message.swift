@@ -42,27 +42,26 @@ public struct Message {
     }
 
     public init(value: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
-        data = value.data(using: encoding)!
+        self.init(value: value.data(using: encoding)!)
         self.encoding = encoding
     }
 
     public init(value: Array<Byte>) {
-        data = Data(bytes: value)
+        self.init(value: Data(bytes: value))
     }
 
     public init(topic: Topic, message: Data) {
+        self.init(value: message)
         self.topic = topic
-        data = message
     }
 
     public init(topic: Topic, message: String, encoding: String.Encoding = NanoMessage.stringEncoding) {
-        self.topic = topic
-        data = message.data(using: encoding)!
+        self.init(topic: topic, message: message.data(using: encoding)!)
         self.encoding = encoding
     }
 
     internal init(buffer: UnsafeMutableBufferPointer<Byte>) {
-        data = Data(bytes: Array(buffer))
+        self.init(value: Data(bytes: Array(buffer)))
     }
 }
 
