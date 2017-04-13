@@ -50,35 +50,35 @@ class SenderReceiverTests: XCTestCase {
             let node8 = try RespondentSocket()
             let node9 = try BusSocket()
 
-            XCTAssertEqual(node0.receiverSocket, false, "PushSocket() cannot be a receiver socket")
-            XCTAssertEqual(node0.senderSocket, true, "PushSocket() must be a sender socket")
+            XCTAssertEqual(node0.receiver, false, "PushSocket() cannot be a receiver socket")
+            XCTAssertEqual(node0.sender, true, "PushSocket() must be a sender socket")
 
-            XCTAssertEqual(node1.receiverSocket, true, "PullSocket() must be a receiver socket")
-            XCTAssertEqual(node1.senderSocket, false, "PullSocket() cannot be a sender socket")
+            XCTAssertEqual(node1.receiver, true, "PullSocket() must be a receiver socket")
+            XCTAssertEqual(node1.sender, false, "PullSocket() cannot be a sender socket")
 
-            XCTAssertEqual(node2.receiverSocket, true, "PairSocket() must be a receiver socket")
-            XCTAssertEqual(node2.senderSocket, true, "PairSocket() must a sender socket")
+            XCTAssertEqual(node2.receiver, true, "PairSocket() must be a receiver socket")
+            XCTAssertEqual(node2.sender, true, "PairSocket() must a sender socket")
 
-            XCTAssertEqual(node3.receiverSocket, true, "RequestSocket() must be a receiver socket")
-            XCTAssertEqual(node3.senderSocket, true, "RequestSocket() must a sender socket")
+            XCTAssertEqual(node3.receiver, true, "RequestSocket() must be a receiver socket")
+            XCTAssertEqual(node3.sender, true, "RequestSocket() must a sender socket")
 
-            XCTAssertEqual(node4.receiverSocket, true, "ReplySocket() must be a receiver socket")
-            XCTAssertEqual(node4.senderSocket, true, "ReplySocket() must a sender socket")
+            XCTAssertEqual(node4.receiver, true, "ReplySocket() must be a receiver socket")
+            XCTAssertEqual(node4.sender, true, "ReplySocket() must a sender socket")
 
-            XCTAssertEqual(node5.receiverSocket, false, "PublisherSocket() cannot be a receiver socket")
-            XCTAssertEqual(node5.senderSocket, true, "PublisherSocket() must be a sender socket")
+            XCTAssertEqual(node5.receiver, false, "PublisherSocket() cannot be a receiver socket")
+            XCTAssertEqual(node5.sender, true, "PublisherSocket() must be a sender socket")
 
-            XCTAssertEqual(node6.receiverSocket, true, "SubscriberSocket() must be a receiver socket")
-            XCTAssertEqual(node6.senderSocket, false, "SubscriberSocket() cannot be a sender socket")
+            XCTAssertEqual(node6.receiver, true, "SubscriberSocket() must be a receiver socket")
+            XCTAssertEqual(node6.sender, false, "SubscriberSocket() cannot be a sender socket")
 
-            XCTAssertEqual(node7.receiverSocket, true, "SurveyorSocket() must be a receiver socket")
-            XCTAssertEqual(node7.senderSocket, true, "SurveyorSocket() must a sender socket")
+            XCTAssertEqual(node7.receiver, true, "SurveyorSocket() must be a receiver socket")
+            XCTAssertEqual(node7.sender, true, "SurveyorSocket() must a sender socket")
 
-            XCTAssertEqual(node8.receiverSocket, true, "RespondentSocket() must be a receiver socket")
-            XCTAssertEqual(node8.senderSocket, true, "RespondentSocket() must a sender socket")
+            XCTAssertEqual(node8.receiver, true, "RespondentSocket() must be a receiver socket")
+            XCTAssertEqual(node8.sender, true, "RespondentSocket() must a sender socket")
 
-            XCTAssertEqual(node9.receiverSocket, true, "BusSocket() must be a receiver socket")
-            XCTAssertEqual(node9.senderSocket, true, "BusSocket() must a sender socket")
+            XCTAssertEqual(node9.receiver, true, "BusSocket() must be a receiver socket")
+            XCTAssertEqual(node9.sender, true, "BusSocket() must a sender socket")
 
             completed = true
         } catch let error as NanoMessageError {

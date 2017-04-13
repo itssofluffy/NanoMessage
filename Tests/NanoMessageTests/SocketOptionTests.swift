@@ -42,9 +42,9 @@ class SocketOptionTests: XCTestCase {
         do {
             let node0 = try PairSocket()
 
-            XCTAssertEqual(node0.socketDomain, SocketDomain.StandardSocket, "node0.socketDomain: \(node0.socketDomain)")
-            XCTAssertEqual(node0.socketProtocol, SocketProtocol.PairProtocol, "node0.socketProtocol: \(node0.socketProtocol)")
-            XCTAssertEqual(node0.socketProtocolFamily, ProtocolFamily.OneToOne, "node0.socketProtocolFamily: \(node0.socketProtocolFamily)")
+            XCTAssertEqual(node0.domain, SocketDomain.StandardSocket, "node0.socketDomain: \(node0.domain)")
+            XCTAssertEqual(node0.protocol, SocketProtocol.PairProtocol, "node0.socketProtocol: \(node0.protocol)")
+            XCTAssertEqual(node0.protocolFamily, ProtocolFamily.OneToOne, "node0.socketProtocolFamily: \(node0.protocolFamily)")
 
             let linger = try node0.getLinger()
             XCTAssertEqual(linger, 1, "getLinger(): \(linger)")

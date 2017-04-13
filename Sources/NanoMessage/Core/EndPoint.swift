@@ -28,7 +28,7 @@ public struct EndPoint {
     public let url: URL                           // end-point address
     public let type: ConnectionType               // end-point connection type (connect/bind)
     public var transport: TransportMechanism {    // end-points transport mechanism
-        return TransportMechanism(url: self.url)
+        return TransportMechanism(url: url)
     }
     public let priorities: SocketPriorities       // end-point socket priorities.
     public let ipv4Only: Bool                     // if true, only IPv4 addresses are used. If false, both IPv4 and IPv6 addresses are used.
@@ -70,6 +70,7 @@ extension EndPoint: Equatable {
 extension EndPoint: CustomStringConvertible {
     public var description: String {
         var description = "id: \(id), url: \(url.absoluteString), type: \(type), transport: \(transport), priorities: (\(priorities)), ipv4only: \(ipv4Only)"
+
         if (!name.isEmpty) {
             description += ", name: \(name)"
         }

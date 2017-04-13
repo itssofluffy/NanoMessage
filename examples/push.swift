@@ -57,9 +57,11 @@ if (messageSize < 1) {
 }
 
 do {
-    let node0 = try PushSocket()
+    let node = try PushSocket()
 
-    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Connect, name: "send end-point")
+    print("\(node)")
+
+    let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Connect, name: "send end-point")
 
     usleep(TimeInterval(milliseconds: 200))
 
@@ -69,13 +71,13 @@ do {
     let timeout = TimeInterval(seconds: 10)
 
     for _ in 0 ..< sendCount {
-        let sent = try node0.sendMessage(messagePayload, timeout: timeout)
+        let sent = try node.sendMessage(messagePayload, timeout: timeout)
 
         print("\(sent)")
     }
 
-    print("messages: \(node0.messagesSent!)")
-    print("bytes   : \(node0.bytesSent!)")
+    print("messages: \(node.messagesSent!)")
+    print("bytes   : \(node.bytesSent!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

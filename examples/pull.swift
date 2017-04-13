@@ -40,9 +40,11 @@ guard let url = URL(string: urlToUse) else {
 }
 
 do {
-    let node0 = try PullSocket()
+    let node = try PullSocket()
 
-    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Bind, name: "receive end-point")
+    print("\(node)")
+
+    let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Bind, name: "receive end-point")
 
     print(endPoint)
 
@@ -51,7 +53,7 @@ do {
 
     while (true) {
         do {
-            let received = try node0.receiveMessage(timeout: timeout)
+            let received = try node.receiveMessage(timeout: timeout)
 
             print("\(received)")
         } catch NanoMessageError.ReceiveTimedOut {
@@ -60,17 +62,17 @@ do {
             throw error
         }
 
-        let socket = try node0.pollSocket(timeout: pollTimeout)
+        let socket = try node.pollSocket(timeout: pollTimeout)
 
         if (!socket.messageIsWaiting) {
             break
         }
     }
 
-    print("messages: \(node0.messagesReceived!)")
-    print("bytes   : \(node0.bytesReceived!)")
+    print("messages: \(node.messagesReceived!)")
+    print("bytes   : \(node.bytesReceived!)")
 
-    if (try node0.removeEndPoint(endPoint)) {
+    if (try node.removeEndPoint(endPoint)) {
         print("end-point removed")
     }
 } catch let error as NanoMessageError {

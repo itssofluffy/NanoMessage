@@ -40,33 +40,35 @@ guard let url = URL(string: urlToUse) else {
 }
 
 do {
-    let node0 = try SubscriberSocket()
+    let node = try SubscriberSocket()
 
-    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Bind, name: "my local end-point")
+    print("\(node)")
+
+    let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Bind, name: "my local end-point")
 
     usleep(TimeInterval(seconds: 0.25))
 
     print(endPoint)
 
-    try node0.subscribeTo(topic: Topic(value: "interesting"))
+    try node.subscribeTo(topic: Topic(value: "interesting"))
 
     let timeout = TimeInterval(seconds: 10)
     let pollTimeout = TimeInterval(seconds: 0.25)
 
     while (true) {
-        let received = try node0.receiveMessage(timeout: timeout)
+        let received = try node.receiveMessage(timeout: timeout)
 
         print("\(received)")
 
-        let socket = try node0.pollSocket(timeout: pollTimeout)
+        let socket = try node.pollSocket(timeout: pollTimeout)
 
         if (!socket.messageIsWaiting) {
             break
         }
     }
 
-    print("messages received: \(node0.messagesReceived!)")
-    print("bytes received   : \(node0.bytesReceived!)")
+    print("messages received: \(node.messagesReceived!)")
+    print("bytes received   : \(node.bytesReceived!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

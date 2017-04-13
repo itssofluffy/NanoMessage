@@ -34,7 +34,7 @@ private let NN_MSG: size_t = -1
 /// - Throws:  `NanoMessageError.SocketIsADevice`
 ///            `NanoMessageError.NoEndPoint`
 internal func validateNanoSocket(_ nanoSocket: NanoSocket) throws {
-    guard (!nanoSocket.socketIsADevice) else {
+    guard (!nanoSocket.isDevice) else {
         throw NanoMessageError.SocketIsADevice(socket: nanoSocket)
     }
 

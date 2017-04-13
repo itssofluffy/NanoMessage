@@ -40,9 +40,11 @@ guard let url = URL(string: urlToUse) else {
 }
 
 do {
-    let node0 = try ReplySocket()
+    let node = try ReplySocket()
 
-    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Bind, name: "reply end-point")
+    print("\(node)")
+
+    let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Bind, name: "reply end-point")
 
     usleep(TimeInterval(milliseconds: 200))
 
@@ -54,35 +56,35 @@ do {
     while (true) {
         print("waiting for a request...")
 
-        let sent = try node0.receiveMessage(receiveTimeout: timeout,
-                                            sendTimeout: timeout,
-                                            { received in
-                                                print("received \(received)")
+        let sent = try node.receiveMessage(receiveTimeout: timeout,
+                                           sendTimeout: timeout,
+                                           { received in
+                                               print("received \(received)")
 
-                                                var message = ""
+                                               var message = ""
 
-                                                if (received.message.string == "ping") {
-                                                    message = "pong"
-                                                } else {
-                                                    message = "personally i prefer wiff-wafe"
-                                                }
+                                               if (received.message.string == "ping") {
+                                                   message = "pong"
+                                               } else {
+                                                   message = "personally i prefer wiff-wafe"
+                                               }
 
-                                                return Message(value: message)
-                                            })
+                                               return Message(value: message)
+                                           })
 
         print("and sent \(sent)")
 
-        let socket = try node0.pollSocket(timeout: pollTimeout)
+        let socket = try node.pollSocket(timeout: pollTimeout)
 
         if (!socket.messageIsWaiting) {
             break
         }
     }
 
-    print("messages received: \(node0.messagesReceived!)")
-    print("bytes received   : \(node0.bytesReceived!)")
-    print("messages sent    : \(node0.messagesSent!)")
-    print("bytes sent       : \(node0.bytesSent!)")
+    print("messages received: \(node.messagesReceived!)")
+    print("bytes received   : \(node.bytesReceived!)")
+    print("messages sent    : \(node.messagesSent!)")
+    print("bytes sent       : \(node.bytesSent!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

@@ -48,9 +48,11 @@ if (sendCount < 1) {
 }
 
 do {
-    let node0 = try RequestSocket()
+    let node = try RequestSocket()
 
-    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Connect, name: "request end-point")
+    print("\(node)")
+
+    let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Connect, name: "request end-point")
 
     usleep(TimeInterval(milliseconds: 200))
 
@@ -60,21 +62,21 @@ do {
     let message = Message(value: "ping")
 
     for _ in 0 ..< sendCount {
-        let received = try node0.sendMessage(message,
-                                             sendTimeout: timeout,
-                                             receiveTimeout: timeout,
-                                             { sent in
-                                                 print("sent \(sent)")
-                                                 print("waiting for a response...")
-                                             })
+        let received = try node.sendMessage(message,
+                                            sendTimeout: timeout,
+                                            receiveTimeout: timeout,
+                                            { sent in
+                                                print("sent \(sent)")
+                                                print("waiting for a response...")
+                                            })
 
         print("and recieved \(received)")
     }
 
-    print("messages sent    : \(node0.messagesSent!)")
-    print("bytes sent       : \(node0.bytesSent!)")
-    print("messages received: \(node0.messagesReceived!)")
-    print("bytes received   : \(node0.bytesReceived!)")
+    print("messages sent    : \(node.messagesSent!)")
+    print("bytes sent       : \(node.bytesSent!)")
+    print("messages received: \(node.messagesReceived!)")
+    print("bytes received   : \(node.bytesReceived!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

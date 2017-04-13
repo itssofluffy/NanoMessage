@@ -31,17 +31,17 @@ public class NanoSocket: NanoSocketProtocol {
     /// The raw nanomsg socket file descriptor.
     public let fileDescriptor: CInt
     /// The domain of the socket as it was created with.
-    public let socketDomain: SocketDomain
+    public let domain: SocketDomain
     /// The protocol of the socket as it was created with.
-    public let socketProtocol: SocketProtocol
+    public let `protocol`: SocketProtocol
     /// The protocol family of the socket as it was created with.
-    public var socketProtocolFamily: ProtocolFamily {
-        return ProtocolFamily(socketProtocol: socketProtocol)
+    public var protocolFamily: ProtocolFamily {
+        return ProtocolFamily(socketProtocol: `protocol`)
     }
     /// Is the socket capable of receiving.
-    public let receiverSocket: Bool
+    public let receiver: Bool
     /// Is the socket capable of sending.
-    public let senderSocket: Bool
+    public let sender: Bool
     /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     public fileprivate(set) var endPoints = Set<EndPoint>()
 
@@ -81,7 +81,7 @@ public class NanoSocket: NanoSocketProtocol {
     /// - Warning: Please not that if true this will block until the class has been de-referenced.
     public var blockTillCloseSuccess = false
     /// Is the socket attached to a device.
-    public fileprivate(set) var socketIsADevice = false
+    public fileprivate(set) var isDevice = false
     /// The dispatch queue that async send/receive messages are run on.
     public var aioQueue = DispatchQueue(label: "com.nanomessage.aioqueue", qos: .userInitiated)
     /// The async dispatch queue's group.
@@ -139,22 +139,22 @@ public class NanoSocket: NanoSocketProtocol {
             throw NanoMessageError.NanoSocket(code: nn_errno())
         }
 
-        self.socketDomain = socketDomain
-        self.socketProtocol = socketProtocol
+        self.domain = socketDomain
+        self.protocol = socketProtocol
 
         // rely on the fact that getting the receive/send file descriptor for a socket type from
         // the underlying library that does not support receive/send will throw a nil to determine
         // if the socket is capable of receiving or ending.
         if let _ = try? getSocketOption(fileDescriptor, .ReceiveFileDescriptor) {
-            receiverSocket = true
+            receiver = true
         } else {
-            receiverSocket = false
+            receiver = false
         }
 
         if let _ = try? getSocketOption(fileDescriptor, .SendFileDescriptor) {
-            senderSocket = true
+            sender = true
         } else {
-            senderSocket = false
+            sender = false
         }
     }
 
@@ -239,10 +239,10 @@ extension NanoSocket {
         var receivePriority: Priority?
         var sendPriority: Priority?
 
-        if (receiverSocket) {                                              // if this is a receiver socket then...
+        if (receiver) {                                                    // if this is a receiver socket then...
             receivePriority = try getSocketOption(self, .ReceivePriority)  // obtain the receive priority for the end-point.
         }
-        if (senderSocket) {                                                // if this is a sender socket then...
+        if (sender) {                                                      // if this is a sender socket then...
             sendPriority = try getSocketOption(self, .SendPriority)        // obtain the send priority for the end-point.
         }
 
@@ -395,12 +395,12 @@ extension NanoSocket {
 
         try validateNanoSocket(nanoSocket)
 
-        socketIsADevice = true
-        nanoSocket.socketIsADevice = true
+        isDevice = true
+        nanoSocket.isDevice = true
 
         defer {
-            socketIsADevice = false
-            nanoSocket.socketIsADevice = false
+            isDevice = false
+            nanoSocket.isDevice = false
         }
 
         let returnCode = nn_device(fileDescriptor, nanoSocket.fileDescriptor)
@@ -444,10 +444,10 @@ extension NanoSocket {
     public func loopBack() throws {
         try validateNanoSocket(self)
 
-        socketIsADevice = true
+        isDevice = true
 
         defer {
-            socketIsADevice = false
+            isDevice = false
         }
 
         let returnCode = nn_device(fileDescriptor, -1)
@@ -880,11 +880,5 @@ extension NanoSocket: Comparable {
 extension NanoSocket: Equatable {
     public static func ==(lhs: NanoSocket, rhs: NanoSocket) -> Bool {
         return (lhs.fileDescriptor == rhs.fileDescriptor)
-    }
-}
-
-extension NanoSocket: CustomStringConvertible {
-    public var description: String {
-        return "file descriptor: \(fileDescriptor), domain: \(socketDomain), protocol: \(socketProtocol), protocol family: \(socketProtocolFamily), close attempts: \(closeAttempts)"
     }
 }

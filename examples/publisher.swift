@@ -48,9 +48,11 @@ do {
     try messages.append(Message(topic: Topic(value: "interesting"), message: "this is message #3"))
     try messages.append(Message(topic: Topic(value: "interesting"), message: "this is message #4"))
 
-    let node0 = try PublisherSocket()
+    let node = try PublisherSocket()
 
-    let endPoint: EndPoint = try node0.createEndPoint(url: url, type: .Connect)
+    print("\(node)")
+
+    let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Connect)
 
     usleep(TimeInterval(seconds: 0.25))
 
@@ -59,13 +61,13 @@ do {
     let timeout = TimeInterval(seconds: 10)
 
     for message in messages {
-        let sent = try node0.sendMessage(message, timeout: timeout)
+        let sent = try node.sendMessage(message, timeout: timeout)
 
         print("\(sent)")
     }
 
-    print("messages sent: \(node0.messagesSent!)")
-    print("bytes sent   : \(node0.bytesSent!)")
+    print("messages sent: \(node.messagesSent!)")
+    print("bytes sent   : \(node.bytesSent!)")
 } catch let error as NanoMessageError {
     print(error, to: &errorStream)
 } catch {

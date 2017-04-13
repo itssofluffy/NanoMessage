@@ -22,7 +22,7 @@
 
 public struct SocketPriorities {
     public let receive: Priority?
-    public let send: Priority?
+    public let send:    Priority?
 }
 
 extension SocketPriorities: CustomStringConvertible {
@@ -34,7 +34,9 @@ extension SocketPriorities: CustomStringConvertible {
         } else {
             description += "nil"
         }
+
         description += ", send: "
+
         if let priority = send {
             description += "(\(priority))"
         } else {

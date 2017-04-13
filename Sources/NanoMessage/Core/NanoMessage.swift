@@ -130,15 +130,15 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
     var pollFds = Array<nn_pollfd>()
 
     for socket in sockets {
-        guard (!socket.socketIsADevice) else {                          // guard against polling a device socket.
+        guard (!socket.isDevice) else {                                 // guard against polling a device socket.
             throw NanoMessageError.SocketIsADevice(socket: socket)
         }
 
         var eventMask = CShort.allZeros                                 //
-        if (socket.receiverSocket) {                                    // if the socket can receive then set the event mask appropriately.
+        if (socket.receiver) {                                          // if the socket can receive then set the event mask appropriately.
             eventMask = _pollinMask
         }
-        if (socket.senderSocket) {                                      // if the socket can send then set the event mask appropriately.
+        if (socket.sender) {                                            // if the socket can send then set the event mask appropriately.
             eventMask = eventMask | _polloutMask
         }
 

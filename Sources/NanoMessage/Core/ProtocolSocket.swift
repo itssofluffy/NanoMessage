@@ -23,7 +23,7 @@
 import Foundation
 
 /// Socket protocol protocol.
-public protocol ProtocolSocket: NanoSocketProtocol {
+public protocol ProtocolSocket: NanoSocketProtocol, CustomStringConvertible {
     init(socketDomain: SocketDomain) throws
     init(socketDomain: SocketDomain,
          urls:         Array<URL>,
@@ -52,5 +52,12 @@ extension ProtocolSocket {
         try self.init(socketDomain: socketDomain)
 
         let _: EndPoint = try createEndPoint(url: url, type: type, name: name)
+    }
+}
+
+/// implementation of `CustomStringConvertible`
+extension ProtocolSocket {
+    public var description: String {
+        return "domain: \(domain), protocol: \(`protocol`), protocol family: \(protocolFamily), file descriptor: \(fileDescriptor), close attempts: \(closeAttempts)"
     }
 }

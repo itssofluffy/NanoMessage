@@ -29,15 +29,15 @@ public protocol NanoSocketProtocol {
     /// The raw nanomsg socket file descriptor.
     var fileDescriptor: CInt { get }
     /// The domain of the socket as it was created with.
-    var socketDomain: SocketDomain { get }
+    var domain: SocketDomain { get }
     /// The protocol of the socket as it was created with.
-    var socketProtocol: SocketProtocol { get }
+    var `protocol`: SocketProtocol { get }
     /// The protocol family of the socket as it was created with.
-    var socketProtocolFamily: ProtocolFamily { get }
+    var protocolFamily: ProtocolFamily { get }
     /// Is the socket capable of receiving.
-    var receiverSocket: Bool { get }
+    var receiver: Bool { get }
     /// Is the socket capable of sending.
-    var senderSocket: Bool { get }
+    var sender: Bool { get }
     /// A set of `EndPoint` structures that the socket is attached to either locally or remotly.
     var endPoints: Set<EndPoint> { get }
 
@@ -47,7 +47,7 @@ public protocol NanoSocketProtocol {
     /// - Warning: Please not that if true this will block until the class has been de-referenced.
     var blockTillCloseSuccess: Bool { get set }
     /// Is the socket attached to a device.
-    var socketIsADevice: Bool { get }
+    var isDevice: Bool { get }
     /// The dispatch queue that async send/receive messages are run on.
     var aioQueue: DispatchQueue { get set }
     /// The async dispatch queue's group.
