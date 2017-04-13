@@ -54,9 +54,9 @@ public func terminate() {
     nn_term()
 }
 
-private var _nanomsgSymbol = Dictionary<String, CInt>()
+private var _nanomsgSymbol = NanoMsgSymbol()
 /// A dictionary of nanomsg symbol names and values.
-public var nanomsgSymbol: Dictionary<String, CInt> {
+public var nanomsgSymbol: NanoMsgSymbol {
     typealias Symbol = (name: String, value:CInt)
 
     if (_nanomsgSymbol.isEmpty) {
@@ -86,9 +86,9 @@ public var nanomsgSymbol: Dictionary<String, CInt> {
     return _nanomsgSymbol
 }
 
-private var _symbolProperty = Set<SymbolProperty>()
+private var _symbolProperty = SymbolProperties()
 /// A set of nanomsg symbol properties.
-public var symbolProperty: Set<SymbolProperty> {
+public var symbolProperty: SymbolProperties {
     if (_symbolProperty.isEmpty) {
         var buffer = nn_symbol_properties()
         let bufferLength = CInt(MemoryLayout<nn_symbol_properties>.size)

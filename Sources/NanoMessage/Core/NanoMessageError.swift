@@ -33,16 +33,16 @@ public func nanoMessageError(_ code: CInt) -> String {
     return String(cString: nn_strerror(code))
 }
 
-private var _nanomsgError = Dictionary<CInt, String>()
+private var _nanoMsgError = NanoMsgError()
 /// A dictionary of nanomsg error codes and their POSIX codes as strings.
-public var nanomsgError: Dictionary<CInt, String> {
-    if (_nanomsgError.isEmpty) {
+public var nanoMsgError: NanoMsgError {
+    if (_nanoMsgError.isEmpty) {
         for symbol in symbolProperty.filter({ $0.namespace == .Error }) {
-            _nanomsgError[symbol.value] = symbol.name
+            _nanoMsgError[symbol.value] = symbol.name
         }
     }
 
-    return _nanomsgError
+    return _nanoMsgError
 }
 
 /// NanoMessage Error Domain.
@@ -79,7 +79,7 @@ extension NanoMessageError: CustomStringConvertible {
         let errorString: (CInt) -> String = { code in
             var errorMessage = nanoMessageError(code)
 
-            if let errorCode = nanomsgError[code] {
+            if let errorCode = nanoMsgError[code] {
                 errorMessage += " (#\(code) '\(errorCode)')"
             } else {
                 errorMessage += " (#\(code))"
