@@ -24,6 +24,6 @@ import Foundation
 
 /// Raw data returned by NanoSocketIO.sendToSocket()
 internal struct RawSentData {
-    internal let bytes:     Int
+    internal let bytes: Int
     internal let timestamp: TimeInterval
 }

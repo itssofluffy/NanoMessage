@@ -22,7 +22,7 @@
 
 public struct SocketPriorities {
     public let receive: Priority?
-    public let send:    Priority?
+    public let send: Priority?
 }
 
 extension SocketPriorities: CustomStringConvertible {

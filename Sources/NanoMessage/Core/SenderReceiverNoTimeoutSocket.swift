@@ -23,9 +23,9 @@
 import Foundation
 
 public protocol SenderReceiverNoTimeoutSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverNoTimeoutSocket {
-    func sendMessage(_ message:      Message,
-                     sendTimeout:    TimeInterval,
-                     _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
+    func sendMessage(_ message:   Message,
+                     sendTimeout: TimeInterval,
+                     _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
 }
 
 extension SenderReceiverNoTimeoutSocket {
@@ -47,9 +47,9 @@ extension SenderReceiverNoTimeoutSocket {
     ///            `NanoMessageError.FreeMessage` deallocation of the message has failed.
     ///
     /// - Returns: The received message.
-    public func sendMessage(_ message:      Message,
-                            sendTimeout:    TimeInterval,
-                            _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
+    public func sendMessage(_ message:   Message,
+                            sendTimeout: TimeInterval,
+                            _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload {
         try closure(sendMessage(message, timeout: sendTimeout))
 
         return try receiveMessage(blockingMode: .Blocking)

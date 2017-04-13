@@ -163,7 +163,9 @@ extension SocketOption: CustomStringConvertible {
 /// - Throws:  `NanoMessageError.GetSocketOption` if an issue is encountered.
 ///
 /// - Returns: The result as a `CInt` type.
-internal func getSocketOption(_ fileDescriptor: CInt, _ option: SocketOption, _ level: CInt = NN_SOL_SOCKET) throws -> CInt {
+internal func getSocketOption(_ fileDescriptor: CInt,
+                              _ option: SocketOption,
+                              _ level: CInt = NN_SOL_SOCKET) throws -> CInt {
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 

@@ -139,8 +139,8 @@ public class NanoSocket: NanoSocketProtocol {
             throw NanoMessageError.NanoSocket(code: nn_errno())
         }
 
-        self.domain = socketDomain
-        self.protocol = socketProtocol
+        domain = socketDomain
+        `protocol` = socketProtocol
 
         // rely on the fact that getting the receive/send file descriptor for a socket type from
         // the underlying library that does not support receive/send will throw a nil to determine

@@ -21,10 +21,10 @@
 */
 
 public protocol SenderReceiverSocketProtocol: SenderSocket, ReceiverNoTimeoutSocketMethods {
-    func sendMessage(_ message:      Message,
-                     sendMode:       BlockingMode,
-                     receiveMode:    BlockingMode,
-                     _ closure:      @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
+    func sendMessage(_ message:   Message,
+                     sendMode:    BlockingMode,
+                     receiveMode: BlockingMode,
+                     _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload
 }
 
 extension SenderReceiverSocketProtocol {
