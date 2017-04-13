@@ -42,7 +42,7 @@ guard let url = URL(string: urlToUse) else {
 do {
     let node = try PullSocket()
 
-    print("\(node)")
+    print(node)
 
     let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Bind, name: "receive end-point")
 

@@ -42,7 +42,7 @@ guard let url = URL(string: urlToUse) else {
 do {
     let node = try SubscriberSocket()
 
-    print("\(node)")
+    print(node)
 
     let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Bind, name: "my local end-point")
 

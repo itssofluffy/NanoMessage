@@ -50,7 +50,7 @@ if (sendCount < 1) {
 do {
     let node = try RequestSocket()
 
-    print("\(node)")
+    print(node)
 
     let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Connect, name: "request end-point")
 

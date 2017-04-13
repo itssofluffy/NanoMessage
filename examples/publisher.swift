@@ -50,7 +50,7 @@ do {
 
     let node = try PublisherSocket()
 
-    print("\(node)")
+    print(node)
 
     let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Connect)
 

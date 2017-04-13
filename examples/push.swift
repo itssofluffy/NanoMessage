@@ -59,7 +59,7 @@ if (messageSize < 1) {
 do {
     let node = try PushSocket()
 
-    print("\(node)")
+    print(node)
 
     let endPoint: EndPoint = try node.createEndPoint(url: url, type: .Connect, name: "send end-point")
 
