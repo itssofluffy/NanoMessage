@@ -63,7 +63,7 @@ do {
     for message in messages {
         let sent = try node.sendMessage(message, timeout: timeout)
 
-        print("\(sent)")
+        print(sent)
     }
 
     print("messages sent: \(node.messagesSent!)")

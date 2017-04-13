@@ -58,7 +58,7 @@ do {
     while (true) {
         let received = try node.receiveMessage(timeout: timeout)
 
-        print("\(received)")
+        print(received)
 
         let socket = try node.pollSocket(timeout: pollTimeout)
 

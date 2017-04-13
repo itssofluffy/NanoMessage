@@ -73,7 +73,7 @@ do {
     for _ in 0 ..< sendCount {
         let sent = try node.sendMessage(messagePayload, timeout: timeout)
 
-        print("\(sent)")
+        print(sent)
     }
 
     print("messages: \(node.messagesSent!)")

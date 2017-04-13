@@ -55,7 +55,7 @@ do {
         do {
             let received = try node.receiveMessage(timeout: timeout)
 
-            print("\(received)")
+            print(received)
         } catch NanoMessageError.ReceiveTimedOut {
             break
         } catch {
