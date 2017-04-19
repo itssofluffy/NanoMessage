@@ -85,8 +85,12 @@ class MessageSpeedTests: XCTestCase {
             let messageSize = 128
             let messagePayload = Message(value: Array<Byte>(repeating: 0xff, count: messageSize))
 
+            if (receiveType == .Asynchronously) {
+                print("started send/recv: \(Date().timeIntervalSinceReferenceDate)")
+            }
+
             for _ in 1 ... 100_000 {
-                switch (receiveType) {
+                switch receiveType {
                     case .Serial:
                         let _ = try node0.sendMessage(messagePayload)
                         let _ = try node1.receiveMessage()
@@ -117,8 +121,11 @@ class MessageSpeedTests: XCTestCase {
             }
 
             if (receiveType == .Asynchronously) {
+                print("before node0.wait: \(Date().timeIntervalSinceReferenceDate)")
                 node0.aioGroup.wait()
+                print("before node1.wait: \(Date().timeIntervalSinceReferenceDate)")
                 node1.aioGroup.wait()
+                print("after wait's     : \(Date().timeIntervalSinceReferenceDate)")
             }
 
             XCTAssertEqual(node0.messagesSent!, node1.messagesReceived!, "node0.messagesSent != node1.messagesReceived")
