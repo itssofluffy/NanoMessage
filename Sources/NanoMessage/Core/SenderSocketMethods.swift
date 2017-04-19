@@ -35,10 +35,10 @@ public protocol SenderSocketMethods: SenderSocketOptions {
     // ASync Output functions.
     func sendMessage(_ message:    Message,
                      blockingMode: BlockingMode,
-                     success:      @escaping (MessagePayload) -> Void)
+                     _ success:    @escaping (MessagePayload) -> Void)
     func sendMessage(_ message:    Message,
                      timeout:      TimeInterval,
-                     success:      @escaping (MessagePayload) -> Void)
+                     _ success:    @escaping (MessagePayload) -> Void)
 }
 
 extension SenderSocketMethods {
@@ -116,7 +116,7 @@ extension SenderSocketMethods {
     ///   - success:      The closure to use when the async functionallity is succesful.
     public func sendMessage(_ message:    Message,
                             blockingMode: BlockingMode = .Blocking,
-                            success:      @escaping (MessagePayload) -> Void) {
+                            _ success:    @escaping (MessagePayload) -> Void) {
         asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
                                closure: {
                                    return try self.sendMessage(message, blockingMode: blockingMode)
@@ -136,7 +136,7 @@ extension SenderSocketMethods {
     ///   - success: The closure to use when the async functionallity is succesful.
     public func sendMessage(_ message: Message,
                             timeout:   TimeInterval,
-                            success:   @escaping (MessagePayload) -> Void) {
+                            _ success: @escaping (MessagePayload) -> Void) {
         asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
                                closure: {
                                    return try self.sendMessage(message, timeout: timeout)

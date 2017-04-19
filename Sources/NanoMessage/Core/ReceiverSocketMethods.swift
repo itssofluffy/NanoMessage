@@ -26,10 +26,10 @@ import ISFLibrary
 /// Receiver socket methods protocol.
 public protocol ReceiverSocketMethods: ReceiverNoTimeoutSocketMethods, ReceiverSocketOptions {
     // Input functions.
-    func receiveMessage(timeout: TimeInterval) throws -> MessagePayload
+    func receiveMessage(timeout:   TimeInterval) throws -> MessagePayload
     // ASync Input functions.
-    func receiveMessage(timeout: TimeInterval,
-                        success: @escaping (MessagePayload) -> Void)
+    func receiveMessage(timeout:   TimeInterval,
+                        _ success: @escaping (MessagePayload) -> Void)
 }
 
 extension ReceiverSocketMethods {
@@ -75,8 +75,8 @@ extension ReceiverSocketMethods {
     ///   - timeout: Specifies if the socket should operate in non-blocking mode for a timeout interval.
     ///              If there is no message to receive the closureHandler will be passed `NanoMessageError.MessageNotReceived`.
     ///   - success: The closure to use when the async functionallity is succesful.
-    public func receiveMessage(timeout: TimeInterval,
-                               success: @escaping (MessagePayload) -> Void) {
+    public func receiveMessage(timeout:   TimeInterval,
+                               _ success: @escaping (MessagePayload) -> Void) {
         asyncOperationOnSocket(nanoSocket: self as! NanoSocket,
                                closure: {
                                    return try self.receiveMessage(timeout: timeout)

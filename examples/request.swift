@@ -62,13 +62,10 @@ do {
     let message = Message(value: "ping")
 
     for _ in 0 ..< sendCount {
-        let received = try node.sendMessage(message,
-                                            sendTimeout: timeout,
-                                            receiveTimeout: timeout,
-                                            { sent in
-                                                print("sent \(sent)")
-                                                print("waiting for a response...")
-                                            })
+        let received = try node.sendMessage(message, sendTimeout: timeout, receiveTimeout: timeout) { sent in
+            print("sent \(sent)")
+            print("waiting for a response...")
+        }
 
         print("and recieved \(received)")
     }

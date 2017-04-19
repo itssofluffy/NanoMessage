@@ -56,21 +56,19 @@ do {
     while (true) {
         print("waiting for a request...")
 
-        let sent = try node.receiveMessage(receiveTimeout: timeout,
-                                           sendTimeout: timeout,
-                                           { received in
-                                               print("received \(received)")
+        let sent = try node.receiveMessage(receiveTimeout: timeout, sendTimeout: timeout) { received in
+            print("received \(received)")
 
-                                               var message = ""
+            var message = ""
 
-                                               if (received.message.string == "ping") {
-                                                   message = "pong"
-                                               } else {
-                                                   message = "personally i prefer wiff-wafe"
-                                               }
+            if (received.message.string == "ping") {
+                message = "pong"
+            } else {
+                message = "personally i prefer wiff-wafe"
+            }
 
-                                               return Message(value: message)
-                                           })
+            return Message(value: message)
+        }
 
         print("and sent \(sent)")
 
