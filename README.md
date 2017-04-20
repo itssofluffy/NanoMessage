@@ -1,7 +1,7 @@
 # NanoMessage
 
 [![Swift][swift-badge]][swift-url]
-[![Build Status][travis-build-badge][travis-build-url]
+[![Build Status][travis-build-badge]][travis-build-url]
 [![License][mit-badge]][mit-url]
 
 **NanoMessage** is a **Swift-3** class wrapper of [nanomsg](http://nanomsg.org/)
