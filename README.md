@@ -101,7 +101,7 @@ This project is released under the MIT license. See [LICENSE](LICENSE) for detai
 
 [swift-badge]: https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat
 [swift-url]: https://swift.org
-[travis-build-badge]: https://travis-ci.org/itssofluffy/NanoMessage.swift.svg?branch=master)
+[travis-build-badge]: https://travis-ci.org/itssofluffy/NanoMessage.swift.svg?branch=master
 [travis-build-url]: https://travis-ci.org/itssofluffy/NanoMessage.swift
 [mit-badge]: https://img.shields.io/badge/License-MIT-blue.svg?style=flat
 [mit-url]: https://tldrlegal.com/license/mit-license
