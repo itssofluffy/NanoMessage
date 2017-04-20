@@ -25,8 +25,8 @@ import ISFLibrary
 
 /// Publisher socket.
 public final class PublisherSocket: NanoSocket, ProtocolSocket, PublishSubscribeSocket, PublishSocket {
-    /// The seperator used between topic and message.
-    public var topicSeperator: Byte = Byte("|")
+    /// The seperator (as an ascii byte value) used between topic and message.
+    public var topicSeperator: Byte = 127
     /// remember which topics we've sent and how many.
     public var topicCounts = true
     /// A Dictionary of the topics sent with a count of the times sent.

@@ -25,8 +25,8 @@ import ISFLibrary
 
 /// Subscriber socket.
 public final class SubscriberSocket: NanoSocket, ProtocolSocket, PublishSubscribeSocket, SubscribeSocket {
-    /// The seperator used between topic and message.
-    public var topicSeperator: Byte = Byte("|")
+    /// The seperator (as an ascii byte value) used between topic and message.
+    public var topicSeperator: Byte = 127
     /// Ignore topic seperator, true means that all topics must be of an equal length.
     /// Use flipIgnoreTopicSeperator() to flip between flase/true true/false
     public fileprivate(set) var ignoreTopicSeperator = false
