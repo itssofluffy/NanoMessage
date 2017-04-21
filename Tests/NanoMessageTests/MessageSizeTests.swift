@@ -24,7 +24,7 @@ import XCTest
 import Foundation
 import ISFLibrary
 
-@testable import NanoMessage
+import NanoMessage
 
 class MessageSizeTests: XCTestCase {
     override func setUp() {
@@ -97,22 +97,22 @@ class MessageSizeTests: XCTestCase {
     }
 
     func testTCPMessageSize() {
-        testMessageSize(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testMessageSize(connectAddress: "tcp://localhost:5800", bindAddress: "tcp://*:5800")
     }
 
     func testInProcessMessageSize() {
-        testMessageSize(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testMessageSize(connectAddress: "inproc:///tmp/msgsize.inproc")
     }
 
     func testInterProcessMessageSize() {
-        testMessageSize(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testMessageSize(connectAddress: "ipc:///tmp/msgsize.ipc")
     }
 
     func testWebSocketMessageSize() {
-        testMessageSize(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testMessageSize(connectAddress: "ws://localhost:5805", bindAddress: "ws://*:5805")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPMessageSize", testTCPMessageSize),
         ("testInProcessMessageSize", testInProcessMessageSize),

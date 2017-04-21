@@ -24,7 +24,7 @@ import XCTest
 import Foundation
 import ISFLibrary
 
-@testable import NanoMessage
+import NanoMessage
 
 class PollSocketTests: XCTestCase {
     override func setUp() {
@@ -103,22 +103,22 @@ class PollSocketTests: XCTestCase {
     }
 
     func testTCPPollSocket() {
-        testPollSocket(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testPollSocket(connectAddress: "tcp://localhost:5600", bindAddress: "tcp://*:5600")
     }
 
     func testInProcessPollSocket() {
-        testPollSocket(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testPollSocket(connectAddress: "inproc:///tmp/poll.inproc")
     }
 
     func testInterProcessPollSocket() {
-        testPollSocket(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testPollSocket(connectAddress: "ipc:///tmp/poll.ipc")
     }
 
     func testWebSocketPollSocket() {
-        testPollSocket(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testPollSocket(connectAddress: "ws://localhost:5605", bindAddress: "ws://*:5605")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPPollSocket", testTCPPollSocket),
         ("testInProcessPollSocket", testInProcessPollSocket),

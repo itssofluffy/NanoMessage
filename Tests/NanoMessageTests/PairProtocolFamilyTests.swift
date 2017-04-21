@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class PairProtocolFamilyTests: XCTestCase {
     override func setUp() {
@@ -85,22 +85,22 @@ class PairProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPPair() {
-        testPair(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testPair(connectAddress: "tcp://localhost:5200", bindAddress: "tcp://*:5200")
     }
 
     func testInProcessPair() {
-        testPair(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testPair(connectAddress: "inproc:///tmp/pair.inproc")
     }
 
     func testInterProcessPair() {
-        testPair(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testPair(connectAddress: "ipc:///tmp/pair.ipc")
     }
 
     func testWebSocketPair() {
-        testPair(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testPair(connectAddress: "ws://localhost:5205", bindAddress: "ws://*:5205")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPPair", testTCPPair),
         ("testInProcessPair", testInProcessPair),

@@ -22,7 +22,7 @@
 
 import XCTest
 
-@testable import NanoMessage
+import NanoMessage
 
 class VersionTests: XCTestCase {
     override func setUp() {
@@ -46,12 +46,12 @@ class VersionTests: XCTestCase {
     func testNanoMessageVersion() {
          XCTAssertEqual(nanoMessageVersion.major, 0, "NanoMessage major of \(nanoMessageVersion.major) not as expected!")
          XCTAssertEqual(nanoMessageVersion.minor, 3, "NanoMessage minor of \(nanoMessageVersion.minor) not as expected!")
-         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 2, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
+         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 4, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
 
          print("major: \(nanoMessageVersion.major), minor: \(nanoMessageVersion.minor), patch: \(nanoMessageVersion.patch)")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testNanoMsgABIVersion", testNanoMsgABIVersion),
         ("testNanoMessageVersion", testNanoMessageVersion)

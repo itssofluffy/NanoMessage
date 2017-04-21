@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class EndPointTests: XCTestCase {
     override func setUp() {
@@ -104,10 +104,10 @@ class EndPointTests: XCTestCase {
     }
 
     func testEndPoint() {
-        testEndPoints(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testEndPoints(connectAddress: "tcp://localhost:5000", bindAddress: "tcp://*:5000")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testEndPoint", testEndPoint)
     ]

@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class BusProtocolFamilyTests: XCTestCase {
     override func setUp() {
@@ -97,14 +97,14 @@ class BusProtocolFamilyTests: XCTestCase {
     }
 
     func testInProcessBus() {
-        testBus(address1: "inproc:///tmp/pipeline_1.inproc", address2: "inproc:///tmp/pipeline_2.inproc")
+        testBus(address1: "inproc:///tmp/bus_1.inproc", address2: "inproc:///tmp/bus_2.inproc")
     }
 
     func testInterProcessBus() {
-        testBus(address1: "ipc:///tmp/pipeline_1.ipc", address2: "ipc:///tmp/pipeline_2.ipc")
+        testBus(address1: "ipc:///tmp/bus_1.ipc", address2: "ipc:///tmp/bus_2.ipc")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testInProcessBus", testInProcessBus),
         ("testInterProcessBus", testInterProcessBus)

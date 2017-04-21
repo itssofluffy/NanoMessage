@@ -22,8 +22,8 @@
 
 import XCTest
 
-@testable import CNanoMessage
-@testable import NanoMessage
+import CNanoMessage
+import NanoMessage
 
 class NanoMsgTests: XCTestCase {
     override func setUp() {
@@ -74,7 +74,7 @@ class NanoMsgTests: XCTestCase {
         }
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testNanoMsgSymbols", testNanoMsgSymbols),
         ("testNanoMsgError", testNanoMsgError),

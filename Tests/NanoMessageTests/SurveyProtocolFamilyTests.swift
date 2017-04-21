@@ -24,7 +24,7 @@ import XCTest
 import Foundation
 import ISFLibrary
 
-@testable import NanoMessage
+import NanoMessage
 
 class SurveyProtocolFamilyTests: XCTestCase {
     override func setUp() {
@@ -106,22 +106,22 @@ class SurveyProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPSurvey() {
-        testSurvey(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testSurvey(connectAddress: "tcp://localhost:5500", bindAddress: "tcp://*:5500")
     }
 
     func testInProcessSurvey() {
-        testSurvey(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testSurvey(connectAddress: "inproc:///tmp/survey.inproc")
     }
 
     func testInterProcessSurvey() {
-        testSurvey(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testSurvey(connectAddress: "ipc:///tmp/survey.ipc")
     }
 
     func testWebSocketSurvey() {
-        testSurvey(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testSurvey(connectAddress: "ws://localhost:5505", bindAddress: "ws://*:5505")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPSurvey", testTCPSurvey),
         ("testInProcessSurvey", testInProcessSurvey),

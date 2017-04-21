@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class RequestReplyProtocolFamilyTests: XCTestCase {
     override func setUp() {
@@ -91,22 +91,22 @@ class RequestReplyProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPRequestReply() {
-        testRequestReply(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testRequestReply(connectAddress: "tcp://localhost:5300", bindAddress: "tcp://*:5300")
     }
 
     func testInProcessRequestReply() {
-        testRequestReply(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testRequestReply(connectAddress: "inproc:///tmp/requestreply.inproc")
     }
 
     func testInterProcessRequestReply() {
-        testRequestReply(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testRequestReply(connectAddress: "ipc:///tmp/requestreply.ipc")
     }
 
     func testWebSocketRequestReply() {
-        testRequestReply(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testRequestReply(connectAddress: "ws://localhost:5305", bindAddress: "ws://*:5305")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPRequestReply", testTCPRequestReply),
         ("testInProcessRequestReply", testInProcessRequestReply),

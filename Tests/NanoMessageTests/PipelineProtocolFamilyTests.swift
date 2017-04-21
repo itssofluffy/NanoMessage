@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class PipelineProtocolFamilyTests: XCTestCase {
     override func setUp() {
@@ -82,7 +82,7 @@ class PipelineProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPPipeline() {
-        testPipeline(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testPipeline(connectAddress: "tcp://localhost:5100", bindAddress: "tcp://*:5100")
     }
 
     func testInProcessPipeline() {
@@ -94,10 +94,10 @@ class PipelineProtocolFamilyTests: XCTestCase {
     }
 
     func testWebSocketPipeline() {
-        testPipeline(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testPipeline(connectAddress: "ws://localhost:5105", bindAddress: "ws://*:5105")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPPipeline", testTCPPipeline),
         ("testInProcessPipeline", testInProcessPipeline),

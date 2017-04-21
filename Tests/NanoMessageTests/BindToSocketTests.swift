@@ -24,7 +24,7 @@ import XCTest
 import Foundation
 import Dispatch
 
-@testable import NanoMessage
+import NanoMessage
 
 class BindToSocketTests: XCTestCase {
     override func setUp() {
@@ -110,10 +110,10 @@ class BindToSocketTests: XCTestCase {
     }
 
     func testTCPBindToSocket() {
-        testBindToSocket(connectAddress: "tcp://localhost:555", bindAddress: "tcp://*:555")
+        testBindToSocket(connectAddress: "tcp://localhost:560", bindAddress: "tcp://*:560")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPBindToSocket", testTCPBindToSocket)
     ]

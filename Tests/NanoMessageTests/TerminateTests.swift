@@ -20,9 +20,10 @@
     IN THE SOFTWARE.
 */
 
+#if os(Linux)
 import XCTest
 
-@testable import NanoMessage
+import NanoMessage
 
 class TerminateTests: XCTestCase {
     override func setUp() {
@@ -38,18 +39,15 @@ class TerminateTests: XCTestCase {
     func testTerminate() {
         var completed = false
 
-        terminate()     // this will cause the closureHandlers in BindToSocketTests and LoopBackTests to be executed
-                        // as it seems we can't cancel the work items in the test classes even though after being#
-                        // cancelled isCancelled = true
+        terminate()
 
         completed = true
 
         XCTAssert(completed, "test not completed")
     }
 
-#if !os(OSX)
     static let allTests = [
         ("testTerminate", testTerminate)
     ]
-#endif
 }
+#endif

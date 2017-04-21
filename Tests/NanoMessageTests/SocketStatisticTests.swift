@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class SocketStatisticTests: XCTestCase {
     override func setUp() {
@@ -141,22 +141,22 @@ class SocketStatisticTests: XCTestCase {
     }
 
     func testTCPSocketStatistic() {
-        testSocketStatistics(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testSocketStatistics(connectAddress: "tcp://localhost:5700", bindAddress: "tcp://*:5700")
     }
 
     func testInProcessSocketStatistic() {
-        testSocketStatistics(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testSocketStatistics(connectAddress: "inproc:///tmp/stat.inproc")
     }
 
     func testInterProcessSocketStatistic() {
-        testSocketStatistics(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testSocketStatistics(connectAddress: "ipc:///tmp/stat.ipc")
     }
 
     func testWebSocketStatistic() {
-        testSocketStatistics(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testSocketStatistics(connectAddress: "ws://localhost:5705", bindAddress: "ws://*:5705")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPSocketStatistic", testTCPSocketStatistic),
         ("testInProcessSocketStatistic", testInProcessSocketStatistic),

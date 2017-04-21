@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class PublishSubscribeProtocolFamilyTests: XCTestCase {
     override func setUp() {
@@ -224,22 +224,22 @@ class PublishSubscribeProtocolFamilyTests: XCTestCase {
     }
 
     func testTCPPublishSubscribe() {
-        testPublishSubscribeTests(connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testPublishSubscribeTests(connectAddress: "tcp://localhost:5400", bindAddress: "tcp://*:5400")
     }
 
     func testInProcessPublishSubscribe() {
-        testPublishSubscribeTests(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testPublishSubscribeTests(connectAddress: "inproc:///tmp/pubsub.inproc")
     }
 
     func testInterProcessPublishSubscribe() {
-        testPublishSubscribeTests(connectAddress: "ipc:///tmp/pipeline.ipc")
+        testPublishSubscribeTests(connectAddress: "ipc:///tmp/pubsub.ipc")
     }
 
     func testWebSocketPublishSubscribe() {
-        testPublishSubscribeTests(connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testPublishSubscribeTests(connectAddress: "ws://localhost:5405", bindAddress: "ws://*:5405")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPPublishSubscribe", testTCPPublishSubscribe),
         ("testInProcessPublishSubscribe", testInProcessPublishSubscribe),

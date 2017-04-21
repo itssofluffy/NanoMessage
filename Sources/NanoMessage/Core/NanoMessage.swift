@@ -41,7 +41,7 @@ public var nanoMsgABIVersion: ABIVersion {
 
 /// NanoMessage library version.
 public var nanoMessageVersion: SemanticVersion {
-    return SemanticVersion(major: 0, minor: 3, patch: 2)
+    return SemanticVersion(major: 0, minor: 3, patch: 4)
 }
 
 /// The string encoding to use by default for topics and messages.

@@ -23,7 +23,7 @@
 import XCTest
 import Foundation
 
-@testable import NanoMessage
+import NanoMessage
 
 class SocketOptionTests: XCTestCase {
     override func setUp() {
@@ -159,7 +159,7 @@ class SocketOptionTests: XCTestCase {
         testSocketOptions()
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testSocketOption", testSocketOption)
     ]

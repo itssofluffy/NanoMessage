@@ -22,7 +22,7 @@
 
 import XCTest
 
-@testable import NanoMessage
+import NanoMessage
 
 class SenderReceiverTests: XCTestCase {
     override func setUp() {
@@ -90,7 +90,7 @@ class SenderReceiverTests: XCTestCase {
         XCTAssert(completed, "test not completed")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testSenderReceiver", testSenderReceiver)
     ]

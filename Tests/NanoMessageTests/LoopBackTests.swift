@@ -24,7 +24,7 @@ import XCTest
 import Foundation
 import Dispatch
 
-@testable import NanoMessage
+import NanoMessage
 
 class LoopBackTests: XCTestCase {
     override func setUp() {
@@ -92,10 +92,10 @@ class LoopBackTests: XCTestCase {
     }
 
     func testInProcessLoopBack() {
-        testLoopBack(connectAddress: "inproc:///tmp/pipeline.inproc")
+        testLoopBack(connectAddress: "inproc:///tmp/loopback.inproc")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testInProcessLoopBack", testInProcessLoopBack)
     ]

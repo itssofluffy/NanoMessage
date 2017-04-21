@@ -23,7 +23,8 @@
 import Foundation
 import XCTest
 import ISFLibrary
-@testable import NanoMessage
+
+import NanoMessage
 
 let payload = Message(value: "This above all...to thine own self be true.")
 
@@ -35,7 +36,7 @@ func pauseForBind() {
     pauseCount += 1
 }
 
-#if !os(OSX)
+#if os(Linux)
 public let allTests = [
     testCase(NanoMsgTests.allTests),
     testCase(VersionTests.allTests),

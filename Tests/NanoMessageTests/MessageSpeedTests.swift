@@ -25,7 +25,7 @@ import Foundation
 import ISFLibrary
 import Mutex
 
-@testable import NanoMessage
+import NanoMessage
 
 class MessageSpeedTests: XCTestCase {
     override func setUp() {
@@ -156,38 +156,38 @@ class MessageSpeedTests: XCTestCase {
     }
 
     func testTCPMessageSpeedSerial() {
-        testMessageSpeed(receiveType: .Serial, connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "tcp://localhost:5900", bindAddress: "tcp://*:5900")
     }
 
     func testTCPMessageSpeedAsynchronously() {
-        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "tcp://localhost:5555", bindAddress: "tcp://*:5555")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "tcp://localhost:5905", bindAddress: "tcp://*:5905")
     }
 
     func testInProcessMessageSpeedSerial() {
-        testMessageSpeed(receiveType: .Serial, connectAddress: "inproc:///tmp/pipeline.inproc")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "inproc:///tmp/msgspeedsync.inproc")
     }
 
     func testInProcessMessageSpeedAsynchronously() {
-        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "inproc:///tmp/pipeline.inproc")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "inproc:///tmp/msgspeedasync.inproc")
     }
 
     func testInterProcessMessageSpeedSerial() {
-        testMessageSpeed(receiveType: .Serial, connectAddress: "ipc:///tmp/pipeline.ipc")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "ipc:///tmp/msgspeedsync.ipc")
     }
 
     func testInterProcessMessageSpeedAsynchronously() {
-        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ipc:///tmp/pipeline.ipc")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ipc:///tmp/msgspeedasync.ipc")
     }
 
     func testWebSocketMessageSpeedSerial() {
-        testMessageSpeed(receiveType: .Serial, connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testMessageSpeed(receiveType: .Serial, connectAddress: "ws://localhost:5910", bindAddress: "ws://*:5910")
     }
 
     func testWebSocketMessageSpeedAsynchronously() {
-        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ws://localhost:5555", bindAddress: "ws://*:5555")
+        testMessageSpeed(receiveType: .Asynchronously, connectAddress: "ws://localhost:5915", bindAddress: "ws://*:5915")
     }
 
-#if !os(OSX)
+#if os(Linux)
     static let allTests = [
         ("testTCPMessageSpeedSerial", testTCPMessageSpeedSerial),
         ("testTCPMessageSpeedAsynchronously", testTCPMessageSpeedAsynchronously),
