@@ -1,7 +1,7 @@
 /*
     SocketOptionTests.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -47,7 +47,7 @@ class SocketOptionTests: XCTestCase {
             XCTAssertEqual(node0.protocolFamily, ProtocolFamily.OneToOne, "node0.socketProtocolFamily: \(node0.protocolFamily)")
 
             let linger = try node0.getLinger()
-            XCTAssertEqual(linger, 1, "getLinger(): \(linger)")
+            XCTAssertEqual(linger, 0, "getLinger(): \(linger)")
             var sendBufferSize = try node0.getSendBufferSize()
             XCTAssertEqual(sendBufferSize, 131072, "getSendBufferSize(): \(sendBufferSize)")
             var receiveBufferSize = try node0.getReceiveBufferSize()

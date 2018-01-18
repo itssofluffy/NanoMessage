@@ -1,7 +1,7 @@
 /*
     NanoMessage.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -41,7 +41,7 @@ public var nanoMsgABIVersion: ABIVersion {
 
 /// NanoMessage library version.
 public var nanoMessageVersion: SemanticVersion {
-    return SemanticVersion(major: 0, minor: 3, patch: 4)
+    return SemanticVersion(major: 0, minor: 3, patch: 3)
 }
 
 /// The string encoding to use by default for topics and messages.
@@ -134,7 +134,7 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
             throw NanoMessageError.SocketIsADevice(socket: socket)
         }
 
-        var eventMask = CShort.allZeros                                 //
+        var eventMask: CShort = 0                                       //
         if (socket.receiver) {                                          // if the socket can receive then set the event mask appropriately.
             eventMask = _pollinMask
         }
@@ -144,7 +144,7 @@ public func poll(sockets: Array<NanoSocket>, timeout: TimeInterval = TimeInterva
 
         pollFds.append(nn_pollfd(fd:      socket.fileDescriptor,
                                  events:  eventMask,
-                                 revents: CShort.allZeros))
+                                 revents: 0))
     }
 
     try pollFds.withUnsafeMutableBufferPointer { fileDescriptors in     // poll the list of nano sockets.

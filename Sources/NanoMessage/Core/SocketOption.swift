@@ -1,7 +1,7 @@
 /*
     SocketOption.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -169,7 +169,7 @@ internal func getSocketOption(_ fileDescriptor: CInt,
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 
-    guard (nn_getsockopt(fileDescriptor, NN_SOL_SOCKET, option.rawValue, &optval, &optvallen) >= 0) else {
+    guard (nn_getsockopt(fileDescriptor, level, option.rawValue, &optval, &optvallen) >= 0) else {
         throw NanoMessageError.GetSocketOption(code: nn_errno(), option: option)
     }
 
@@ -189,9 +189,6 @@ internal func getSocketOption(_ fileDescriptor: CInt,
 internal func getSocketOption(_ nanoSocket: NanoSocket,
                               _ option:     SocketOption,
                               _ level:      CInt = NN_SOL_SOCKET) throws -> CInt {
-    /*
-    return try getSocketOption(nanoSocket.fileDescriptor, option, level)
-    */
     var optval: CInt = -1
     var optvallen = MemoryLayout<CInt>.size
 

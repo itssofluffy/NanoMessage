@@ -1,7 +1,7 @@
 /*
     VersionTests.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -37,7 +37,7 @@ class VersionTests: XCTestCase {
 
     func testNanoMsgABIVersion() {
          XCTAssertEqual(nanoMsgABIVersion.current, 5, "nanomsg ABI current of \(nanoMsgABIVersion.current) not as expected!")
-         XCTAssertEqual(nanoMsgABIVersion.revision, 0, "nanomsg ABI revision of \(nanoMsgABIVersion.revision) not as expected!")
+         XCTAssertGreaterThanOrEqual(nanoMsgABIVersion.revision, 0, "nanomsg ABI revision of \(nanoMsgABIVersion.revision) not as expected!")
          XCTAssertEqual(nanoMsgABIVersion.age, 0, "nanomsg ABI age of \(nanoMsgABIVersion.age) not as expected!")
 
          print("current: \(nanoMsgABIVersion.current), revision: \(nanoMsgABIVersion.revision), age: \(nanoMsgABIVersion.age)")
@@ -46,7 +46,7 @@ class VersionTests: XCTestCase {
     func testNanoMessageVersion() {
          XCTAssertEqual(nanoMessageVersion.major, 0, "NanoMessage major of \(nanoMessageVersion.major) not as expected!")
          XCTAssertEqual(nanoMessageVersion.minor, 3, "NanoMessage minor of \(nanoMessageVersion.minor) not as expected!")
-         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 4, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
+         XCTAssertGreaterThanOrEqual(nanoMessageVersion.patch, 3, "NanoMessage patch of \(nanoMessageVersion.patch) not as expected!")
 
          print("major: \(nanoMessageVersion.major), minor: \(nanoMessageVersion.minor), patch: \(nanoMessageVersion.patch)")
     }

@@ -1,10 +1,11 @@
 # NanoMessage
 
-[![Swift][swift-badge]][swift-url]
+[![Swift][swift-badge-3]][swift-url]
+[![Swift][swift-badge-4]][swift-url]
 [![Build Status][travis-build-badge]][travis-build-url]
 [![License][mit-badge]][mit-url]
 
-**NanoMessage** is a **Swift-3** class wrapper of [nanomsg](http://nanomsg.org/)
+**NanoMessage** is a **Swift-3/4** class wrapper of [nanomsg](http://nanomsg.org/)
 
 ## Socket Protocols
 
@@ -99,7 +100,8 @@ do {
 
 This project is released under the MIT license. See [LICENSE](LICENSE) for details.
 
-[swift-badge]: https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat
+[swift-badge-3]: https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat
+[swift-badge-4]: https://img.shields.io/badge/Swift-4.0-orange.svg?style=flat
 [swift-url]: https://swift.org
 [travis-build-badge]: https://travis-ci.org/itssofluffy/NanoMessage.swift.svg?branch=master
 [travis-build-url]: https://travis-ci.org/itssofluffy/NanoMessage.swift

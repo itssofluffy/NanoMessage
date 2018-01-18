@@ -1,7 +1,7 @@
 /*
     SenderReceiverNoTimeoutSocket.swift
 
-    Copyright (c) 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,7 +22,7 @@
 
 import Foundation
 
-public protocol SenderReceiverNoTimeoutSocket: SenderReceiverSocketProtocol, SenderSocket, ReceiverNoTimeoutSocket {
+public protocol SenderReceiverNoTimeoutSocket: SenderReceiverSocketProtocol, ReceiverNoTimeoutSocket {
     func sendMessage(_ message:   Message,
                      sendTimeout: TimeInterval,
                      _ closure:   @escaping (MessagePayload) throws -> Void) throws -> MessagePayload

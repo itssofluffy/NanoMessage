@@ -2,7 +2,7 @@
 #
 #  compile.sh
 #
-#  Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+#  Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"),
@@ -28,8 +28,21 @@ else
     export lib_path="$base_dir/.build/debug"
 fi
 
+CNanoMessageHeader="CNanoMessage.h"
+
 CNanoMessagePath="$(dirname "$(find "$base_dir/Packages" \
-                                    -name "CNanoMessage.h")")"
+                                    -name "$CNanoMessageHeader" 2>/dev/null)")"
+if [[ "$CNanoMessagePath" == "." ]] ; then
+    CNanoMessagePath="$(dirname "$(find "$base_dir/.build" \
+                                        -name "$CNanoMessageHeader" 2>/dev/null)")"
+fi
+
+if [[ "$CNanoMessagePath" == "." ]] ; then
+    printf "%s : failed to find '%s'.\n" "$(basename "$0")" \
+                                         "$CNanoMessageHeader" >&2
+
+    exit 1
+fi
 
 for fname in $(ls *.swift)
 do
