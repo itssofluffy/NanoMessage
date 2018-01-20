@@ -12,4 +12,8 @@ cmake ..
 cmake --build .
 sudo cmake --build . --target install
 
-sudo ldconfig
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    sudo update_dyld_shared_cache
+else
+    sudo ldconfig
+fi
