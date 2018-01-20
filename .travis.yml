@@ -4,7 +4,7 @@ matrix:
   include:
     # Linux
     - dist: trusty
-      sudo: false
+      sudo: required
 
     # OSX
     - os: osx
