@@ -1,4 +1,4 @@
-!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -eufx -o pipefail
 
@@ -7,7 +7,7 @@ cd /tmp/nanomsg
 git checkout 1.1.2
 
 mkdir build && cd build
-apt-get update && apt-get install --yes cmake
+sudo apt-get update && apt-get install --yes cmake
 cmake ..
 cmake --build .
 sudo cmake --build . --target install
