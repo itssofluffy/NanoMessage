@@ -10,6 +10,6 @@ mkdir build && cd build
 apt-get update && apt-get install --yes cmake
 cmake ..
 cmake --build .
-cmake --build . --target install
+sudo cmake --build . --target install
 
-ldconfig
+sudo ldconfig
