@@ -7,7 +7,7 @@ cd /tmp/nanomsg
 git checkout 1.1.2
 
 mkdir build && cd build
-sudo apt-get update && apt-get install --yes cmake
+sudo apt-get update && sudo apt-get install --yes cmake
 cmake ..
 cmake --build .
 sudo cmake --build . --target install
