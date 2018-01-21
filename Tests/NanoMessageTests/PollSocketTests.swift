@@ -1,7 +1,7 @@
 /*
     PollSocketTests.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -115,7 +115,7 @@ class PollSocketTests: XCTestCase {
     }
 
     func testWebSocketPollSocket() {
-        testPollSocket(connectAddress: "ws://localhost:5605", bindAddress: "ws://*:5605")
+        testPollSocket(connectAddress: "ws://localhost:5601", bindAddress: "ws://*:5601")
     }
 
 #if os(Linux)
