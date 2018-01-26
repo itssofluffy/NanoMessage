@@ -115,7 +115,11 @@ class PollSocketTests: XCTestCase {
     }
 
     func testWebSocketPollSocket() {
+#if os(Linux)
+        testPollSocket(connectAddress: "ws://localhost:5605", bindAddress: "ws://*:5605")
+#else
         testPollSocket(connectAddress: "ws://localhost:5601", bindAddress: "ws://*:5601")
+#endif
     }
 
 #if os(Linux)
