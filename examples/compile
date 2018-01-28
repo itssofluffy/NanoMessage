@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
-#  compile.sh
+#  compile
 #
 #  Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 #
@@ -28,18 +28,20 @@ else
     export lib_path="$base_dir/.build/debug"
 fi
 
-CNanoMessageHeader="CNanoMessage.h"
+lib="NanoMessage"
 
-CNanoMessagePath="$(dirname "$(find "$base_dir/Packages" \
-                                    -name "$CNanoMessageHeader" 2>/dev/null)")"
-if [[ "$CNanoMessagePath" == "." ]] ; then
-    CNanoMessagePath="$(dirname "$(find "$base_dir/.build" \
-                                        -name "$CNanoMessageHeader" 2>/dev/null)")"
+header="C$lib.h"
+
+header_path="$(dirname "$(find "$base_dir/Packages" \
+                               -name "$header" 2>/dev/null)")"
+if [[ "$header_path" == "." ]] ; then
+    header_path="$(dirname "$(find "$base_dir/.build/checkouts" \
+                                   -name "$header" 2>/dev/null)")"
 fi
 
-if [[ "$CNanoMessagePath" == "." ]] ; then
+if [[ "$header_path" == "." ]] ; then
     printf "%s : failed to find '%s'.\n" "$(basename "$0")" \
-                                         "$CNanoMessageHeader" >&2
+                                         "$header" >&2
 
     exit 1
 fi
@@ -47,10 +49,13 @@ fi
 for fname in $(ls *.swift)
 do
     swiftc -I "$lib_path" \
-           -I "$CNanoMessagePath" \
+           -I "$header_path" \
            -L "$lib_path" \
-           -L "$CNanoMessagePath" \
-           -lNanoMessage \
+           -L "$header_path" \
+           -l$lib \
+           -o "$(echo "$fname" | \
+                 cut -d. \
+                     -f1)" \
            "$fname"
 done
 

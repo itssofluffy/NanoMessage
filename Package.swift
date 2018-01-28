@@ -1,7 +1,7 @@
 /*
     Package.swift
 
-    Copyright (c) 2016, 2017 Stephen Whittle  All rights reserved.
+    Copyright (c) 2016, 2017, 2018 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,7 +22,8 @@
 
 import PackageDescription
 
-let package = Package (
+#if os(Linux) || os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+let package = Package(
     name:    "NanoMessage",
     dependencies: [
         .Package (url: "https://github.com/itssofluffy/FNVHashValue.git", majorVersion: 0),
@@ -32,13 +33,13 @@ let package = Package (
     ]
 )
 
-let staticLibrary = Product (
+let staticLibrary = Product(
     name:    "NanoMessage",
     type:    .Library(.Static),
     modules: ["NanoMessage"]
 )
 
-let dynamicLibrary = Product (
+let dynamicLibrary = Product(
     name:    "NanoMessage",
     type:    .Library(.Dynamic),
     modules: ["NanoMessage"]
@@ -46,3 +47,6 @@ let dynamicLibrary = Product (
 
 products.append(staticLibrary)
 products.append(dynamicLibrary)
+#else
+fatalError("Unsupported OS")
+#endif
