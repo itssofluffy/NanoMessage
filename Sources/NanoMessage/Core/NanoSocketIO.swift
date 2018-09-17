@@ -110,18 +110,14 @@ internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
                                 _ blockingMode: BlockingMode) throws -> MessagePayload {
     try validateNanoSocket(nanoSocket)
 
-    var buffer = UnsafeMutablePointer<Byte>.allocate(capacity: 0)
+    // A raw null pointer, we allocate nothing. In C this would be a void*
+    var buffer = UnsafeMutableRawPointer(bitPattern: 0)
 
+    // We pass a pointer to the above null pointer, in C this would be a void**
+    // nn_recv() will do the actual memory allocation, and change raw to point to the new memory.
     let bytesReceived = Int(nn_recv(nanoSocket.fileDescriptor, &buffer, NN_MSG, blockingMode.rawValue))
 
     let timestamp = Date().timeIntervalSinceReferenceDate
-
-    defer {
-        // not sure if this needed because of the deallocation using nn_freemsg() but doesn't seem to hurt
-        // when we complete succesfully, but call it just in case we `throw` prior to doing the `nn_freemsg()`
-        // underlying library documentation says that `buffer` is unallocated if `nn_recv` fails.
-        buffer.deinitialize(count: (bytesReceived < 0) ? 0 : bytesReceived)
-    }
 
     guard (bytesReceived >= 0) else {
         let errno = nn_errno()
@@ -142,8 +138,13 @@ internal func receiveFromSocket(_ nanoSocket:   NanoSocket,
         throw NanoMessageError.ReceiveMessage(code: errno)
     }
 
-    let message = Message(buffer: UnsafeMutableBufferPointer(start: buffer, count: bytesReceived))
+    // Swift doesn't like going between UnsafeMutableRawPointer and UnsafeMutableBufferPointer, so we create a
+    // OpaquePointer out of our UnsafeMutableRawPointer, just to create an UnsafeMutablePointer which we can use to
+    // create an UnsafeMutableBufferPointer. Thanks Apple.
+    let p = UnsafeMutablePointer<Byte>(OpaquePointer(buffer))
+    let message = Message(buffer: UnsafeMutableBufferPointer(start: p, count: bytesReceived))
 
+    // finally call nn_freemsg() to free the memory that nn_recv() allocated for us
     guard (nn_freemsg(buffer) >= 0) else {
         throw NanoMessageError.FreeMessage(code: nn_errno())
     }
